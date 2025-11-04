@@ -1,0 +1,74 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.log
+*.pot
+*.pyc
+
+# Byte-compiled / optimized / DLL files
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.manifest
+*.spec
+
+# Virtual Environment
+venv/
+.venv/
+ENV/
+env/
+.env/
+
+# Django
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+local_settings.py
+
+# dotenv
+.env
+
+# Docker
+*.pid
+*.db
+*.tar
+docker-compose.override.yml
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test/report/output
+coverage/
+htmlcov/
+*.cover
+.tox/
+.pytest_cache/
+.noseids
+*.log
+
+# Migrations (если хочешь игнорировать сгенерированные файлы)
+**/migrations/*.pyc
+**/migrations/__pycache__/
+# Если хочешь игнорировать и миграции самих моделей:
+# **/migrations/*.py
+
+# Jupyter / notebooks
+*.ipynb_checkpoints
+
+# Swagger/OpenAPI cache (если используешь drf-spectacular или drf-yasg)
+*.schema.json

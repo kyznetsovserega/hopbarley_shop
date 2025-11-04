@@ -1,0 +1,12 @@
+services:
+  db:
+    image: postgres:17
+    env_file:
+        - .env
+    ports:
+      - "5435:5432"
+    volumes:
+      - hopbarley_shop_postgres_db_data:/var/lib/postgresql/data
+
+volumes:
+   hopbarley_shop_postgres_db_data:
