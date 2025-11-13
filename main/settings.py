@@ -12,8 +12,15 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+import os
+from dotenv import load_dotenv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables
+
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 
 # Quick-start development settings - unsuitable for production
@@ -37,6 +44,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #---my apps---
+    'rest_framework',
+    'shop',
+    'orders',
+    'users',
+    'reviews',
 ]
 
 MIDDLEWARE = [
@@ -74,8 +87,12 @@ WSGI_APPLICATION = 'main.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv("DJANGO_DB_NAME", "hopbarley_shop_db"),
+        'USER': os.getenv("DJANGO_DB_USER", "user"),
+        'PASSWORD':os.getenv("DJANGO_DB_PASSWORD","password"),
+        'HOST': os.getenv("DJANGO_DB_HOST", "localhost"),
+        'PORT': os.getenv("DJANGO_DB_PORT", "5432"),
     }
 }
 
