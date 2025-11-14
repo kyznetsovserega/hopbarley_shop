@@ -6,6 +6,7 @@ from shop.models import Category, Product
 from reviews.models import Review
 
 
+
 # ------------------------------
 # USERS
 # ------------------------------
@@ -18,6 +19,12 @@ def user_fixture(db):
         email='test@example.com',
         password='testpass123',
     )
+
+@pytest.fixture
+def profile_fixture(db, user_fixture):
+    from users.models import UserProfile
+    return UserProfile.objects.create(user=user_fixture)
+
 
 
 # ------------------------------
