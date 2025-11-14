@@ -10,3 +10,4 @@ services:
 
 volumes:
    hopbarley_shop_postgres_db_data:
+
