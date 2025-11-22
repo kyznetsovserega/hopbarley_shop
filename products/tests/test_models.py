@@ -1,5 +1,5 @@
 import pytest
-from shop.models import Category, Product
+
 
 @pytest.mark.django_db
 def test_create_product(product_fixture, category_fixture):

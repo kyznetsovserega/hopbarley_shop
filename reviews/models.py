@@ -1,7 +1,7 @@
 from django.db import models
 
 from django.conf import settings
-from shop.models import Product
+from products.models import Product
 
 class Review(models.Model):
     product = models.ForeignKey(

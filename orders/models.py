@@ -2,7 +2,7 @@ from tkinter.constants import CASCADE
 
 from django.db import models
 from django.conf import settings
-from shop.models import Product
+from products.models import Product
 
 class Order(models.Model):
     STATUS_CHOICES = [
