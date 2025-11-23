@@ -2,8 +2,9 @@ import pytest
 from django.contrib.auth import get_user_model
 from django.template.defaulttags import comment
 
-from shop.models import Category, Product
+from products.models import Category, Product
 from reviews.models import Review
+from rest_framework.test import APIClient
 
 
 
@@ -63,6 +64,7 @@ def review_fixture(db, user_fixture, product_fixture):
         rating=5,
         comment='Отличный товар!',
     )
+
 # ------------------------------
 # ORDERS
 # ------------------------------
@@ -87,9 +89,19 @@ def order_item_fixture(db, order_fixture, product_fixture):
         price=product_fixture.price
     )
 
+# ------------------------------
+# API
+# ------------------------------
 
+@pytest.fixture
+def client():
+    return APIClient()
 
-
+@pytest.fixture
+def auth_client(client,user_fixture):
+    """клиент с авторизацией"""
+    client.force_authenticate(user=user_fixture)
+    return client
 
 
 
