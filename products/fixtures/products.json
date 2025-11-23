@@ -1,0 +1,217 @@
+[
+  {
+    "model": "products.category",
+    "pk": 1,
+    "fields": {
+      "name": "Default",
+      "slug": "default",
+      "parent": null,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+
+  {
+    "model": "products.product",
+    "pk": 1,
+    "fields": {
+      "name": "Citra Hops",
+      "slug": "citra-hops",
+      "description": "Ideal for IPAs and Pale Ales",
+      "price": "5.99",
+      "image": "products/citra_hops.jpg",
+      "is_active": true,
+      "stock": 0,
+      "category": 1,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+
+  {
+    "model": "products.product",
+    "pk": 2,
+    "fields": {
+      "name": "Maris Otter Pale Malt",
+      "slug": "maris-otter-pale-malt",
+      "description": "Perfect for traditional ales",
+      "price": "2.50",
+      "image": "products/maris_otter_malt.jpg",
+      "is_active": true,
+      "stock": 0,
+      "category": 1,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+
+  {
+    "model": "products.product",
+    "pk": 3,
+    "fields": {
+      "name": "SafAle US-05 Dry Ale Yeast",
+      "slug": "safale-us05-dry-ale-yeast",
+      "description": "Clean fermenting American ale yeast",
+      "price": "3.25",
+      "image": "products/safale_us05_yeast.jpg",
+      "is_active": true,
+      "stock": 0,
+      "category": 1,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+
+  {
+    "model": "products.product",
+    "pk": 4,
+    "fields": {
+      "name": "Cascade Hops",
+      "slug": "cascade-hops",
+      "description": "Great for dry hopping",
+      "price": "7.49",
+      "image": "products/cascade_hops.jpg",
+      "is_active": true,
+      "stock": 0,
+      "category": 1,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+
+  {
+    "model": "products.product",
+    "pk": 5,
+    "fields": {
+      "name": "Caramel Malt 60L",
+      "slug": "caramel-malt-60l",
+      "description": "Head retention in darker beers",
+      "price": "3.00",
+      "image": "products/caramel_malt.jpg",
+      "is_active": true,
+      "stock": 0,
+      "category": 1,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+
+  {
+    "model": "products.product",
+    "pk": 6,
+    "fields": {
+      "name": "Saaz Hops",
+      "slug": "saaz-hops",
+      "description": "Essential for Lagers",
+      "price": "4.75",
+      "image": "products/saaz_hops.jpg",
+      "is_active": true,
+      "stock": 0,
+      "category": 1,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+
+  {
+    "model": "products.product",
+    "pk": 7,
+    "fields": {
+      "name": "Pilsner Malt",
+      "slug": "pilsner-malt",
+      "description": "Foundation for lagers and pilsners",
+      "price": "2.20",
+      "image": "products/pilsner_malt.jpg",
+      "is_active": true,
+      "stock": 0,
+      "category": 1,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+
+  {
+    "model": "products.product",
+    "pk": 8,
+    "fields": {
+      "name": "Imperial Organic Yeast A07",
+      "slug": "imperial-organic-yeast-a07",
+      "description": "American ales with citrus notes",
+      "price": "8.99",
+      "image": "products/imperial_yeast.jpg",
+      "is_active": true,
+      "stock": 0,
+      "category": 1,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+
+  {
+    "model": "products.product",
+    "pk": 9,
+    "fields": {
+      "name": "Centennial Hops",
+      "slug": "centennial-hops",
+      "description": "Often called 'Super Cascade'",
+      "price": "6.20",
+      "image": "products/centennial_hops.jpg",
+      "is_active": true,
+      "stock": 0,
+      "category": 1,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+
+  {
+    "model": "products.product",
+    "pk": 10,
+    "fields": {
+      "name": "Mosaic Hops",
+      "slug": "mosaic-hops",
+      "description": "Ideal for modern hoppy beers",
+      "price": "9.50",
+      "image": "products/mosaic_hops.jpg",
+      "is_active": true,
+      "stock": 0,
+      "category": 1,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+
+  {
+    "model": "products.product",
+    "pk": 11,
+    "fields": {
+      "name": "West Coast IPA – All-Grain Kit",
+      "slug": "west-coast-ipa-kit",
+      "description": "Full West Coast IPA kit",
+      "price": "60.00",
+      "image": "products/ipa_kit.jpg",
+      "is_active": true,
+      "stock": 0,
+      "category": 1,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+
+  {
+    "model": "products.product",
+    "pk": 12,
+    "fields": {
+      "name": "Unmalted Wheat",
+      "slug": "unmalted-wheat",
+      "description": "For Belgian Witbier",
+      "price": "1.80",
+      "image": "products/unmalted_wheat.jpg",
+      "is_active": true,
+      "stock": 0,
+      "category": 1,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  }
+]
