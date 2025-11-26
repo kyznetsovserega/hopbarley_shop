@@ -29,7 +29,7 @@ def profile_fixture(db, user_fixture):
 
 
 # ------------------------------
-# SHOP
+# Products
 # ------------------------------
 @pytest.fixture
 def category_fixture(db):
