@@ -22,4 +22,3 @@ class ProductDetailView(DetailView):
     context_object_name = "product"
     slug_field = "slug"
     slug_url_kwarg = "slug"
-

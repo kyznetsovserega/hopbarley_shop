@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:17
-    container_name: hopbarley_shop-db-1
+    container_name: db
     restart: always
     env_file:
       - .env
@@ -27,6 +27,7 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
+      - ./static:/app/static
 
 volumes:
   hopbarley_data:

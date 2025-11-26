@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ product.name }} | Hop & Barley{% endblock %}
+
+{% block content %}
+
+<div class="product-detail">
+
+    <section class="product-header">
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-detail__image">
+        <div class="product-detail__info">
+            <h1 class="product-detail__name">{{ product.name }}</h1>
+            <p class="product-detail__category">{{ product.category.name }}</p>
+            <p class="product-detail__price">${{ product.price }}</p>
+            <p class="product-detail__description">{{ product.description }}</p>
+
+            <form method="post" action="#">
+                {% csrf_token %}
+                <button class="button button--primary">Add to cart</button>
+            </form>
+        </div>
+    </section>
+
+</div>
+
+{% endblock %}
