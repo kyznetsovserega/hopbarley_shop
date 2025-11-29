@@ -30,6 +30,9 @@ urlpatterns = [
     # Cart
     path("cart/", include("cart.urls", namespace="cart")),
 
+    # Orders
+    path("orders/", include("orders.urls")),
+
     # API (DRF)
     path('api/', include('api.urls')),
 ]

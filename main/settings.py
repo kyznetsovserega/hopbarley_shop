@@ -34,6 +34,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# EMAIL CONFIG — dev mode (консольный вывод)
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+DEFAULT_FROM_EMAIL = "no-reply@hopbarley.shop"
+ADMIN_EMAIL = "admin@hopbarley.shop"
+
 
 # Application definition
 
@@ -54,9 +60,6 @@ INSTALLED_APPS = [
     'users',
     'cart',
     'api',
-
-
-
 
     'django_extensions',
     'django_filters',
