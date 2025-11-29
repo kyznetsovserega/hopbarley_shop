@@ -11,10 +11,6 @@ class CategoryAdmin(admin.ModelAdmin):
 
     readonly_fields = ('created_at', 'updated_at')
 
-    class Meta:
-        verbose_name = "Category"
-        verbose_name_plural = "Categories"
-
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("parent")
 

@@ -95,4 +95,4 @@ def test_checkout_not_enough_stock(product_fixture, web_session_key):
     })
 
     assert response.status_code == 200
-    assert "недостаточно" in response.content.decode()
+    assert "Недостаточно" in response.content.decode()

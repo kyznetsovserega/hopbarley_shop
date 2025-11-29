@@ -2,9 +2,18 @@ from __future__ import annotations
 
 from django.db import models
 from django.conf import settings
+from django.core.validators import RegexValidator
 
 
 class UserProfile(models.Model):
+    """
+    Профиль пользователя.
+
+    Дополняет встроенную модель User контактной информацией,
+    адресом и датой рождения. Создаётся автоматически
+    в signals.py при создании пользователя.
+    """
+
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -16,6 +25,12 @@ class UserProfile(models.Model):
         max_length=20,
         blank=True,
         verbose_name="Телефон",
+        validators=[
+            RegexValidator(
+                regex=r"^[0-9+\-() ]*$",
+                message="Телефон может содержать только цифры и символы + - ( )",
+            )
+        ],
     )
 
     city = models.CharField(
@@ -51,5 +66,4 @@ class UserProfile(models.Model):
         verbose_name_plural = "Профили пользователей"
 
     def __str__(self) -> str:
-        username = getattr(self.user, "username", "Unknown")
-        return f"Profile of {username}"
+        return f"Profile of {self.user.email or self.user.username}"

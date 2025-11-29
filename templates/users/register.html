@@ -25,9 +25,24 @@
                 <!-- GLOBAL FORM ERRORS -->
                 {% if form.errors %}
                 <div class="auth-error">
-                    <p>Please fix the errors below.</p>
+                    <p>Please correct the errors below.</p>
                 </div>
                 {% endif %}
+
+                <!-- USERNAME -->
+                <div class="InputField">
+                    <label for="id_username">Username</label>
+                    <input type="text"
+                           id="id_username"
+                           name="username"
+                           value="{{ form.username.value|default:'' }}"
+                           class="Input"
+                           placeholder="Enter username"
+                           required>
+                    {% if form.username.errors %}
+                        <p class="field-error">{{ form.username.errors.0 }}</p>
+                    {% endif %}
+                </div>
 
                 <!-- EMAIL -->
                 <div class="InputField">
@@ -37,7 +52,7 @@
                            name="email"
                            value="{{ form.email.value|default:'' }}"
                            class="Input"
-                           placeholder="Value"
+                           placeholder="example@mail.com"
                            required>
                     {% if form.email.errors %}
                         <p class="field-error">{{ form.email.errors.0 }}</p>
@@ -51,7 +66,7 @@
                            id="id_password1"
                            name="password1"
                            class="Input"
-                           placeholder="Value"
+                           placeholder="Enter password"
                            required>
                 </div>
 
@@ -62,19 +77,11 @@
                            id="id_password2"
                            name="password2"
                            class="Input"
-                           placeholder="Value"
+                           placeholder="Repeat password"
                            required>
                     {% if form.password2.errors %}
                         <p class="field-error">{{ form.password2.errors.0 }}</p>
                     {% endif %}
-                </div>
-
-                <div class="CheckboxField">
-                    <label class="checkbox-container">
-                        Remember me
-                        <input type="checkbox" checked>
-                        <span class="checkmark"></span>
-                    </label>
                 </div>
 
                 <div class="ButtonGroup">

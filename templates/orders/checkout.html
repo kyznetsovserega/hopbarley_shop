@@ -10,15 +10,14 @@
         <form method="post" id="checkout-form">
             {% csrf_token %}
 
-            {% if messages %}
-                <div class="alert-messages">
-                    {% for message in messages %}
-                        <p class="alert">{{ message }}</p>
+                {% if messages %}
+                <div class="messages">
+                    {% for msg in messages %}
+                        <p class="{{ msg.tags }}">{{ msg }}</p>
                     {% endfor %}
                 </div>
-            {% endif %}
-
-            {% if error %}
+                {% endif %}
+                            {% if error %}
                 <div class="checkout-error">
                     {{ error }}
                 </div>

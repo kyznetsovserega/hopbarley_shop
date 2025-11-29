@@ -31,7 +31,6 @@
 
           <!-- Rows -->
           <div class="order-table-body">
-
             {% for order in orders %}
             <div class="order-table-row">
 
@@ -57,27 +56,9 @@
             {% empty %}
               <p>You have no orders yet.</p>
             {% endfor %}
-
           </div>
 
         </div>
-
-        <!-- Pagination -->
-        {% if is_paginated %}
-        <div class="account-pagination">
-          {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link-account">← Previous</a>
-          {% else %}
-            <span class="pagination-link-account disabled">← Previous</span>
-          {% endif %}
-
-          {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="pagination-link-account">Next →</a>
-          {% else %}
-            <span class="pagination-link-account disabled">Next →</span>
-          {% endif %}
-        </div>
-        {% endif %}
 
       </div>
 
@@ -89,9 +70,18 @@
         <div class="account-form-container">
           <h2 class="account-form-title">Personal Info</h2>
 
-          <form method="post" action="{% url 'users:profile' %}">
+          <form method="post" action="{% url 'users:account' %}">
             {% csrf_token %}
 
+            {% if messages %}
+              <div class="account-messages">
+                {% for msg in messages %}
+                  <p class="message {{ msg.tags }}">{{ msg }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <!-- FULL NAME -->
             <div class="checkout-form-group">
               <label for="acc-full-name">Full Name</label>
               <input type="text"
@@ -99,9 +89,10 @@
                      name="full_name"
                      class="Input"
                      value="{{ user.first_name }} {{ user.last_name }}"
-                     placeholder="Value">
+                     placeholder="John Doe">
             </div>
 
+            <!-- EMAIL -->
             <div class="checkout-form-group">
               <label for="acc-email">Email</label>
               <input type="email"
@@ -113,11 +104,57 @@
                      required>
             </div>
 
-            <button type="submit" class="button button--primary button--full-width">Save</button>
+            <!-- PHONE -->
+            <div class="checkout-form-group">
+              <label for="acc-phone">Phone</label>
+              <input type="text"
+                     id="acc-phone"
+                     name="phone"
+                     class="Input"
+                     value="{{ profile.phone }}"
+                     placeholder="+1234567890">
+            </div>
 
-            <a href="{% url 'users:logout' %}" class="button button--secondary button--full-width">
+            <!-- CITY -->
+            <div class="checkout-form-group">
+              <label for="acc-city">City</label>
+              <input type="text"
+                     id="acc-city"
+                     name="city"
+                     class="Input"
+                     value="{{ profile.city }}"
+                     placeholder="City">
+            </div>
+
+            <!-- ADDRESS -->
+            <div class="checkout-form-group">
+              <label for="acc-address">Address</label>
+              <textarea id="acc-address"
+                        name="address"
+                        class="Input"
+                        placeholder="Your address">{{ profile.address }}</textarea>
+            </div>
+
+            <!-- DATE OF BIRTH -->
+            <div class="checkout-form-group">
+              <label for="acc-dob">Date of Birth</label>
+              <input type="date"
+                     id="acc-dob"
+                     name="date_of_birth"
+                     class="Input"
+                     value="{{ profile.date_of_birth|date:'Y-m-d' }}">
+            </div>
+
+            <button type="submit"
+                    class="button button--primary button--full-width">
+              Save
+            </button>
+
+            <a href="{% url 'users:logout' %}"
+               class="button button--secondary button--full-width">
               Logout
             </a>
+
           </form>
 
         </div>
@@ -133,7 +170,7 @@
 <script src="{% static 'js/main.js' %}"></script>
 
 <script>
-// Simple tabs (your original JS logic kept)
+// Simple tabs logic
 document.querySelectorAll(".account-tab").forEach((tab) => {
   tab.addEventListener("click", () => {
 

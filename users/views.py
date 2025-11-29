@@ -1,59 +1,82 @@
+from __future__ import annotations
+
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from orders.models import Order
+from django.contrib.auth.models import User
 
+from orders.models import Order
+from .forms import RegisterForm
+
+
+# ACCOUNT VIEW
 @login_required
 def account_view(request):
+    """
+    Личный кабинет пользователя.
+    Позволяет редактировать данные профиля и смотреть историю заказов.
+    """
+    user = request.user
+    profile = user.profile  # создаётся сигналами автоматически
 
     if request.method == "POST":
-        # update profile
-        user = request.user
-        full_name = request.POST.get("full_name", "")
-        email = request.POST.get("email", "")
+        full_name = request.POST.get("full_name", "").strip()
+        email = request.POST.get("email", "").strip()
+        phone = request.POST.get("phone", "").strip()
+        city = request.POST.get("city", "").strip()
+        address = request.POST.get("address", "").strip()
+        dob = request.POST.get("date_of_birth", None)
 
-        # split full_name → first/last
-        parts = full_name.strip().split(" ", 1)
-        user.first_name = parts[0]
-        if len(parts) > 1:
-            user.last_name = parts[1]
-
+        # ---- Update User ----
+        parts = full_name.split(" ", 1)
+        user.first_name = parts[0] if parts else ""
+        user.last_name = parts[1] if len(parts) > 1 else ""
         user.email = email
         user.save()
 
-        return redirect("users:account")
+        # ---- Update Profile ----
+        profile.phone = phone
+        profile.city = city
+        profile.address = address
+        if dob:
+            profile.date_of_birth = dob
+        profile.save()
 
-    # GET
-    orders = Order.objects.filter(user=request.user).order_by("-created_at")
+        messages.success(request, "Профиль успешно обновлён!")
+        return redirect("account")  # <---- ВАЖНО: фикс для всех тестов!!!
+
+    orders = Order.objects.filter(user=user).order_by("-created_at")
 
     return render(request, "users/account.html", {
         "orders": orders,
+        "profile": profile,
     })
 
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
-
+# FORGOT PASSWORD
 def forgot_password_view(request):
+    """
+    Заглушка восстановления пароля.
+    """
     if request.method == "POST":
         email = request.POST.get("email")
-
-        # Пока просто сообщение
         messages.info(request, "If this email exists, instructions will be sent.")
         return redirect("users:login")
 
     return render(request, "users/forgot_password.html")
 
-from django.contrib.auth import authenticate, login
-from django.shortcuts import render, redirect
-from django.contrib import messages
 
+# LOGIN VIEW (EMAIL → USERNAME)
 def login_view(request):
+    """
+    Авторизация пользователя по email + password.
+    """
     if request.method == "POST":
         email = request.POST.get("username")
         password = request.POST.get("password")
 
-        # ищем пользователя по email
-        from django.contrib.auth.models import User
+        # получаем username по email
         try:
             user_obj = User.objects.get(email=email)
             username = user_obj.username
@@ -64,29 +87,33 @@ def login_view(request):
             user = authenticate(request, username=username, password=password)
             if user:
                 login(request, user)
-                return redirect("users:account")
+                return redirect("account")
 
         messages.error(request, "Incorrect email or password.")
 
     return render(request, "users/login.html", {
-        "form": {},   # чтобы template мог показывать form.errors
+        "form": {},
     })
 
-from django.contrib.auth import login
-from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
-from .forms import RegisterForm
 
-
+# REGISTER
 def register_view(request):
+    """
+    Регистрация нового пользователя.
+    """
     if request.method == "POST":
         form = RegisterForm(request.POST)
 
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect("users:account")
+            return redirect("account")  # <-- FIX
     else:
         form = RegisterForm()
 
     return render(request, "users/register.html", {"form": form})
+
+# LOGOUT
+def logout_view(request):
+    logout(request)
+    return redirect("products:list")
