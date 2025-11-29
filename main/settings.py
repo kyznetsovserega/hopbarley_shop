@@ -48,14 +48,18 @@ INSTALLED_APPS = [
 
     'rest_framework',
 
-    'products',
+    "products.apps.ProductsConfig",
     'orders',
     'reviews',
     'users',
     'cart',
     'api',
 
+
+
+
     'django_extensions',
+    'django_filters',
 ]
 
 MIDDLEWARE = [

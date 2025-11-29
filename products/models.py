@@ -1,10 +1,11 @@
 from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
+import re
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(unique=True, blank=True, db_index=True)
     description = models.TextField(blank=True, null=True)
 
     parent = models.ForeignKey(
@@ -49,7 +50,7 @@ class Product(models.Model):
     stock = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    tags = models.CharField(max_length=255,blank=True, help_text="Separated keywords")
     class Meta:
         ordering = ["-created_at"]
         verbose_name = "Product"
@@ -63,7 +64,23 @@ class Product(models.Model):
         """ Auto-generate slug if empty """
         if not self.slug:
             self.slug = slugify(self.name)
-        super().save(*args,**kwargs)
+
+        if self.short_description:
+            text = self.short_description.lower()
+            text = re.sub(r"[^a-zA-Zа-яА-Я0-9 ]+", " ", text)
+            words = text.split()
+
+            stop_words = {
+                "the", "and", "or", "for", "with", "from", "made",
+                "of", "to", "a", "in", "on", "at", "is", "this", "an"
+            }
+
+            tags_set = {w for w in words if len(w) > 2 and w not in stop_words}
+
+            if tags_set:
+                self.tags = ", ".join(sorted(tags_set))
+
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse("products:product_detail", kwargs={"slug": self.slug})

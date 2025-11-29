@@ -1980,3 +1980,13 @@ body.user-logged-in .header__user-actions {
     height: 44px;
     padding: 0 32px;
 }
+
+/* ---my---*/
+
+.hidden {
+    display: none;
+}
+
+.keywords-list {
+    margin-top: 10px;
+}
