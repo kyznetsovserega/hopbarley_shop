@@ -88,8 +88,8 @@
         <p id="cart-total-price">${{ total }}</p>
       </div>
 
-      <a href="#" class="button button--primary button--checkout">
-        Proceed to Checkout
+      <a href="{% url 'orders:checkout' %}" class="button button--primary">
+          Proceed to Checkout
       </a>
     </div>
   </div>

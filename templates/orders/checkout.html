@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<main class="checkout-page-wrapper">
+    <div class="checkout-container">
+        <h1 class="checkout-title">Order Details</h1>
+
+        <form method="post" id="checkout-form">
+            {% csrf_token %}
+
+            {% if messages %}
+                <div class="alert-messages">
+                    {% for message in messages %}
+                        <p class="alert">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if error %}
+                <div class="checkout-error">
+                    {{ error }}
+                </div>
+            {% endif %}
+
+            <section class="checkout-section">
+                <h2 class="checkout-section__title">Shipping information</h2>
+
+                <div class="checkout-form-group">
+                    {{ form.full_name.label_tag }}
+                    {{ form.full_name }}
+                    {{ form.full_name.errors }}
+                </div>
+
+                <div class="checkout-form-group">
+                    {{ form.email.label_tag }}
+                    {{ form.email }}
+                    {{ form.email.errors }}
+                </div>
+
+                <div class="checkout-form-group">
+                    {{ form.phone.label_tag }}
+                    {{ form.phone }}
+                    {{ form.phone.errors }}
+                </div>
+
+                <div class="checkout-form-group">
+                    {{ form.shipping_address.label_tag }}
+                    {{ form.shipping_address }}
+                    {{ form.shipping_address.errors }}
+                </div>
+
+                <div class="checkout-form-group">
+                    {{ form.comment.label_tag }}
+                    {{ form.comment }}
+                </div>
+            </section>
+
+            <section class="checkout-section">
+                <h2 class="checkout-section__title">Payment Method</h2>
+                <div class="payment-options">
+                    {{ form.payment_method }}
+                    {{ form.payment_method.errors }}
+                </div>
+            </section>
+
+            <section class="checkout-summary">
+                <h2 class="checkout-section__title">Order Summary</h2>
+
+                <div class="summary-total">
+                    <p>Total:</p>
+                    <p>{{ cart_total }}₽</p>
+                </div>
+
+                <button type="submit" class="button button--primary button--pay">
+                    Pay
+                </button>
+            </section>
+        </form>
+    </div>
+</main>
+
+{% endblock %}
