@@ -5,23 +5,113 @@
 
 {% block content %}
 
-<div class="product-detail">
+<main class="page-product">
+  <div class="container">
 
-    <section class="product-header">
-        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-detail__image">
-        <div class="product-detail__info">
-            <h1 class="product-detail__name">{{ product.name }}</h1>
-            <p class="product-detail__category">{{ product.category.name }}</p>
-            <p class="product-detail__price">${{ product.price }}</p>
-            <p class="product-detail__description">{{ product.description }}</p>
+    <!-- Product Info Section -->
+    <section class="product-details-section">
 
-            <form method="post" action="#">
-                {% csrf_token %}
-                <button class="button button--primary">Add to cart</button>
-            </form>
+      <!-- Product Image -->
+      <div class="product-image-container">
+        <img
+            src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/products/default.jpg' %}{% endif %}"
+            alt="{{ product.name }}"
+            class="product-image">
+      </div>
+
+      <!-- Product Data -->
+      <div class="product-info-column">
+
+        <div class="product-title-price">
+          <h1 class="product-name">{{ product.name }}</h1>
+
+          <div class="price-section">
+            <span class="price-tag">
+                {% if product.unit %} per {{ product.unit }} {% else %} price {% endif %}
+            </span>
+            <p class="product-price">${{ product.price }}</p>
+          </div>
         </div>
+
+        <!-- Description -->
+        <div class="product-description">
+            {{ product.description|linebreaks }}
+        </div>
+
+        <!-- Cart Buttons (static for now, logic later) -->
+        <div class="cart-controls">
+
+          <button class="button button--primary add-to-cart-button" id="add-to-cart-btn">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span>Add to Cart</span>
+          </button>
+
+          <div class="quantity-counter is-hidden" id="quantity-counter">
+            <button class="quantity-btn" data-action="decrease" aria-label="Decrease quantity">
+              <i class="fa-solid fa-minus"></i>
+            </button>
+
+            <span class="quantity-value">1 in cart</span>
+
+            <button class="quantity-btn" data-action="increase" aria-label="Increase quantity">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
     </section>
 
-</div>
+    <!-- Technical Specifications (static block for now) -->
+    <section class="accordion-section">
+      <div class="accordion-item">
+        <div class="accordion-title">
+          <h3>Technical Specifications</h3>
+          <i class="fa-solid fa-chevron-down accordion-icon"></i>
+        </div>
+
+        <div class="accordion-content">
+          <ul>
+            <li><strong>Origin:</strong> USA / Belgium</li>
+            <li><strong>Type:</strong> Specialty / Grain</li>
+            <li><strong>Color (°L):</strong> 60 °L</li>
+            <li><strong>Moisture:</strong> —</li>
+            <li><strong>Extract FG:</strong> —</li>
+            <li><strong>Flavor Profile:</strong> —</li>
+            <li><strong>Usage:</strong> —</li>
+            <li><strong>Recommended Styles:</strong> —</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Latest Reviews (static for now, later — Django reviews app) -->
+    <section class="reviews-section">
+      <h2 class="reviews-title">Latest reviews</h2>
+
+      <div class="reviews-grid">
+
+        <div class="review-card">
+          <div class="review-rating">
+            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <div class="review-body">
+            <h4 class="review-heading">The Perfect Sweet Spot</h4>
+            <p class="review-text">Static sample review text…</p>
+          </div>
+          <div class="review-author">
+            <img src="{% static 'img/avatars/avatar1.svg' %}" alt="User avatar" class="author-avatar">
+            <span class="author-name">AmberAleFanatic</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+</main>
 
 {% endblock %}

@@ -9,4 +9,3 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name','description']
     ordering_fields = ['price', 'created_at']
-    
