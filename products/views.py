@@ -1,6 +1,6 @@
 from django_filters.views import FilterView
 from django.views.generic import DetailView
-from django.db.models import Avg
+
 from .models import Product, Category
 from .filter import ProductFilter
 

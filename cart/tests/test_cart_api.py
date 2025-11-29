@@ -60,6 +60,3 @@ class TestCartAPI:
         response = auth_client.delete(url)
 
         assert response.status_code == 204
-
-
-

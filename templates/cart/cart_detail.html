@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Shopping Cart | Hop & Barley{% endblock %}
+
+{% block content %}
+
+<main class="cart-page-wrapper">
+  <div class="cart-container">
+    <h1 class="cart-title">Shopping Cart</h1>
+
+    <div class="cart-items-list">
+
+      {% if items %}
+        {% for item in items %}
+        <div class="cart-item">
+
+          <!-- Product Image -->
+          <img
+            src="{% if item.product.image %}{{ item.product.image.url }}{% else %}{% static 'img/products/default.jpg' %}{% endif %}"
+            alt="{{ item.product.name }}"
+            class="cart-item__image"
+          >
+
+          <div class="cart-item__body">
+
+            <!-- Product name + price -->
+            <div class="cart-item__details">
+              <h2 class="cart-item__name">{{ item.product.name }}</h2>
+
+              <div class="cart-item__price-info">
+                <p class="cart-item__price">
+                  ${{ item.get_total_price }}
+                </p>
+                <span class="cart-item__price-tag">
+                  {% if item.product.unit %}
+                    per {{ item.product.unit }}
+                  {% else %}
+                    per unit
+                  {% endif %}
+                </span>
+              </div>
+            </div>
+
+            <!-- Quantity controls -->
+            <div class="cart-item__actions">
+
+              <div class="cart-item__quantity-selector">
+
+                <!-- decrease -->
+                <a href="{% url 'cart:decrease' item.id %}"
+                   class="quantity-btn-cart">
+                  <i class="fa-solid fa-minus"></i>
+                </a>
+
+                <span class="quantity-value-cart">{{ item.quantity }}</span>
+
+                <!-- increase -->
+                <a href="{% url 'cart:increase' item.id %}"
+                   class="quantity-btn-cart">
+                  <i class="fa-solid fa-plus"></i>
+                </a>
+
+              </div>
+
+              <!-- remove -->
+              <a href="{% url 'cart:remove' item.id %}"
+                 class="button--remove">
+                Remove <i class="fa-solid fa-xmark"></i>
+              </a>
+
+            </div>
+
+          </div>
+        </div>
+        {% endfor %}
+
+      {% else %}
+        <p>Your cart is empty.</p>
+      {% endif %}
+
+    </div>
+
+    <!-- Summary -->
+    <div class="cart-summary">
+      <div class="cart-summary__total">
+        <p>Total</p>
+        <p id="cart-total-price">${{ total }}</p>
+      </div>
+
+      <a href="#" class="button button--primary button--checkout">
+        Proceed to Checkout
+      </a>
+    </div>
+  </div>
+</main>
+
+{% endblock %}

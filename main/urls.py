@@ -27,6 +27,9 @@ urlpatterns = [
     # Веб-интерфейс Django
     path("", include("products.urls", namespace="products")),
 
+    # Cart
+    path("cart/", include("cart.urls", namespace="cart")),
+
     # API (DRF)
     path('api/', include('api.urls')),
 ]
