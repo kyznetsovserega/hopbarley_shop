@@ -27,7 +27,7 @@
 
           <div class="price-section">
             <span class="price-tag">
-                {% if product.unit %} per {{ product.unit }} {% else %} price {% endif %}
+              {% if product.unit %} per {{ product.unit }} {% else %} price {% endif %}
             </span>
             <p class="product-price">${{ product.price }}</p>
           </div>
@@ -35,35 +35,48 @@
 
         <!-- Description -->
         <div class="product-description">
-            {{ product.description|linebreaks }}
+          {{ product.description|linebreaks }}
         </div>
 
-        <!-- Cart Buttons (static for now, logic later) -->
-        <div class="cart-controls">
+        <!-- Cart Form -->
+        <form method="POST" action="{% url 'cart:add' product.id %}" class="cart-add-form">
+          {% csrf_token %}
 
-          <button class="button button--primary add-to-cart-button" id="add-to-cart-btn">
-            <i class="fa-solid fa-cart-shopping"></i>
-            <span>Add to Cart</span>
-          </button>
+          <div class="cart-controls">
 
-          <div class="quantity-counter is-hidden" id="quantity-counter">
-            <button class="quantity-btn" data-action="decrease" aria-label="Decrease quantity">
-              <i class="fa-solid fa-minus"></i>
+            <!-- Quantity selector -->
+            <div class="quantity-counter">
+              <button type="button" class="quantity-btn" data-action="decrease">
+                <i class="fa-solid fa-minus"></i>
+              </button>
+
+              <input
+                type="number"
+                name="quantity"
+                value="1"
+                min="1"
+                max="10"
+                class="quantity-value"
+              >
+
+              <button type="button" class="quantity-btn" data-action="increase">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="button button--primary add-to-cart-button">
+              <i class="fa-solid fa-cart-shopping"></i>
+              Add to Cart
             </button>
 
-            <span class="quantity-value">1 in cart</span>
-
-            <button class="quantity-btn" data-action="increase" aria-label="Increase quantity">
-              <i class="fa-solid fa-plus"></i>
-            </button>
           </div>
-
-        </div>
+        </form>
 
       </div>
     </section>
 
-    <!-- Technical Specifications (static block for now) -->
+    <!-- Technical Specifications -->
     <section class="accordion-section">
       <div class="accordion-item">
         <div class="accordion-title">
@@ -86,7 +99,7 @@
       </div>
     </section>
 
-    <!-- Latest Reviews (static for now, later — Django reviews app) -->
+    <!-- Latest Reviews -->
     <section class="reviews-section">
       <h2 class="reviews-title">Latest reviews</h2>
 
@@ -114,4 +127,8 @@
   </div>
 </main>
 
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/cart_quantity.js' %}"></script>
 {% endblock %}
