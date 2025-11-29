@@ -33,6 +33,9 @@ urlpatterns = [
     # Orders
     path("orders/", include("orders.urls")),
 
+    # Users
+    path("account/", include("users.urls")),
+
     # API (DRF)
     path('api/', include('api.urls')),
 ]
