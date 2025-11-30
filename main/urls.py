@@ -20,22 +20,31 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from users.views import account_view
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # Веб-интерфейс Django
-    path("", include("products.urls", namespace="products")),
+    # PRODUCTS (главная точка входа)
+    path('', include(('products.urls', 'products'), namespace='products')),
 
-    # Cart
-    path("cart/", include("cart.urls", namespace="cart")),
+    # CART
+    path('cart/', include(('cart.urls', 'cart'), namespace='cart')),
 
-    # Orders
-    path("orders/", include("orders.urls")),
+    # ORDERS
+    path('orders/', include(('orders.urls', 'orders'), namespace='orders')),
+
+    # USERS (авторизация, регистрация, восстановление)
+    path('users/', include(('users.urls', 'users'), namespace='users')),
+
+    # ACCOUNT (личный кабинет)
+    path('account/', account_view, name='account'),
 
     # API (DRF)
     path('api/', include('api.urls')),
 ]
 
+# MEDIA (DEBUG mode)
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
