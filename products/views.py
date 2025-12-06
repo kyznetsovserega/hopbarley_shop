@@ -1,6 +1,9 @@
 from django_filters.views import FilterView
 from django.views.generic import DetailView
 
+from django.db.models import Avg, Count
+
+from reviews.forms import ReviewForm
 from .models import Product, Category
 from .filter import ProductFilter
 
@@ -78,7 +81,25 @@ class ProductDetailView(DetailView):
     slug_field = "slug"
     slug_url_kwarg = "slug"
 
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        product = self.object
+
+        # Все отзывы по продукту
+        reviews_qs = product.reviews.select_related("user").order_by("-created_at")
+        context["reviews"] = reviews_qs
+
+        # Агрегация: средний рейтинг и кол-во отзывов
+        agg = reviews_qs.aggregate(
+            avg_rating=Avg("rating"),
+            count=Count("id"),
+        )
+
+        context["average_rating"] = agg["avg_rating"] or 0
+        context["reviews_count"] = agg["count"] or 0
+
+        # Пустая форма для создания отзыва
+        context["review_form"] = ReviewForm()
 
         return context

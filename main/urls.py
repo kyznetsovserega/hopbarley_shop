@@ -41,6 +41,9 @@ urlpatterns = [
     # ACCOUNT (личный кабинет)
     path('account/', account_view, name='account'),
 
+    # REVIEWS (отзывы)
+    path('reviews/', include(('reviews.urls', 'reviews'), namespace='reviews')),
+
     # API (DRF)
     path('api/', include('api.urls')),
 ]

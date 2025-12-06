@@ -4,7 +4,6 @@
 {% block title %}{{ product.name }} | Hop & Barley{% endblock %}
 
 {% block content %}
-
 <main class="page-product">
   <div class="container">
 
@@ -14,16 +13,40 @@
       <!-- Product Image -->
       <div class="product-image-container">
         <img
-            src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/products/default.jpg' %}{% endif %}"
-            alt="{{ product.name }}"
-            class="product-image">
+          src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/products/default.jpg' %}{% endif %}"
+          alt="{{ product.name }}"
+          class="product-image"
+        >
       </div>
 
       <!-- Product Data -->
       <div class="product-info-column">
-
         <div class="product-title-price">
+
           <h1 class="product-name">{{ product.name }}</h1>
+
+          <!-- Средний рейтинг товара -->
+          {% if reviews_count > 0 %}
+          <div class="product-rating">
+            <span class="rating-stars">
+              {% for i in "12345" %}
+                {% if forloop.counter <= average_rating|floatformat:0 %}
+                  <i class="fa-solid fa-star"></i>
+                {% else %}
+                  <i class="fa-regular fa-star"></i>
+                {% endif %}
+              {% endfor %}
+            </span>
+            <span class="rating-text">
+              {{ average_rating|floatformat:1 }}/5
+              ({{ reviews_count }} review{{ reviews_count|pluralize:"s" }})
+            </span>
+          </div>
+          {% else %}
+          <div class="product-rating">
+            <span class="rating-text">No reviews yet</span>
+          </div>
+          {% endif %}
 
           <div class="price-section">
             <span class="price-tag">
@@ -31,6 +54,7 @@
             </span>
             <p class="product-price">${{ product.price }}</p>
           </div>
+
         </div>
 
         <!-- Description -->
@@ -43,9 +67,9 @@
           {% csrf_token %}
 
           <div class="cart-controls">
-
             <!-- Quantity selector -->
             <div class="quantity-counter">
+
               <button type="button" class="quantity-btn" data-action="decrease">
                 <i class="fa-solid fa-minus"></i>
               </button>
@@ -62,6 +86,7 @@
               <button type="button" class="quantity-btn" data-action="increase">
                 <i class="fa-solid fa-plus"></i>
               </button>
+
             </div>
 
             <!-- Submit -->
@@ -99,34 +124,74 @@
       </div>
     </section>
 
-    <!-- Latest Reviews -->
+    <!-- Reviews Section -->
     <section class="reviews-section">
-      <h2 class="reviews-title">Latest reviews</h2>
+      <h2 class="reviews-title">Latest Reviews</h2>
 
+      <!-- REVIEW LIST -->
+      {% if reviews %}
       <div class="reviews-grid">
 
+        {% for r in reviews %}
         <div class="review-card">
+
           <div class="review-rating">
-            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-            <i class="fa-solid fa-star"></i>
+            {% for i in "12345" %}
+              {% if forloop.counter <= r.rating %}
+                <i class="fa-solid fa-star"></i>
+              {% else %}
+                <i class="fa-regular fa-star"></i>
+              {% endif %}
+            {% endfor %}
           </div>
+
           <div class="review-body">
-            <h4 class="review-heading">The Perfect Sweet Spot</h4>
-            <p class="review-text">Static sample review text…</p>
+            <p class="review-text">{{ r.comment }}</p>
           </div>
+
           <div class="review-author">
             <img src="{% static 'img/avatars/avatar1.svg' %}" alt="User avatar" class="author-avatar">
-            <span class="author-name">AmberAleFanatic</span>
+            <span class="author-name">{{ r.user.username }}</span>
           </div>
+
         </div>
+        {% endfor %}
 
       </div>
+
+      {% else %}
+        <p>No reviews yet. Be the first to write one!</p>
+      {% endif %}
+
+      <!-- ADD REVIEW FORM -->
+      {% if user.is_authenticated %}
+      <div class="add-review-form">
+        <h3 class="reviews-title" style="margin-top: 40px;">Leave a Review</h3>
+
+        <form action="{% url 'reviews:add' product.slug %}" method="post" class="review-form">
+          {% csrf_token %}
+
+          {{ review_form.rating.label_tag }}
+          {{ review_form.rating }}
+
+          {{ review_form.comment.label_tag }}
+          {{ review_form.comment }}
+
+          <button type="submit" class="button button--primary" style="margin-top: 12px;">
+            Submit Review
+          </button>
+        </form>
+      </div>
+      {% else %}
+        <p style="margin-top: 20px;">
+          <a href="{% url 'users:login' %}">Log in</a> to add a review.
+        </p>
+      {% endif %}
+
     </section>
 
   </div>
 </main>
-
 {% endblock %}
 
 {% block scripts %}
