@@ -7,10 +7,10 @@
 <main class="page-product">
   <div class="container">
 
-    <!-- Product Info Section -->
+    <!-- ОСНОВНОЙ БЛОК ТОВАРА -->
     <section class="product-details-section">
 
-      <!-- Product Image -->
+      <!-- Изображение -->
       <div class="product-image-container">
         <img
           src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/products/default.jpg' %}{% endif %}"
@@ -19,7 +19,7 @@
         >
       </div>
 
-      <!-- Product Data -->
+      <!-- Информация о товаре -->
       <div class="product-info-column">
         <div class="product-title-price">
 
@@ -50,26 +50,24 @@
 
           <div class="price-section">
             <span class="price-tag">
-              {% if product.unit %} per {{ product.unit }} {% else %} price {% endif %}
+              {% if product.unit %}per {{ product.unit }}{% else %}price{% endif %}
             </span>
             <p class="product-price">${{ product.price }}</p>
           </div>
 
         </div>
 
-        <!-- Description -->
+        <!-- Описание товара -->
         <div class="product-description">
-          {{ product.description|linebreaks }}
+          {{ product.description|safe }}
         </div>
 
-        <!-- Cart Form -->
+        <!-- Форма добавления в корзину -->
         <form method="POST" action="{% url 'cart:add' product.id %}" class="cart-add-form">
           {% csrf_token %}
-
           <div class="cart-controls">
-            <!-- Quantity selector -->
-            <div class="quantity-counter">
 
+            <div class="quantity-counter">
               <button type="button" class="quantity-btn" data-action="decrease">
                 <i class="fa-solid fa-minus"></i>
               </button>
@@ -79,17 +77,15 @@
                 name="quantity"
                 value="1"
                 min="1"
-                max="10"
+                max="{{ product.stock }}"
                 class="quantity-value"
               >
 
               <button type="button" class="quantity-btn" data-action="increase">
                 <i class="fa-solid fa-plus"></i>
               </button>
-
             </div>
 
-            <!-- Submit -->
             <button type="submit" class="button button--primary add-to-cart-button">
               <i class="fa-solid fa-cart-shopping"></i>
               Add to Cart
@@ -101,43 +97,37 @@
       </div>
     </section>
 
-    <!-- Technical Specifications -->
+    <!-- ХАРАКТЕРИСТИКИ -->
     <section class="accordion-section">
       <div class="accordion-item">
         <div class="accordion-title">
           <h3>Technical Specifications</h3>
           <i class="fa-solid fa-chevron-down accordion-icon"></i>
         </div>
-
         <div class="accordion-content">
           <ul>
-            <li><strong>Origin:</strong> USA / Belgium</li>
-            <li><strong>Type:</strong> Specialty / Grain</li>
-            <li><strong>Color (°L):</strong> 60 °L</li>
-            <li><strong>Moisture:</strong> —</li>
-            <li><strong>Extract FG:</strong> —</li>
-            <li><strong>Flavor Profile:</strong> —</li>
-            <li><strong>Usage:</strong> —</li>
-            <li><strong>Recommended Styles:</strong> —</li>
+            {% for spec in specifications %}
+              <li><strong>{{ spec.name }}:</strong> {{ spec.value }}</li>
+            {% empty %}
+              <li>No technical specifications available.</li>
+            {% endfor %}
           </ul>
         </div>
       </div>
     </section>
 
-    <!-- Reviews Section -->
+    <!-- ОТЗЫВЫ -->
     <section class="reviews-section">
       <h2 class="reviews-title">Latest Reviews</h2>
 
-      <!-- REVIEW LIST -->
       {% if reviews %}
       <div class="reviews-grid">
-
-        {% for r in reviews %}
+        {% for review in reviews %}
         <div class="review-card">
 
           <div class="review-rating">
             {% for i in "12345" %}
-              {% if forloop.counter <= r.rating %}
+              {% if forloop.counter <= review.rating %}
                 <i class="fa-solid fa-star"></i>
               {% else %}
                 <i class="fa-regular fa-star"></i>
@@ -146,25 +136,23 @@
           </div>
 
           <div class="review-body">
-            <p class="review-text">{{ r.comment }}</p>
+            <p class="review-text">{{ review.comment }}</p>
           </div>
 
           <div class="review-author">
             <img src="{% static 'img/avatars/avatar1.svg' %}" alt="User avatar" class="author-avatar">
-            <span class="author-name">{{ r.user.username }}</span>
+            <span class="author-name">{{ review.user.username }}</span>
           </div>
 
         </div>
         {% endfor %}
-
       </div>
-
       {% else %}
         <p>No reviews yet. Be the first to write one!</p>
       {% endif %}
 
-      <!-- ADD REVIEW FORM -->
-      {% if user.is_authenticated %}
+      <!-- Блок добавления отзыва -->
+      {% if can_review %}
       <div class="add-review-form">
         <h3 class="reviews-title" style="margin-top: 40px;">Leave a Review</h3>
 
@@ -182,8 +170,12 @@
           </button>
         </form>
       </div>
+      {% elif user.is_authenticated %}
+        <p class="review-info">
+          Only customers who purchased this product can leave a review.
+        </p>
       {% else %}
-        <p style="margin-top: 20px;">
+        <p class="review-info">
           <a href="{% url 'users:login' %}">Log in</a> to add a review.
         </p>
       {% endif %}
@@ -196,4 +188,5 @@
 
 {% block scripts %}
 <script src="{% static 'js/cart_quantity.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
 {% endblock %}
