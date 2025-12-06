@@ -1,8 +1,3 @@
-"""
-Тесты моделей Category и Product.
-Покрывают: slug, URL, связи, скидки, генерацию тегов.
-"""
-
 import pytest
 from products.models import Category, Product
 

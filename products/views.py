@@ -1,10 +1,11 @@
-from django.db.models import Q, Avg
+from django.db.models import Q, Avg, Count
 from django_filters.views import FilterView
 from django.views.generic import DetailView
 
 from .models import Product, Category
 from .filter import ProductFilter
 from orders.models import OrderItem
+from reviews.forms import ReviewForm
 
 
 class ProductListView(FilterView):
@@ -32,7 +33,7 @@ class ProductListView(FilterView):
                 Q(description__icontains=q)
             )
 
-        # Django Filter
+        # Фильтры django-filter
         queryset = self.filterset_class(
             self.request.GET,
             queryset=queryset
@@ -49,14 +50,14 @@ class ProductListView(FilterView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Категории
+        # Список корневых категорий
         context["categories"] = (
             Category.objects
             .filter(parent__isnull=True)
             .exclude(slug="default")
         )
 
-        # Keywords (SEO)
+        # Keywords (SEO) из поля tags
         keywords_set = set()
         tags_qs = (
             Product.objects
@@ -73,7 +74,7 @@ class ProductListView(FilterView):
 
         context["keywords_list"] = sorted(keywords_set)
 
-        # Сохранение GET параметров для пагинации
+        # Параметры запроса без page — для пагинации
         params = self.request.GET.copy()
         params.pop("page", None)
         context["current_params"] = params.urlencode()
@@ -91,37 +92,40 @@ class ProductDetailView(DetailView):
     slug_field = "slug"
     slug_url_kwarg = "slug"
 
-    def user_can_review(self, product, user):
-        """Проверка: купил ли пользователь продукт."""
+    def user_can_review(self, product, user) -> bool:
+        """Проверка: купил ли пользователь этот продукт со статусом delivered."""
         if not user.is_authenticated:
             return False
 
         return OrderItem.objects.filter(
             order__user=user,
             order__status="delivered",
-            product=product
+            product=product,
         ).exists()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         product = self.object
 
-        # Характеристики
+        # Характеристики товара
         context["specifications"] = product.specifications.all()
 
-        # Отзывы (исправление review_set → related_name="reviews")
-        context["reviews"] = (
-            product.reviews
-            .select_related("user")
-            .order_by("-created_at")
-        )
+        # Все отзывы по продукту
+        reviews_qs = product.reviews.select_related("user").order_by("-created_at")
+        context["reviews"] = reviews_qs
 
-        # Средний рейтинг
-        context["avg_rating"] = (
-            product.reviews.aggregate(avg=Avg("rating"))["avg"] or 0
+        # Агрегация: средний рейтинг и количество отзывов
+        agg = reviews_qs.aggregate(
+            avg_rating=Avg("rating"),
+            count=Count("id"),
         )
+        context["average_rating"] = agg["avg_rating"] or 0
+        context["reviews_count"] = agg["count"] or 0
 
-        # Возможность оставить отзыв
+        # Может ли пользователь оставить отзыв
         context["can_review"] = self.user_can_review(product, self.request.user)
+
+        # Пустая форма для создания отзыва
+        context["review_form"] = ReviewForm()
 
         return context
