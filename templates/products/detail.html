@@ -8,18 +8,19 @@
 <main class="page-product">
   <div class="container">
 
-    <!-- Product Info Section -->
+    <!-- ОСНОВНОЙ БЛОК ТОВАРА -->
     <section class="product-details-section">
 
-      <!-- Product Image -->
+      <!-- Изображение -->
       <div class="product-image-container">
         <img
-            src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/products/default.jpg' %}{% endif %}"
-            alt="{{ product.name }}"
-            class="product-image">
+          src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/products/default.jpg' %}{% endif %}"
+          alt="{{ product.name }}"
+          class="product-image"
+        >
       </div>
 
-      <!-- Product Data -->
+      <!-- Информация о товаре -->
       <div class="product-info-column">
 
         <div class="product-title-price">
@@ -27,44 +28,37 @@
 
           <div class="price-section">
             <span class="price-tag">
-              {% if product.unit %} per {{ product.unit }} {% else %} price {% endif %}
+              {% if product.unit %}per {{ product.unit }}{% else %}price{% endif %}
             </span>
             <p class="product-price">${{ product.price }}</p>
           </div>
         </div>
 
-        <!-- Description -->
+        {% if avg_rating %}
+        <div class="product-rating">
+          <span class="rating-value">{{ avg_rating|floatformat:1 }}/5</span>
+          <span class="rating-stars">
+            {% for i in "12345" %}
+              {% if forloop.counter <= avg_rating %}⭐{% else %}☆{% endif %}
+            {% endfor %}
+          </span>
+        </div>
+        {% endif %}
+
         <div class="product-description">
-          {{ product.description|linebreaks }}
+          {{ product.description|safe }}
         </div>
 
-        <!-- Cart Form -->
         <form method="POST" action="{% url 'cart:add' product.id %}" class="cart-add-form">
           {% csrf_token %}
-
           <div class="cart-controls">
 
-            <!-- Quantity selector -->
             <div class="quantity-counter">
-              <button type="button" class="quantity-btn" data-action="decrease">
-                <i class="fa-solid fa-minus"></i>
-              </button>
-
-              <input
-                type="number"
-                name="quantity"
-                value="1"
-                min="1"
-                max="10"
-                class="quantity-value"
-              >
-
-              <button type="button" class="quantity-btn" data-action="increase">
-                <i class="fa-solid fa-plus"></i>
-              </button>
+              <button type="button" class="quantity-btn" data-action="decrease"><i class="fa-solid fa-minus"></i></button>
+              <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="quantity-value">
+              <button type="button" class="quantity-btn" data-action="increase"><i class="fa-solid fa-plus"></i></button>
             </div>
 
-            <!-- Submit -->
             <button type="submit" class="button button--primary add-to-cart-button">
               <i class="fa-solid fa-cart-shopping"></i>
               Add to Cart
@@ -76,52 +70,68 @@
       </div>
     </section>
 
-    <!-- Technical Specifications -->
+    <!-- ХАРАКТЕРИСТИКИ -->
     <section class="accordion-section">
       <div class="accordion-item">
         <div class="accordion-title">
           <h3>Technical Specifications</h3>
           <i class="fa-solid fa-chevron-down accordion-icon"></i>
         </div>
-
         <div class="accordion-content">
           <ul>
-            <li><strong>Origin:</strong> USA / Belgium</li>
-            <li><strong>Type:</strong> Specialty / Grain</li>
-            <li><strong>Color (°L):</strong> 60 °L</li>
-            <li><strong>Moisture:</strong> —</li>
-            <li><strong>Extract FG:</strong> —</li>
-            <li><strong>Flavor Profile:</strong> —</li>
-            <li><strong>Usage:</strong> —</li>
-            <li><strong>Recommended Styles:</strong> —</li>
+            {% for spec in specifications %}
+              <li><strong>{{ spec.name }}:</strong> {{ spec.value }}</li>
+            {% empty %}
+              <li>No technical specifications available.</li>
+            {% endfor %}
           </ul>
         </div>
       </div>
     </section>
 
-    <!-- Latest Reviews -->
+    <!-- ОТЗЫВЫ -->
     <section class="reviews-section">
-      <h2 class="reviews-title">Latest reviews</h2>
+      <h2 class="reviews-title">Latest Reviews</h2>
 
       <div class="reviews-grid">
-
+        {% for review in reviews %}
         <div class="review-card">
-          <div class="review-rating">
-            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-            <i class="fa-solid fa-star"></i>
-          </div>
-          <div class="review-body">
-            <h4 class="review-heading">The Perfect Sweet Spot</h4>
-            <p class="review-text">Static sample review text…</p>
-          </div>
-          <div class="review-author">
-            <img src="{% static 'img/avatars/avatar1.svg' %}" alt="User avatar" class="author-avatar">
-            <span class="author-name">AmberAleFanatic</span>
-          </div>
-        </div>
 
+          <div class="review-rating">
+            {% for i in "12345" %}
+              {% if forloop.counter <= review.rating %}
+                <i class="fa-solid fa-star"></i>
+              {% else %}
+                <i class="fa-regular fa-star"></i>
+              {% endif %}
+            {% endfor %}
+          </div>
+
+          <div class="review-body">
+            <p class="review-text">{{ review.comment }}</p>
+          </div>
+
+          <div class="review-author">
+            <img src="{% static 'img/avatars/avatar1.svg' %}" class="author-avatar">
+            <span class="author-name">{{ review.user.username }}</span>
+          </div>
+
+        </div>
+        {% empty %}
+        <p>No reviews yet.</p>
+        {% endfor %}
       </div>
+
+      {% if can_review %}
+        <div class="review-form-container">
+          <a href="{% url 'reviews:add' product.id %}" class="button button--primary">
+            Leave a Review
+          </a>
+        </div>
+      {% else %}
+        <p class="review-info">Only customers who purchased this product can leave a review.</p>
+      {% endif %}
+
     </section>
 
   </div>
@@ -131,4 +141,5 @@
 
 {% block scripts %}
 <script src="{% static 'js/cart_quantity.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
 {% endblock %}
