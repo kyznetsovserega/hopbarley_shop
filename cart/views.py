@@ -1,70 +1,140 @@
-from django.shortcuts import redirect, render, get_object_or_404
+"""
+Web-представления корзины.
+
+Используют CartService — единый слой бизнес-логики, который управляет
+корзиной как для гостей (session_key), так и для авторизованных пользователей.
+
+Данный модуль отвечает ТОЛЬКО за:
+- обработку HTTP-запросов
+- валидацию форм (AddToCartForm)
+- вывод шаблонов
+
+Вся бизнес-логика находится в cart/services.py.
+"""
+
+from __future__ import annotations
+
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
+from django.contrib import messages
+
 from products.models import Product
-from .models import CartItem
 from .forms import AddToCartForm
+from .services import CartService
 
 
-def _get_session_key(request):
-    if not request.session.session_key:
-        request.session.create()
-    return request.session.session_key
-
-
+# ======================================================================
+# ADD TO CART
+# ======================================================================
 @require_POST
-def add_to_cart(request, product_id):
+def add_to_cart(request, product_id: int):
+    """
+    Добавление товара в корзину через веб-форму.
+
+    Логика:
+    - получаем товар
+    - инициализируем форму, передаём product + request
+    - при валидной форме > CartService.add()
+    - при ошибке stock > показываем сообщение пользователю
+    """
     product = get_object_or_404(Product, id=product_id)
-    form = AddToCartForm(request.POST)
+
+    form = AddToCartForm(
+        data=request.POST,
+        product=product,
+        request=request,
+    )
 
     if form.is_valid():
         quantity = form.cleaned_data["quantity"]
-        session_key = _get_session_key(request)
 
-        item, created = CartItem.objects.get_or_create(
-            session_key=session_key,
-            product=product,
-            defaults={"quantity": quantity},
-        )
+        try:
+            CartService(request).add(product, quantity)
+            messages.success(request, "Товар добавлен в корзину.")
+        except Exception as e:
+            messages.error(request, str(e))
 
-        if not created:
-            item.quantity += quantity
-            item.save()
-
-    return redirect("cart:detail")
-
-
-def remove_from_cart(request, item_id):
-    session_key = _get_session_key(request)
-    CartItem.objects.filter(id=item_id, session_key=session_key).delete()
-    return redirect("cart:detail")
-
-def increase_quantity(request, item_id):
-    session_key = _get_session_key(request)
-    item = get_object_or_404(CartItem, id=item_id, session_key=session_key)
-    item.quantity += 1
-    item.save()
-    return redirect("cart:detail")
-
-def decrease_quantity(request, item_id):
-    session_key = _get_session_key(request)
-    item = get_object_or_404(CartItem, id=item_id, session_key=session_key)
-    if item.quantity > 1:
-        item.quantity -= 1
-        item.save()
     else:
-        item.delete()
+        messages.error(request, "Некорректное количество.")
+
     return redirect("cart:detail")
 
+
+# ======================================================================
+# REMOVE ITEM
+# ======================================================================
+def remove_from_cart(request, item_id: int):
+    """
+    Удаление элемента корзины.
+    """
+    service = CartService(request)
+    try:
+        service.remove(item_id)
+        messages.success(request, "Товар удалён.")
+    except Exception:
+        messages.error(request, "Не удалось удалить товар.")
+
+    return redirect("cart:detail")
+
+
+# ======================================================================
+# INCREASE QUANTITY
+# ======================================================================
+def increase_quantity(request, item_id: int):
+    """
+    Увеличивает количество товара на 1.
+    Проверки stock выполняет CartService.
+    """
+    service = CartService(request)
+
+    try:
+        service.increase(item_id)
+    except Exception as e:
+        messages.error(request, str(e))
+
+    return redirect("cart:detail")
+
+
+# ======================================================================
+# DECREASE QUANTITY
+# ======================================================================
+def decrease_quantity(request, item_id: int):
+    """
+    Уменьшает количество товара.
+    Если товар становится 1 > уменьшается до 0 → удаляется.
+    """
+    service = CartService(request)
+
+    try:
+        service.decrease(item_id)
+    except Exception as e:
+        messages.error(request, str(e))
+
+    return redirect("cart:detail")
+
+
+# ======================================================================
+# CLEAR CART
+# ======================================================================
 def clear_cart(request):
-    session_key = _get_session_key(request)
-    CartItem.objects.filter(session_key=session_key).delete()
+    """
+    Полностью очищает корзину текущего владельца (user или session_key).
+    """
+    CartService(request).clear()
+    messages.info(request, "Корзина очищена.")
     return redirect("cart:detail")
 
-def cart_detail(request):
-    session_key = _get_session_key(request)
-    items = CartItem.objects.filter(session_key=session_key)
 
-    total = sum(item.get_total_price() for item in items)
+# ======================================================================
+# CART DETAIL PAGE
+# ======================================================================
+def cart_detail(request):
+    """
+    Страница корзины: список товаров + итоговая сумма.
+    """
+    service = CartService(request)
+    items = service.get_items()
+    total = service.get_total()
 
     return render(request, "cart/cart_detail.html", {
         "items": items,

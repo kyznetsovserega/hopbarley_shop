@@ -46,8 +46,14 @@ def checkout_view(request):
     # ------------------------------------------------------------------
     # 2. Корзина
     # ------------------------------------------------------------------
-    cart_items = CartItem.objects.filter(session_key=session_key)
-    cart_total = sum(item.get_total_price() for item in cart_items)
+    #    - если пользователь авторизован → user-cart
+    #    - если гость → session-cart
+    if request.user.is_authenticated:
+        cart_items = CartItem.objects.filter(user=request.user).select_related("product")
+    else:
+        cart_items = CartItem.objects.filter(session_key=session_key).select_related("product")
+
+    cart_total = sum(item.total_price for item in cart_items)
 
     # ------------------------------------------------------------------
     # 3. Форма

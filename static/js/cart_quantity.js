@@ -3,21 +3,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
     counters.forEach(counter => {
         const input = counter.querySelector(".quantity-value");
-        if (!input) return;
+        const btnIncrease = counter.querySelector('[data-action="increase"]');
+        const btnDecrease = counter.querySelector('[data-action="decrease"]');
 
-        counter.addEventListener("click", (e) => {
-            const btn = e.target.closest("button");
-            if (!btn) return;
+        if (!input || !btnIncrease || !btnDecrease) return;
 
-            const action = btn.dataset.action;
-            let value = parseInt(input.value, 10);
+        const min = parseInt(input.min) || 1;
+        const max = parseInt(input.max) || 9999; // fallback на случай отсутствия max
 
-            if (action === "increase" && value < 10) {
+        // ---- УВЕЛИЧЕНИЕ ----
+        btnIncrease.addEventListener("click", () => {
+            let value = parseInt(input.value);
+
+            if (value < max) {
                 input.value = value + 1;
             }
+        });
 
-            if (action === "decrease" && value > 1) {
+        // ---- УМЕНЬШЕНИЕ ----
+        btnDecrease.addEventListener("click", () => {
+            let value = parseInt(input.value);
+
+            if (value > min) {
                 input.value = value - 1;
+            }
+        });
+
+        // ---- КОРРЕКЦИЯ РУЧНОГО ВВОДА ----
+        input.addEventListener("input", () => {
+            let value = parseInt(input.value);
+
+            if (isNaN(value) || value < min) {
+                input.value = min;
+            } else if (value > max) {
+                input.value = max;
             }
         });
     });
