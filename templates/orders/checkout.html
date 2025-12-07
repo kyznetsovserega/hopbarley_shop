@@ -10,44 +10,61 @@
         <form method="post" id="checkout-form">
             {% csrf_token %}
 
-                {% if messages %}
+            {# === Django messages (корзина) === #}
+            {% if messages %}
                 <div class="messages">
                     {% for msg in messages %}
                         <p class="{{ msg.tags }}">{{ msg }}</p>
                     {% endfor %}
                 </div>
-                {% endif %}
-                            {% if error %}
+            {% endif %}
+
+            {% if error %}
                 <div class="checkout-error">
-                    {{ error }}
+                    <p>{{ error }}</p>
                 </div>
             {% endif %}
 
+            {# === Ошибки Django-формы === #}
+            {% if form.errors %}
+                <div class="checkout-error">
+
+                    {# Ошибки по каждому полю #}
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    {% endfor %}
+
+                    {# Ошибки всей формы #}
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {# === Shipping info === #}
             <section class="checkout-section">
                 <h2 class="checkout-section__title">Shipping information</h2>
 
                 <div class="checkout-form-group">
                     {{ form.full_name.label_tag }}
                     {{ form.full_name }}
-                    {{ form.full_name.errors }}
                 </div>
 
                 <div class="checkout-form-group">
                     {{ form.email.label_tag }}
                     {{ form.email }}
-                    {{ form.email.errors }}
                 </div>
 
                 <div class="checkout-form-group">
                     {{ form.phone.label_tag }}
                     {{ form.phone }}
-                    {{ form.phone.errors }}
                 </div>
 
                 <div class="checkout-form-group">
                     {{ form.shipping_address.label_tag }}
                     {{ form.shipping_address }}
-                    {{ form.shipping_address.errors }}
                 </div>
 
                 <div class="checkout-form-group">
@@ -56,14 +73,15 @@
                 </div>
             </section>
 
+            {# === Payment === #}
             <section class="checkout-section">
                 <h2 class="checkout-section__title">Payment Method</h2>
                 <div class="payment-options">
                     {{ form.payment_method }}
-                    {{ form.payment_method.errors }}
                 </div>
             </section>
 
+            {# === Summary === #}
             <section class="checkout-summary">
                 <h2 class="checkout-section__title">Order Summary</h2>
 
@@ -76,6 +94,7 @@
                     Pay
                 </button>
             </section>
+
         </form>
     </div>
 </main>

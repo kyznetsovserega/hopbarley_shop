@@ -1,56 +1,97 @@
 from django.core.mail import send_mail
 from django.conf import settings
 
+from orders.models import Order
 
-def send_order_confirmation(order):
+
+def send_order_confirmation(order: Order) -> None:
     """
-    Письмо покупателю о том, что заказ успешно оформлен.
+    Отправляет покупателю письмо с подтверждением успешного оформления заказа.
+
+    Логика:
+    1. Если у заказа не указан email — письмо не отправляется.
+    2. Формируется текст письма с номером заказа, суммой и адресом доставки.
+    3. Используется settings.DEFAULT_FROM_EMAIL как отправитель.
+
+    Параметры:
+        order (Order): объект заказа, для которого отправляется письмо.
     """
 
-    # Если email не указан — просто ничего не делаем
+    # ============================================================
+    #   1. Проверка наличия email у покупателя
+    # ============================================================
     if not order.email:
+        # Если email не указан — просто выходим без ошибок
         return
 
+    # ============================================================
+    #   2. Формирование темы и текста письма
+    # ============================================================
     subject = f"Ваш заказ #{order.id} успешно оформлен"
+
     message = (
-        f"Здравствуйте, {order.full_name}!\n\n"
+        f"Здравствуйте, {order.full_name or 'покупатель'}!\n\n"
         f"Ваш заказ #{order.id} принят в обработку.\n"
         f"Сумма заказа: {order.total_price} ₽\n\n"
         f"Адрес доставки:\n{order.shipping_address}\n\n"
         f"Спасибо за покупку в Hop & Barley!"
     )
 
+    # ============================================================
+    #   3. Отправка письма
+    # ============================================================
     send_mail(
-        subject,
-        message,
-        settings.DEFAULT_FROM_EMAIL,
-        [order.email],
+        subject=subject,
+        message=message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[order.email],
         fail_silently=False,
     )
 
 
-def notify_admin(order):
+def notify_admin(order: Order) -> None:
     """
-    Уведомление администратору о новом заказе.
+    Отправляет администратору уведомление о новом заказе.
+
+    Логика:
+    1. Берёт адрес администратора из settings.ADMIN_EMAIL.
+    2. Если ADMIN_EMAIL не указан — функция тихо завершается.
+    3. Формирует письмо с основной информацией о заказе.
+    4. Отправляет письмо от DEFAULT_FROM_EMAIL.
+
+    Параметры:
+        order (Order): объект нового заказа.
     """
 
+    # ============================================================
+    #   1. Получение email администратора
+    # ============================================================
     admin_email = getattr(settings, "ADMIN_EMAIL", None)
     if not admin_email:
+        # Не настроен системный email администратора — уведомление пропускаем
         return
 
+    # ============================================================
+    #   2. Формирование темы и текста письма
+    # ============================================================
     subject = f"Новый заказ #{order.id}"
+
     message = (
         f"Поступил новый заказ #{order.id}\n\n"
         f"Сумма: {order.total_price} ₽\n"
-        f"Покупатель: {order.full_name} ({order.email}, {order.phone})\n"
+        f"Покупатель: {order.full_name or 'не указано'} "
+        f"({order.email or 'email не указан'}, {order.phone or 'телефон не указан'})\n\n"
         f"Адрес доставки:\n{order.shipping_address}\n\n"
-        f"Комментарий: {order.comment}"
+        f"Комментарий: {order.comment or '—'}"
     )
 
+    # ============================================================
+    #   3. Отправка письма администратору
+    # ============================================================
     send_mail(
-        subject,
-        message,
-        settings.DEFAULT_FROM_EMAIL,
-        [admin_email],
+        subject=subject,
+        message=message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[admin_email],
         fail_silently=False,
     )
