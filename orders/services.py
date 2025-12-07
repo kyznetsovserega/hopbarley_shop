@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from decimal import Decimal
-
 from django.db import transaction
 from django.core.exceptions import ValidationError
 
@@ -14,24 +13,30 @@ def create_order_from_cart(request, form_data):
     """
     Создаёт заказ на основе корзины текущего пользователя или session_key.
 
-    Функция:
-    - Загружает cart-items для session_key
-    - Проверяет наличие обязательных данных (full_name, shipping_address)
-    - Проверяет остатки на складе (select_for_update)
-    - Создаёт Order и OrderItem (snapshot цены)
-    - Уменьшает stock товаров
-    - Очищает корзину
+    Процесс оформления заказа:
+    1. Получение session_key (для гостей).
+    2. Загрузка корзины.
+    3. Проверка обязательных полей.
+    4. Проверка остатков товара (select_for_update).
+    5. Создание заказа.
+    6. Создание OrderItem и уменьшение stock.
+    7. Очистка корзины.
 
-    Возвращает созданный Order.
+    Возвращает:
+        Order — созданный заказ.
     """
 
-    # === SESSION KEY ===
+    # ----------------------------------------------------------------------
+    # 1. Session key
+    # ----------------------------------------------------------------------
     session_key = request.session.session_key
     if not session_key:
         request.session.create()
         session_key = request.session.session_key
 
-    # === LOAD CART ITEMS ===
+    # ----------------------------------------------------------------------
+    # 2. Загрузка корзины
+    # ----------------------------------------------------------------------
     cart_items = (
         CartItem.objects
         .filter(session_key=session_key)
@@ -39,26 +44,34 @@ def create_order_from_cart(request, form_data):
     )
 
     if not cart_items.exists():
-        raise ValidationError("Корзина пуста.")
+        raise ValidationError("Корзина пуста")
 
-    # === VALIDATE FORM FIELDS ===
-    required_fields = ["full_name", "shipping_address"]
+    # ----------------------------------------------------------------------
+    # 3. Проверка обязательных полей
+    # ----------------------------------------------------------------------
+    required_fields = ["full_name", "shipping_address", "phone"]
     for field in required_fields:
         value = form_data.get(field, "").strip()
         if not value:
-            raise ValidationError(f"Поле '{field}' обязательно.")
+            raise ValidationError("Поле обязательно.")
 
-    full_name = form_data.get("full_name", "").strip()
+    full_name = form_data["full_name"].strip()
     email = form_data.get("email", "").strip()
-    phone = form_data.get("phone", "").strip()
-    shipping_address = form_data.get("shipping_address", "").strip()
+    phone = form_data["phone"].strip()
+    shipping_address = form_data["shipping_address"].strip()
     comment = form_data.get("comment", "").strip()
+    payment_method = form_data.get("payment_method", "cash")
 
-    # === SNAPSHOT + STOCK CHECK ===
-    """
-    select_for_update() блокирует строки product до конца транзакции,
-    предотвращая race condition (double-sell).
-    """
+    # ----------------------------------------------------------------------
+    # 4. Валидация телефона
+    # ----------------------------------------------------------------------
+    # Просто проверяем, что поле не пустое
+    if not phone:
+        raise ValidationError("Поле обязательно.")
+
+    # ----------------------------------------------------------------------
+    # 5. Проверка остатков товара
+    # ----------------------------------------------------------------------
     total_price = Decimal(0)
     snapshot = []
 
@@ -67,25 +80,22 @@ def create_order_from_cart(request, form_data):
         qty = cart_item.quantity
 
         if product.stock < qty:
-            raise ValidationError(
-                f"Недостаточно товара '{product.name}'. "
-                f"В наличии: {product.stock}, в корзине: {qty}."
-            )
-
-        line_price = product.price
-        total_price += line_price * qty
+            raise ValidationError("Недостаточно товара")
 
         snapshot.append({
-            "product_id": product.id,
             "product": product,
             "qty": qty,
-            "price": line_price,
+            "price": product.price,
         })
 
-    # === CREATE ORDER ===
+        total_price += product.price * qty
+
+    # ----------------------------------------------------------------------
+    # 6. Создание заказа
+    # ----------------------------------------------------------------------
     order = Order.objects.create(
         user=request.user if request.user.is_authenticated else None,
-        total_price=total_price,
+        session_key=session_key,
 
         full_name=full_name,
         email=email,
@@ -93,22 +103,28 @@ def create_order_from_cart(request, form_data):
         shipping_address=shipping_address,
         comment=comment,
 
-        status="pending",  # лучше использовать Enum: Order.Status.PENDING
+        payment_method=payment_method,
+        status=Order.STATUS_PENDING,
+        total_price=total_price,
     )
 
-    # === CREATE ORDER ITEMS + UPDATE STOCK ====
+    # ----------------------------------------------------------------------
+    # 7. Создание OrderItem и уменьшение stock
+    # ----------------------------------------------------------------------
     for item in snapshot:
         OrderItem.objects.create(
             order=order,
             product=item["product"],
             quantity=item["qty"],
-            price=item["price"],  # snapshot
+            price=item["price"],
         )
 
         item["product"].stock -= item["qty"]
         item["product"].save(update_fields=["stock"])
 
-    # === CLEAR CART ===
+    # ----------------------------------------------------------------------
+    # 8. Очистка корзины
+    # ----------------------------------------------------------------------
     cart_items.delete()
 
     return order
