@@ -9,6 +9,8 @@ from django.contrib.auth.models import User
 from orders.models import Order
 from .forms import RegisterForm
 
+from cart.utils import merge_session_cart_into_user_cart
+
 
 # ACCOUNT VIEW
 @login_required
@@ -67,10 +69,11 @@ def forgot_password_view(request):
     return render(request, "users/forgot_password.html")
 
 
-# LOGIN VIEW (EMAIL → USERNAME)
+# LOGIN VIEW (EMAIL > USERNAME)
 def login_view(request):
     """
     Авторизация пользователя по email + password.
+    После успешного входа корзина гостя объединяется с корзиной пользователя.
     """
     if request.method == "POST":
         email = request.POST.get("username")
@@ -87,6 +90,12 @@ def login_view(request):
             user = authenticate(request, username=username, password=password)
             if user:
                 login(request, user)
+
+                # переносим корзину гостя > корзину пользователя
+                merge_session_cart_into_user_cart(
+                    user, request.session.session_key
+                )
+
                 return redirect("account")
 
         messages.error(request, "Incorrect email or password.")
@@ -100,6 +109,7 @@ def login_view(request):
 def register_view(request):
     """
     Регистрация нового пользователя.
+    После создания учётной записи — объединение корзины гостя и пользователя.
     """
     if request.method == "POST":
         form = RegisterForm(request.POST)
@@ -107,7 +117,13 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect("account")  # <-- FIX
+
+            # merge при регистрации
+            merge_session_cart_into_user_cart(
+                user, request.session.session_key
+            )
+
+            return redirect("account")
     else:
         form = RegisterForm()
 

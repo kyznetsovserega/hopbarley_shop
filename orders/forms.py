@@ -5,14 +5,15 @@ class CheckoutForm(forms.Form):
     """
     Форма оформления заказа.
 
-    Содержит персональные данные покупателя, адрес доставки,
-    комментарий к заказу и метод оплаты.
+    Все обязательные поля валидируются вручную в clean_<field>,
+    чтобы тесты могли находить строку «Поле обязательно.»
     """
 
     # --- Основные поля ---
     full_name = forms.CharField(
         max_length=255,
         label="ФИО",
+        required=False,
     )
 
     email = forms.EmailField(
@@ -21,12 +22,12 @@ class CheckoutForm(forms.Form):
     )
 
     phone = forms.CharField(
-        required=True,
+        required=False,
         label="Телефон",
     )
 
     shipping_address = forms.CharField(
-        required=True,
+        required=False,
         max_length=500,
         label="Адрес доставки",
         widget=forms.Textarea(attrs={"rows": 2}),
@@ -42,7 +43,7 @@ class CheckoutForm(forms.Form):
     PAYMENT_CHOICES = [
         ("cash", "Наличными при получении"),
         ("card", "Банковская карта"),
-        ("cod", "Оплата при получении (COD)"),     # нужно для тестов
+        ("cod", "Оплата при получении (COD)"),  # важно для тестов
     ]
 
     payment_method = forms.ChoiceField(
@@ -52,7 +53,7 @@ class CheckoutForm(forms.Form):
         widget=forms.RadioSelect,
     )
 
-    # --- Валидация обязательных полей ---
+    # --- Кастомная валидация обязательных полей ---
 
     def clean_full_name(self):
         value = self.cleaned_data.get("full_name", "").strip()

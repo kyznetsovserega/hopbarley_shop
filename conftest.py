@@ -8,9 +8,9 @@ from products.models import Category, Product
 from reviews.models import Review
 
 
-# ============================================================================
+# ======================================================================
 # USERS
-# ============================================================================
+# ======================================================================
 
 @pytest.fixture
 def user_fixture(db):
@@ -30,9 +30,9 @@ def profile_fixture(db, user_fixture):
     return UserProfile.objects.create(user=user_fixture)
 
 
-# ============================================================================
+# ======================================================================
 # PRODUCTS
-# ============================================================================
+# ======================================================================
 
 @pytest.fixture
 def category_fixture(db):
@@ -45,7 +45,7 @@ def category_fixture(db):
 
 @pytest.fixture
 def product_fixture(db, category_fixture):
-    """Создаёт тестовый продукт с ценой и остатком."""
+    """Создаёт тестовый продукт."""
     return Product.objects.create(
         name="Тестовый продукт",
         slug="test-product",
@@ -57,9 +57,9 @@ def product_fixture(db, category_fixture):
     )
 
 
-# ============================================================================
+# ======================================================================
 # REVIEWS
-# ============================================================================
+# ======================================================================
 
 @pytest.fixture
 def review_fixture(db, user_fixture, product_fixture):
@@ -72,9 +72,9 @@ def review_fixture(db, user_fixture, product_fixture):
     )
 
 
-# ============================================================================
+# ======================================================================
 # ORDERS
-# ============================================================================
+# ======================================================================
 
 @pytest.fixture
 def order_fixture(db, user_fixture):
@@ -90,7 +90,7 @@ def order_fixture(db, user_fixture):
 
 @pytest.fixture
 def order_item_fixture(db, order_fixture, product_fixture):
-    """Создаёт товар внутри заказа."""
+    """Создаёт элемент заказа."""
     from orders.models import OrderItem
     return OrderItem.objects.create(
         order=order_fixture,
@@ -100,31 +100,33 @@ def order_item_fixture(db, order_fixture, product_fixture):
     )
 
 
-# ---- Настройки email для тестов (нужно для send_mail) ----
+# ======================================================================
+# EMAIL SETTINGS
+# ======================================================================
 
 @pytest.fixture(autouse=True)
 def email_settings(settings):
-    """Автоматически переопределяет email-настройки для всех тестов."""
+    """Переопределяет email-настройки для всех тестов."""
     settings.DEFAULT_FROM_EMAIL = "noreply@test.com"
     settings.ADMIN_EMAIL = "admin@test.com"
 
 
-# ---- Упрощённый вызов checkout в тестах ----
+# ======================================================================
+# CHECKOUT POST HELPER
+# ======================================================================
 
 @pytest.fixture
 def checkout_post(client_web, web_session_key):
-    """
-    checkout_post(data) > делает POST на /checkout/ с учётом session_key.
-    """
+    """Хелпер для POST /checkout/."""
     def do_post(data):
         client_web.cookies["sessionid"] = web_session_key
         return client_web.post(reverse("orders:checkout"), data)
     return do_post
 
 
-# ============================================================================
+# ======================================================================
 # API CLIENTS
-# ============================================================================
+# ======================================================================
 
 @pytest.fixture
 def client():
@@ -139,19 +141,26 @@ def auth_client(client, user_fixture):
     return client
 
 
+# Клиент + корзина пользователя
+@pytest.fixture
+def auth_client_with_cart(auth_client, user_cart_item_fixture):
+    """Авторизованный клиент, у которого уже есть товар в корзине."""
+    return auth_client
+
+
 @pytest.fixture
 def client_api():
     """Альтернативный API client."""
     return APIClient()
 
 
-# ============================================================================
-# SESSIONS
-# ============================================================================
+# ======================================================================
+# SESSION FIXTURES
+# ======================================================================
 
 @pytest.fixture
 def session_key(client):
-    """Создаёт session_key для API тестов."""
+    """Создаёт session_key (API-тесты)."""
     session = client.session
     session.create()
     session.save()
@@ -160,20 +169,20 @@ def session_key(client):
 
 @pytest.fixture
 def web_session_key(client_web):
-    """Создаёт session_key для web-тестов (Django Client)."""
+    """Создаёт session_key (web-тесты)."""
     session = client_web.session
     session.create()
     session.save()
     return session.session_key
 
 
-# ============================================================================
-# CART
-# ============================================================================
+# ======================================================================
+# CART FIXTURES
+# ======================================================================
 
 @pytest.fixture
 def cart_item_fixture(db, session_key, product_fixture):
-    """Создаёт CartItem."""
+    """CartItem для гостя (session_key)."""
     from cart.models import CartItem
     return CartItem.objects.create(
         session_key=session_key,
@@ -182,9 +191,20 @@ def cart_item_fixture(db, session_key, product_fixture):
     )
 
 
-# ============================================================================
+@pytest.fixture
+def user_cart_item_fixture(db, user_fixture, product_fixture):
+    """CartItem для пользователя (API-тесты)."""
+    from cart.models import CartItem
+    return CartItem.objects.create(
+        user=user_fixture,
+        product=product_fixture,
+        quantity=2,
+    )
+
+
+# ======================================================================
 # WEB CLIENT
-# ============================================================================
+# ======================================================================
 
 @pytest.fixture
 def client_web(db):

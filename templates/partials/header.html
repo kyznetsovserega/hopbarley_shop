@@ -7,6 +7,7 @@
             <img src="{% static 'img/logo.svg' %}" alt="Hop & Barley Logo">
             <p class="logo-text">Hop & Barley</p>
         </a>
+
         <nav class="header__nav">
             <ul>
                 <li><a href="/">Products</a></li>
@@ -26,12 +27,13 @@
         <!-- Block for authorized user -->
         <div class="header__user-actions" id="auth-user">
             <a href="/account/" class="user-icon" aria-label="My Account">
-                <img src="{% static 'img/icons/User_alt.svg' %}" alt="User Account">
-            </a>
-            <a href="/cart/" class="cart-icon" aria-label="Shopping Cart">
-                <img src="{% static 'img/icons/Shopping_bag.svg' %}" alt="Shopping Cart">
+                <img src="{% static 'img/icons/user_alt.svg' %}" alt="User Account">
             </a>
 
+            <a href="{% url 'cart:detail' %}" class="cart-icon" aria-label="Shopping Cart">
+                <img src="{% static 'img/icons/shopping_bag.svg' %}" alt="Shopping Cart">
+            </a>
         </div>
+
     </div>
 </header>
