@@ -1,12 +1,33 @@
 services:
   db:
     image: postgres:17
+    container_name: db
+    restart: always
     env_file:
-        - .env
+      - .env
     ports:
       - "5435:5432"
     volumes:
-      - hopbarley_shop_postgres_db_data:/var/lib/postgresql/data
+      - hopbarley_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    container_name: hopbarley_web
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - db
+    command: >
+      sh -c "
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+      "
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - ./static:/app/static
 
 volumes:
-   hopbarley_shop_postgres_db_data:
+  hopbarley_data:
