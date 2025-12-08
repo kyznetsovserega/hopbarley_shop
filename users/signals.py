@@ -10,19 +10,13 @@ User = get_user_model()
 
 
 @receiver(post_save, sender=User)
-def create_user_profile(sender, instance: User, created: bool, **kwargs):
+def create_or_update_user_profile(sender, instance: User, created: bool, **kwargs):
     """
-    Создаёт профиль сразу после создания пользователя.
+    Создаёт профиль при первом сохранении пользователя.
+    Если профиль уже существует — ничего не делает.
     """
     if created:
         UserProfile.objects.create(user=instance)
-
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance: User, created: bool, **kwargs):
-    """
-    Сохраняет профиль при обновлении данных пользователя.
-    """
-    if not created:
-        # Профиль гарантированно существует, т.к. создается в create_user_profile
-        instance.profile.save()
+    else:
+        # Профиль может отсутствовать, если был создан вручную или в тестах
+        UserProfile.objects.get_or_create(user=instance)

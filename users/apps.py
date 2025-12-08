@@ -6,9 +6,7 @@ from django.apps import AppConfig
 class UsersConfig(AppConfig):
     """
     Конфигурация приложения users.
-
-    Подключает signals для автоматического создания профилей
-    при создании пользователя.
+    Подключает сигнал создания профиля при создании пользователя.
     """
 
     default_auto_field = "django.db.models.BigAutoField"
@@ -16,4 +14,4 @@ class UsersConfig(AppConfig):
 
     def ready(self):
         # Импорт сигналов при старте приложения
-        from . import signals
+        import users.signals

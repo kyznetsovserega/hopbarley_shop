@@ -15,18 +15,18 @@
     <div class="auth-form-container">
         <div class="auth-container auth-container--register">
 
-            <div class="Legend">
-                <h1 class="auth-title">Register</h1>
-            </div>
+            <h1 class="auth-title">Register</h1>
 
             <form method="post" class="auth-form">
                 {% csrf_token %}
 
-                <!-- GLOBAL FORM ERRORS -->
-                {% if form.errors %}
-                <div class="auth-error">
-                    <p>Please correct the errors below.</p>
-                </div>
+                <!-- NON-FIELD ERRORS (пароли, сложность пароля) -->
+                {% if form.non_field_errors %}
+                    <div class="auth-error">
+                        {% for err in form.non_field_errors %}
+                            <p class="field-error">{{ err }}</p>
+                        {% endfor %}
+                    </div>
                 {% endif %}
 
                 <!-- USERNAME -->
@@ -38,6 +38,7 @@
                            value="{{ form.username.value|default:'' }}"
                            class="Input"
                            placeholder="Enter username"
+                           autocomplete="username"
                            required>
                     {% if form.username.errors %}
                         <p class="field-error">{{ form.username.errors.0 }}</p>
@@ -53,6 +54,7 @@
                            value="{{ form.email.value|default:'' }}"
                            class="Input"
                            placeholder="example@mail.com"
+                           autocomplete="email"
                            required>
                     {% if form.email.errors %}
                         <p class="field-error">{{ form.email.errors.0 }}</p>
@@ -67,7 +69,11 @@
                            name="password1"
                            class="Input"
                            placeholder="Enter password"
+                           autocomplete="new-password"
                            required>
+                    {% if form.password1.errors %}
+                        <p class="field-error">{{ form.password1.errors.0 }}</p>
+                    {% endif %}
                 </div>
 
                 <!-- PASSWORD2 -->
@@ -78,6 +84,7 @@
                            name="password2"
                            class="Input"
                            placeholder="Repeat password"
+                           autocomplete="new-password"
                            required>
                     {% if form.password2.errors %}
                         <p class="field-error">{{ form.password2.errors.0 }}</p>
@@ -87,6 +94,7 @@
                 <div class="ButtonGroup">
                     <button type="submit" class="button button--primary">Register</button>
                 </div>
+
             </form>
 
             <p class="auth-switch">

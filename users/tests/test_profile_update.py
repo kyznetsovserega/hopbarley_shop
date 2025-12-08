@@ -16,8 +16,10 @@ def test_profile_update(client):
     client.login(username="john", password="StrongPass123")
 
     response = client.post(reverse("account"), {
-        "full_name": "John Smith",
+        "first_name": "John",
+        "last_name": "Smith",
         "email": "new@example.com",
+
         "phone": "+123456",
         "city": "London",
         "address": "Baker St",

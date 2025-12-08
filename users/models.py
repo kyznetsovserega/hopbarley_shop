@@ -11,7 +11,7 @@ class UserProfile(models.Model):
 
     Дополняет встроенную модель User контактной информацией,
     адресом и датой рождения. Создаётся автоматически
-    в signals.py при создании пользователя.
+    через signals.py.
     """
 
     user = models.OneToOneField(
@@ -19,6 +19,7 @@ class UserProfile(models.Model):
         on_delete=models.CASCADE,
         related_name="profile",
         verbose_name="Пользователь",
+        db_index=True,
     )
 
     phone = models.CharField(
@@ -67,3 +68,8 @@ class UserProfile(models.Model):
 
     def __str__(self) -> str:
         return f"Profile of {self.user.email or self.user.username}"
+
+    def get_full_address(self) -> str:
+        """Возвращает форматированный адрес."""
+        parts = [self.city, self.address]
+        return ", ".join(p for p in parts if p)
