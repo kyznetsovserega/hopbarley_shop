@@ -12,8 +12,15 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+import os
+from dotenv import load_dotenv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables
+
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 
 # Quick-start development settings - unsuitable for production
@@ -25,7 +32,17 @@ SECRET_KEY = 'django-insecure-v$z50+ud4-@w=o*9eg$bvz%f3e%syoq@maw9*4@63mlgpu7w4*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "192.168.100.3"
+    ]
+
+# EMAIL CONFIG — dev mode (консольный вывод)
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+DEFAULT_FROM_EMAIL = "no-reply@hopbarley.shop"
+ADMIN_EMAIL = "admin@hopbarley.shop"
 
 
 # Application definition
@@ -37,6 +54,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #---my apps---
+
+    'rest_framework',
+
+    "products.apps.ProductsConfig",
+    "users.apps.UsersConfig",
+    'orders',
+    'reviews',
+    'cart',
+    'api',
+
+    'django_extensions',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +84,7 @@ ROOT_URLCONF = 'main.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -74,8 +104,12 @@ WSGI_APPLICATION = 'main.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv("DJANGO_DB_NAME", "hopbarley_shop_db"),
+        'USER': os.getenv("DJANGO_DB_USER", "user"),
+        'PASSWORD':os.getenv("DJANGO_DB_PASSWORD","password"),
+        'HOST': os.getenv("DJANGO_DB_HOST", "localhost"),
+        'PORT': os.getenv("DJANGO_DB_PORT", "5432"),
     }
 }
 
@@ -114,7 +148,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

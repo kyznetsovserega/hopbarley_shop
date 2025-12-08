@@ -31,7 +31,7 @@ env/
 # Django
 *.sqlite3
 db.sqlite3
-media/
+#media/
 staticfiles/
 local_settings.py
 
@@ -61,14 +61,16 @@ htmlcov/
 .noseids
 *.log
 
-# Migrations (если хочешь игнорировать сгенерированные файлы)
+# Migrations
 **/migrations/*.pyc
 **/migrations/__pycache__/
-# Если хочешь игнорировать и миграции самих моделей:
+
 # **/migrations/*.py
 
-# Jupyter / notebooks
+
 *.ipynb_checkpoints
 
-# Swagger/OpenAPI cache (если используешь drf-spectacular или drf-yasg)
+
 *.schema.json
+
+staticfiles/

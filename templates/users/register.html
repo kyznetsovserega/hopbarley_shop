@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Register | Hop & Barley{% endblock %}
+
+{% block content %}
+
+<main class="auth-page-wrapper">
+
+    <!-- Background -->
+    <div class="auth-background">
+        <img src="{% static 'img/background/pattern.jpg' %}" alt="Background pattern">
+    </div>
+
+    <div class="auth-form-container">
+        <div class="auth-container auth-container--register">
+
+            <h1 class="auth-title">Register</h1>
+
+            <form method="post" class="auth-form">
+                {% csrf_token %}
+
+                <!-- NON-FIELD ERRORS (пароли, сложность пароля) -->
+                {% if form.non_field_errors %}
+                    <div class="auth-error">
+                        {% for err in form.non_field_errors %}
+                            <p class="field-error">{{ err }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- USERNAME -->
+                <div class="InputField">
+                    <label for="id_username">Username</label>
+                    <input type="text"
+                           id="id_username"
+                           name="username"
+                           value="{{ form.username.value|default:'' }}"
+                           class="Input"
+                           placeholder="Enter username"
+                           autocomplete="username"
+                           required>
+                    {% if form.username.errors %}
+                        <p class="field-error">{{ form.username.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- EMAIL -->
+                <div class="InputField">
+                    <label for="id_email">Email</label>
+                    <input type="email"
+                           id="id_email"
+                           name="email"
+                           value="{{ form.email.value|default:'' }}"
+                           class="Input"
+                           placeholder="example@mail.com"
+                           autocomplete="email"
+                           required>
+                    {% if form.email.errors %}
+                        <p class="field-error">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- PASSWORD1 -->
+                <div class="InputField">
+                    <label for="id_password1">Password</label>
+                    <input type="password"
+                           id="id_password1"
+                           name="password1"
+                           class="Input"
+                           placeholder="Enter password"
+                           autocomplete="new-password"
+                           required>
+                    {% if form.password1.errors %}
+                        <p class="field-error">{{ form.password1.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- PASSWORD2 -->
+                <div class="InputField">
+                    <label for="id_password2">Repeat Password</label>
+                    <input type="password"
+                           id="id_password2"
+                           name="password2"
+                           class="Input"
+                           placeholder="Repeat password"
+                           autocomplete="new-password"
+                           required>
+                    {% if form.password2.errors %}
+                        <p class="field-error">{{ form.password2.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="ButtonGroup">
+                    <button type="submit" class="button button--primary">Register</button>
+                </div>
+
+            </form>
+
+            <p class="auth-switch">
+                Already have an account?
+                <a href="{% url 'users:login' %}">Sign in</a>
+            </p>
+
+        </div>
+    </div>
+
+</main>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/main.js' %}"></script>
+{% endblock %}
