@@ -10,6 +10,7 @@ from django.shortcuts import render, redirect
 
 from orders.models import Order
 from cart.utils import merge_session_cart_into_user_cart
+from reviews.models import Review
 
 from .forms import (
     RegisterForm,
@@ -120,11 +121,18 @@ def account_view(request):
 
     orders = Order.objects.filter(user=user).order_by("-created_at")
 
+    reviewed_product_ids = Review.objects.filter(
+        user=user
+    ).values_list("product_id", flat=True)
+
+    reviewed_product_ids = set(reviewed_product_ids)
+
     return render(request, "users/account.html", {
         "orders": orders,
         "profile": profile,
         "user_form": user_form,
         "profile_form": profile_form,
+        "reviewed_product_ids": reviewed_product_ids,
     })
 
 

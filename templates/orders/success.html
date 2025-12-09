@@ -1,14 +1,30 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block title %}Order Success | Hop & Barley{% endblock %}
+
 {% block content %}
 <main class="order-success-wrapper">
     <div class="order-success-container">
-        <h1>Thank you for your order!</h1>
-        <p>Your order #{{ order_id }} has been successfully placed.</p>
-        <a href="/" class="button button--primary" style="margin-top:16px; width:200px; align-self:center;">
-            Back to shop
+
+        <img
+            src="{% static 'img/icons/success.svg' %}"
+            alt="Success"
+            class="order-success-icon"
+        >
+
+        <h1 class="order-success-title">
+            Thank you for your order!
+        </h1>
+
+        <p class="order-success-text">
+            Your order <strong>#{{ order_id }}</strong> has been successfully placed.
+        </p>
+
+        <a href="/" class="button button--primary order-success-button">
+            Back to Shop
         </a>
+
     </div>
 </main>
 {% endblock %}

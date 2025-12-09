@@ -151,7 +151,8 @@
         <p>No reviews yet. Be the first to write one!</p>
       {% endif %}
 
-      <!-- Блок добавления отзыва -->
+
+      <!-- ДОБАВЛЕНИЕ ОТЗЫВА -->
       {% if can_review %}
       <div class="add-review-form">
         <h3 class="reviews-title" style="margin-top: 40px;">Leave a Review</h3>
@@ -159,21 +160,36 @@
         <form action="{% url 'reviews:add' product.slug %}" method="post" class="review-form">
           {% csrf_token %}
 
-          {{ review_form.rating.label_tag }}
-          {{ review_form.rating }}
+          {{ review_form.non_field_errors }}
 
-          {{ review_form.comment.label_tag }}
-          {{ review_form.comment }}
+          <div class="form-group">
+            {{ review_form.rating.label_tag }}
+            {{ review_form.rating }}
+            {{ review_form.rating.errors }}
+          </div>
+
+          <div class="form-group">
+            {{ review_form.comment.label_tag }}
+            {{ review_form.comment }}
+            {{ review_form.comment.errors }}
+          </div>
 
           <button type="submit" class="button button--primary" style="margin-top: 12px;">
             Submit Review
           </button>
         </form>
       </div>
+
+      {% elif already_reviewed %}
+        <p class="review-info">
+          You have already submitted a review for this product.
+        </p>
+
       {% elif user.is_authenticated %}
         <p class="review-info">
           Only customers who purchased this product can leave a review.
         </p>
+
       {% else %}
         <p class="review-info">
           <a href="{% url 'users:login' %}">Log in</a> to add a review.
@@ -181,6 +197,7 @@
       {% endif %}
 
     </section>
+
 
   </div>
 </main>

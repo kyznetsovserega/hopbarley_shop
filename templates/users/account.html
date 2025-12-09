@@ -15,9 +15,9 @@
 
     <div class="tab-content">
 
-      <!-- ============================= -->
+      <!-- ========================================================= -->
       <!-- ORDER HISTORY TAB -->
-      <!-- ============================= -->
+      <!-- ========================================================= -->
       <div id="order-history" class="tab-pane active">
 
         <div class="order-history-table">
@@ -29,7 +29,7 @@
             <div class="order-table-cell">Total</div>
           </div>
 
-          <!-- Rows -->
+          <!-- Orders -->
           <div class="order-table-body">
             {% for order in orders %}
               <div class="order-table-row">
@@ -37,9 +37,7 @@
                 <!-- DETAILS -->
                 <div class="order-table-cell">
                   <span class="order-id">#{{ order.id }}</span>
-                  <span class="order-date">
-                    {{ order.created_at|date:"d M Y" }}
-                  </span>
+                  <span class="order-date">{{ order.created_at|date:"d M Y" }}</span>
                 </div>
 
                 <!-- STATUS -->
@@ -53,6 +51,44 @@
                 </div>
 
               </div>
+
+              <!-- ========================================================= -->
+              <!-- ORDER ITEMS WITH PREVIEW + REVIEW STATUS -->
+              <!-- ========================================================= -->
+              <div class="order-items-list">
+                {% for item in order.items.all %}
+                  <div class="order-item">
+
+                    <!-- IMAGE -->
+                    <div class="order-item-image">
+                      <img
+                        src="{% if item.product.image %}{{ item.product.image.url }}{% else %}{% static 'img/products/default.jpg' %}{% endif %}"
+                        alt="{{ item.product.name }}"
+                      >
+                    </div>
+
+                    <!-- INFO -->
+                    <div class="order-item-info">
+                      <strong>{{ item.product.name }}</strong>
+                      <span class="product-quantity">x{{ item.quantity }}</span>
+                    </div>
+
+                    <!-- REVIEW BUTTON OR STATUS -->
+                    <div class="order-item-review">
+                      {% if item.product.id in reviewed_product_ids %}
+                        <span class="review-status done">Review submitted</span>
+                      {% else %}
+                        <a class="review-button"
+                           href="{% url 'products:product_detail' item.product.slug %}?review=1">
+                          Leave a Review
+                        </a>
+                      {% endif %}
+                    </div>
+
+                  </div>
+                {% endfor %}
+              </div>
+
             {% empty %}
               <p>You have no orders yet.</p>
             {% endfor %}
@@ -62,9 +98,9 @@
 
       </div>
 
-      <!-- ============================= -->
+      <!-- ========================================================= -->
       <!-- ACCOUNT INFORMATION TAB -->
-      <!-- ============================= -->
+      <!-- ========================================================= -->
       <div id="account-info" class="tab-pane">
 
         <div class="account-form-container">
@@ -73,7 +109,6 @@
           <form method="post" action="{% url 'users:account' %}">
             {% csrf_token %}
 
-            <!-- GLOBAL MESSAGES -->
             {% if messages %}
               <div class="account-messages">
                 {% for msg in messages %}
@@ -82,9 +117,7 @@
               </div>
             {% endif %}
 
-            <!-- ============================= -->
-            <!-- USER FORM (first_name, last_name, email) -->
-            <!-- ============================= -->
+            <!-- USER FORM -->
             <div class="checkout-form-group">
               <label>First Name</label>
               {{ user_form.first_name }}
@@ -109,11 +142,7 @@
               {% endfor %}
             </div>
 
-
-            <!-- ============================= -->
-            <!-- PROFILE FORM (phone, city, address, dob) -->
-            <!-- ============================= -->
-
+            <!-- PROFILE FORM -->
             <div class="checkout-form-group">
               <label>Phone</label>
               {{ profile_form.phone }}
@@ -146,21 +175,15 @@
               {% endfor %}
             </div>
 
-
-            <!-- SUBMIT BUTTON -->
             <button type="submit" class="button button--primary button--full-width">
               Save
             </button>
 
-            <!-- CHANGE PASSWORD -->
-            <a href="{% url 'users:password_change' %}"
-               class="button button--secondary button--full-width">
+            <a href="{% url 'users:password_change' %}" class="button button--secondary button--full-width">
               Change Password
             </a>
 
-            <!-- LOGOUT -->
-            <a href="{% url 'users:logout' %}"
-               class="button button--secondary button--full-width">
+            <a href="{% url 'users:logout' %}" class="button button--secondary button--full-width">
               Logout
             </a>
 
@@ -177,5 +200,4 @@
 
 {% block scripts %}
 <script src="{% static 'js/main.js' %}"></script>
-
 {% endblock %}

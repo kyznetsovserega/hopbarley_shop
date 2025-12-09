@@ -73,3 +73,5 @@ class UserProfile(models.Model):
         """Возвращает форматированный адрес."""
         parts = [self.city, self.address]
         return ", ".join(p for p in parts if p)
+
+

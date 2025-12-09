@@ -6,6 +6,7 @@ from .models import Product, Category
 from .filter import ProductFilter
 from orders.models import OrderItem
 from reviews.forms import ReviewForm
+from reviews.models import Review
 
 
 class ProductListView(FilterView):
@@ -57,7 +58,7 @@ class ProductListView(FilterView):
             .exclude(slug="default")
         )
 
-        # Keywords (SEO) из поля tags
+        # Keywords (SEO)
         keywords_set = set()
         tags_qs = (
             Product.objects
@@ -82,6 +83,10 @@ class ProductListView(FilterView):
         return context
 
 
+# -------------------------------------------------------------------------
+#  PRODUCT DETAIL VIEW
+# -------------------------------------------------------------------------
+
 class ProductDetailView(DetailView):
     """
     Детальная страница товара: характеристики, отзывы, рейтинг.
@@ -92,40 +97,72 @@ class ProductDetailView(DetailView):
     slug_field = "slug"
     slug_url_kwarg = "slug"
 
-    def user_can_review(self, product, user) -> bool:
-        """Проверка: купил ли пользователь этот продукт со статусом delivered."""
+    # Позволяет принимать invalid_form от add_review
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.invalid_form = None
+
+    def dispatch(self, request, *args, **kwargs):
+        # Если extra_context передан — забираем invalid_form
+        if hasattr(self, "extra_context") and self.extra_context:
+            self.invalid_form = self.extra_context.get("invalid_form")
+        return super().dispatch(request, *args, **kwargs)
+
+
+    # --- Проверки (купил товар + писал раньше отзыв) ---
+    def user_has_bought(self, product, user) -> bool:
+        """
+        Проверка: купил ли пользователь товар.
+        Статусы: paid или delivered.
+        """
         if not user.is_authenticated:
             return False
 
         return OrderItem.objects.filter(
             order__user=user,
-            order__status="delivered",
+            order__status__in=["paid", "delivered"],
             product=product,
         ).exists()
 
+    def user_already_reviewed(self, product, user) -> bool:
+        """Проверка: писал ли пользователь отзыв ранее."""
+        if not user.is_authenticated:
+            return False
+
+        return Review.objects.filter(
+            user=user,
+            product=product,
+        ).exists()
+
+
+    # --- Контекст страницы ---
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         product = self.object
+        user = self.request.user
 
         # Характеристики товара
         context["specifications"] = product.specifications.all()
 
-        # Все отзывы по продукту
+        # Все отзывы
         reviews_qs = product.reviews.select_related("user").order_by("-created_at")
         context["reviews"] = reviews_qs
 
-        # Агрегация: средний рейтинг и количество отзывов
-        agg = reviews_qs.aggregate(
-            avg_rating=Avg("rating"),
-            count=Count("id"),
-        )
+        # Агрегация по отзывам
+        agg = reviews_qs.aggregate(avg_rating=Avg("rating"), count=Count("id"))
         context["average_rating"] = agg["avg_rating"] or 0
         context["reviews_count"] = agg["count"] or 0
 
-        # Может ли пользователь оставить отзыв
-        context["can_review"] = self.user_can_review(product, self.request.user)
+        # Проверки
+        has_bought = self.user_has_bought(product, user)
+        already_reviewed = self.user_already_reviewed(product, user)
 
-        # Пустая форма для создания отзыва
-        context["review_form"] = ReviewForm()
+        context["can_review"] = has_bought and not already_reviewed
+        context["already_reviewed"] = already_reviewed
+
+        # Форма: пустая или с ошибками
+        context["review_form"] = (
+            self.invalid_form if self.invalid_form else ReviewForm()
+        )
 
         return context

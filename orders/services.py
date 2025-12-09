@@ -11,48 +11,35 @@ from .models import Order, OrderItem
 @transaction.atomic
 def create_order_from_cart(request, form_data):
     """
-    Создаёт заказ на основе корзины текущего пользователя или гостя.
+    Создаёт заказ из корзины.
 
-    Поддерживает две корзины:
-    - session_key (гости)
-    - user (авторизованные)
+    Твой сценарий (учебный):
+    - ВСЕГДА списываем stock
+    - ВСЕГДА очищаем корзину
+    - Если method=card > переходим на fake-payment (имитация)
     """
 
-    # ------------------------------------------------------------
+    # ---------------------------
     # 1. Session key
-    # ------------------------------------------------------------
+    # ---------------------------
     if not request.session.session_key:
         request.session.create()
     session_key = request.session.session_key
 
-    # ------------------------------------------------------------
-    # 2. Загрузка корзины (FIX!)
-    # ------------------------------------------------------------
+    # ---------------------------
+    # 2. Загрузка корзины
+    # ---------------------------
     if request.user.is_authenticated:
-        cart_items = (
-            CartItem.objects
-            .filter(user=request.user)
-            .select_related("product")
-        )
+        cart_items = CartItem.objects.filter(user=request.user).select_related("product")
     else:
-        cart_items = (
-            CartItem.objects
-            .filter(session_key=session_key)
-            .select_related("product")
-        )
+        cart_items = CartItem.objects.filter(session_key=session_key).select_related("product")
 
     if not cart_items.exists():
         raise ValidationError("Корзина пуста")
 
-    # ------------------------------------------------------------
-    # 3. Проверка обязательных полей
-    # ------------------------------------------------------------
-    required_fields = ["full_name", "shipping_address", "phone"]
-    for field in required_fields:
-        value = form_data.get(field, "").strip()
-        if not value:
-            raise ValidationError("Поле обязательно.")
-
+    # ---------------------------
+    # 3. Поля формы
+    # ---------------------------
     full_name = form_data["full_name"].strip()
     email = form_data.get("email", "").strip()
     phone = form_data["phone"].strip()
@@ -60,15 +47,9 @@ def create_order_from_cart(request, form_data):
     comment = form_data.get("comment", "").strip()
     payment_method = form_data.get("payment_method", "cash")
 
-    # ------------------------------------------------------------
-    # 4. Валидация телефона
-    # ------------------------------------------------------------
-    if not phone:
-        raise ValidationError("Поле обязательно.")
-
-    # ------------------------------------------------------------
-    # 5. Проверка остатков товара + snapshot
-    # ------------------------------------------------------------
+    # ---------------------------
+    # 4. Проверка остатков (только проверка)
+    # ---------------------------
     total_price = Decimal(0)
     snapshot = []
 
@@ -87,9 +68,17 @@ def create_order_from_cart(request, form_data):
 
         total_price += product.price * qty
 
-    # ------------------------------------------------------------
+    # ---------------------------
+    # 5. Статус заказа
+    # ---------------------------
+    if payment_method == "card":
+        status = Order.STATUS_PENDING_PAYMENT   # ожидает фейковую оплату
+    else:
+        status = Order.STATUS_PENDING           # оформлен, ожидает подтверждения
+
+    # ---------------------------
     # 6. Создание заказа
-    # ------------------------------------------------------------
+    # ---------------------------
     order = Order.objects.create(
         user=request.user if request.user.is_authenticated else None,
         session_key=session_key,
@@ -101,13 +90,13 @@ def create_order_from_cart(request, form_data):
         comment=comment,
 
         payment_method=payment_method,
-        status=Order.STATUS_PENDING,
+        status=status,
         total_price=total_price,
     )
 
-    # ------------------------------------------------------------
-    # 7. Создание OrderItem + списание stock
-    # ------------------------------------------------------------
+    # ---------------------------
+    # 7. Создание OrderItem
+    # ---------------------------
     for item in snapshot:
         OrderItem.objects.create(
             order=order,
@@ -116,12 +105,15 @@ def create_order_from_cart(request, form_data):
             price=item["price"],
         )
 
+    # ---------------------------
+    # 8. СПИСАНИЕ ТОВАРА — ВСЕГДА
+    # ---------------------------
+    for item in snapshot:
         item["product"].stock -= item["qty"]
         item["product"].save(update_fields=["stock"])
 
-    # ------------------------------------------------------------
-    # 8. Очистка корзины
-    # ------------------------------------------------------------
+
+    #  Очистка корзины
     cart_items.delete()
 
     return order

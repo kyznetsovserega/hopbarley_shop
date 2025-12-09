@@ -6,12 +6,11 @@ from orders.models import Order, OrderItem
 from reviews.models import Review
 
 
-# ----------------------------
-# 1. Пользователь НЕ покупал → отзыв запрещён
-# ----------------------------
+# ----------------------------------------------------------------------
+# 1. Пользователь НЕ покупал > отзыв запрещён
+# ----------------------------------------------------------------------
 @pytest.mark.django_db
 def test_add_review_not_purchased(client_web, product_fixture, user_fixture):
-    # логиним пользователя в обычный Django-клиент
     client_web.force_login(user_fixture)
 
     url = reverse("reviews:add", args=[product_fixture.slug])
@@ -21,16 +20,16 @@ def test_add_review_not_purchased(client_web, product_fixture, user_fixture):
         "comment": "Should NOT work"
     })
 
-    # редирект обратно на страницу товара
+    # должен быть редирект (messages + redirect)
     assert response.status_code == 302
 
     # отзыв НЕ создан
     assert product_fixture.reviews.count() == 0
 
 
-# ----------------------------
-# 2. Пользователь покупал → отзыв разрешён
-# ----------------------------
+# ----------------------------------------------------------------------
+# 2. Пользователь покупал > отзыв разрешён
+# ----------------------------------------------------------------------
 @pytest.mark.django_db
 def test_add_review_purchased(client_web, product_fixture, user_fixture):
     client_web.force_login(user_fixture)
@@ -38,12 +37,12 @@ def test_add_review_purchased(client_web, product_fixture, user_fixture):
     # создаём успешный заказ
     order = Order.objects.create(
         user=user_fixture,
-        status=Order.STATUS_PAID,  # "paid"
+        status="paid",
         total_price=Decimal("100.00"),
         shipping_address="Test address",
     )
 
-    # создаём позицию заказа с этим продуктом
+    # создаём OrderItem с продуктом
     OrderItem.objects.create(
         order=order,
         product=product_fixture,
@@ -58,10 +57,9 @@ def test_add_review_purchased(client_web, product_fixture, user_fixture):
         "comment": "Great product",
     })
 
-    # редирект обратно на детальную страницу товара
-    assert response.status_code == 302
+    assert response.status_code == 302  # redirect to product detail
 
-    # создан ровно один отзыв
+    # создан один отзыв
     assert product_fixture.reviews.count() == 1
 
     review = product_fixture.reviews.first()
@@ -70,12 +68,27 @@ def test_add_review_purchased(client_web, product_fixture, user_fixture):
     assert review.user == user_fixture
 
 
-# ----------------------------
-# 3. Повторный отзыв тем же пользователем → запрещён
-# ----------------------------
+# ----------------------------------------------------------------------
+# 3. Повторный отзыв тем же пользователем > запрещён
+# ----------------------------------------------------------------------
 @pytest.mark.django_db
 def test_add_review_unique(client_web, product_fixture, user_fixture):
     client_web.force_login(user_fixture)
+
+    # создаём оплаченный заказ, иначе add_review не будет доступен
+    order = Order.objects.create(
+        user=user_fixture,
+        status="paid",
+        total_price=Decimal("100.00"),
+        shipping_address="Test address",
+    )
+
+    OrderItem.objects.create(
+        order=order,
+        product=product_fixture,
+        quantity=1,
+        price=Decimal("100.00"),
+    )
 
     # первый отзыв уже есть
     Review.objects.create(
@@ -87,15 +100,14 @@ def test_add_review_unique(client_web, product_fixture, user_fixture):
 
     url = reverse("reviews:add", args=[product_fixture.slug])
 
-    # пытаемся отправить второй отзыв
     response = client_web.post(url, {
         "rating": 3,
         "comment": "Second review",
     })
 
-    assert response.status_code == 302
+    assert response.status_code == 302  # redirect after error message
 
-    # в базе всё ещё только один отзыв
+    # второй отзыв НЕ создаётся
     assert product_fixture.reviews.count() == 1
 
     review = product_fixture.reviews.first()
