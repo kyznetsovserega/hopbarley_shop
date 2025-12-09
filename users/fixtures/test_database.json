@@ -1,0 +1,259 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "username": "admin",
+      "email": "admin@example.com",
+      "is_staff": true,
+      "is_superuser": true,
+      "is_active": true,
+      "password": "pbkdf2_sha256$260000$tFAKEpwHASHhere"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+      "username": "john",
+      "email": "john@example.com",
+      "is_active": true,
+      "password": "pbkdf2_sha256$fakehash"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 3,
+    "fields": {
+      "username": "anna",
+      "email": "anna@example.com",
+      "is_active": true,
+      "password": "pbkdf2_sha256$fakehash"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 4,
+    "fields": {
+      "username": "mark",
+      "email": "mark@example.com",
+      "is_active": true,
+      "password": "pbkdf2_sha256$fakehash"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 5,
+    "fields": {
+      "username": "guest1",
+      "email": "",
+      "is_active": true,
+      "password": "pbkdf2_sha256$fakehash"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 6,
+    "fields": {
+      "username": "heavybuyer",
+      "email": "heavy@example.com",
+      "is_active": true,
+      "password": "pbkdf2_sha256$fakehash"
+    }
+  },
+
+  {
+    "model": "users.userprofile",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "phone": "+10000000",
+      "city": "AdminCity",
+      "address": "Admin Address",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "users.userprofile",
+    "pk": 2,
+    "fields": {
+      "user": 2,
+      "phone": "+1234567",
+      "city": "New York",
+      "address": "5th Avenue",
+      "created_at": "2025-01-02T00:00:00Z",
+      "updated_at": "2025-01-02T00:00:00Z"
+    }
+  },
+  {
+    "model": "users.userprofile",
+    "pk": 3,
+    "fields": {
+      "user": 3,
+      "phone": "+998877",
+      "city": "Los Angeles",
+      "address": "Sunset Blvd",
+      "created_at": "2025-01-03T00:00:00Z",
+      "updated_at": "2025-01-03T00:00:00Z"
+    }
+  },
+  {
+    "model": "users.userprofile",
+    "pk": 4,
+    "fields": {
+      "user": 4,
+      "phone": "+445566",
+      "city": "Chicago",
+      "address": "Lake Shore Drive",
+      "created_at": "2025-01-04T00:00:00Z",
+      "updated_at": "2025-01-04T00:00:00Z"
+    }
+  },
+  {
+    "model": "users.userprofile",
+    "pk": 5,
+    "fields": {
+      "user": 5,
+      "phone": "",
+      "city": "",
+      "address": "",
+      "created_at": "2025-01-05T00:00:00Z",
+      "updated_at": "2025-01-05T00:00:00Z"
+    }
+  },
+  {
+    "model": "users.userprofile",
+    "pk": 6,
+    "fields": {
+      "user": 6,
+      "phone": "+777777",
+      "city": "Miami",
+      "address": "Ocean Drive",
+      "created_at": "2025-01-06T00:00:00Z",
+      "updated_at": "2025-01-06T00:00:00Z"
+    }
+  },
+
+  {
+    "model": "orders.order",
+    "pk": 1,
+    "fields": {
+      "user": 2,
+      "status": "paid",
+      "payment_method": "card",
+      "total_price": "59.99",
+      "full_name": "John Doe",
+      "email": "john@example.com",
+      "phone": "+1234567",
+      "shipping_address": "New York, 5th Avenue",
+      "comment": "",
+      "session_key": null,
+      "created_at": "2025-01-10T10:00:00Z",
+      "updated_at": "2025-01-10T10:05:00Z"
+    }
+  },
+  {
+    "model": "orders.order",
+    "pk": 2,
+    "fields": {
+      "user": 2,
+      "status": "delivered",
+      "payment_method": "card",
+      "total_price": "29.99",
+      "full_name": "John Doe",
+      "email": "john@example.com",
+      "phone": "+1234567",
+      "shipping_address": "New York, 5th Avenue",
+      "comment": "",
+      "session_key": null,
+      "created_at": "2025-01-12T10:00:00Z",
+      "updated_at": "2025-01-12T10:05:00Z"
+    }
+  },
+  {
+    "model": "orders.order",
+    "pk": 3,
+    "fields": {
+      "user": 3,
+      "status": "paid",
+      "payment_method": "cash",
+      "total_price": "14.50",
+      "full_name": "Anna Smith",
+      "email": "anna@example.com",
+      "phone": "+998877",
+      "shipping_address": "Los Angeles, Sunset Blvd",
+      "comment": "",
+      "session_key": null,
+      "created_at": "2025-01-15T12:00:00Z",
+      "updated_at": "2025-01-15T12:05:00Z"
+    }
+  },
+  {
+    "model": "orders.order",
+    "pk": 4,
+    "fields": {
+      "user": 6,
+      "status": "paid",
+      "payment_method": "card",
+      "total_price": "99.00",
+      "full_name": "Big Buyer",
+      "email": "heavy@example.com",
+      "phone": "+777777",
+      "shipping_address": "Miami, Ocean Drive",
+      "comment": "",
+      "session_key": null,
+      "created_at": "2025-01-20T10:00:00Z",
+      "updated_at": "2025-01-20T10:05:00Z"
+    }
+  },
+
+  {
+    "model": "orders.orderitem",
+    "pk": 1,
+    "fields": { "order": 1, "product": 1, "quantity": 5, "price": "5.99" }
+  },
+  {
+    "model": "orders.orderitem",
+    "pk": 2,
+    "fields": { "order": 1, "product": 2, "quantity": 2, "price": "6.49" }
+  },
+  {
+    "model": "orders.orderitem",
+    "pk": 3,
+    "fields": { "order": 2, "product": 3, "quantity": 3, "price": "3.99" }
+  },
+  {
+    "model": "orders.orderitem",
+    "pk": 4,
+    "fields": { "order": 3, "product": 1, "quantity": 1, "price": "5.99" }
+  },
+  {
+    "model": "orders.orderitem",
+    "pk": 5,
+    "fields": { "order": 4, "product": 2, "quantity": 10, "price": "6.49" }
+  },
+
+  {
+    "model": "reviews.review",
+    "pk": 1,
+    "fields": {
+      "product": 1,
+      "user": 2,
+      "rating": 5,
+      "comment": "Отличный продукт!",
+      "created_at": "2025-01-11T10:00:00Z"
+    }
+  },
+  {
+    "model": "reviews.review",
+    "pk": 2,
+    "fields": {
+      "product": 2,
+      "user": 4,
+      "rating": 4,
+      "comment": "Мне понравилось",
+      "created_at": "2025-01-16T12:00:00Z"
+    }
+  }
+]
