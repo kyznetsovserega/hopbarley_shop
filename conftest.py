@@ -54,6 +54,7 @@ def product_fixture(db, category_fixture):
 
 @pytest.fixture
 def review_fixture(db, user_fixture, product_fixture):
+    """Готовый отзыв (используется для тестов списка)."""
     return Review.objects.create(
         product=product_fixture,
         user=user_fixture,
@@ -68,6 +69,7 @@ def review_fixture(db, user_fixture, product_fixture):
 
 @pytest.fixture
 def order_fixture(db, user_fixture):
+    """Базовый заказ (по умолчанию pending)."""
     from orders.models import Order
     return Order.objects.create(
         user=user_fixture,
@@ -79,11 +81,42 @@ def order_fixture(db, user_fixture):
 
 @pytest.fixture
 def order_item_fixture(db, order_fixture, product_fixture):
+    """Item заказа — НЕ делает покупку завершённой."""
     from orders.models import OrderItem
     return OrderItem.objects.create(
         order=order_fixture,
         product=product_fixture,
         quantity=2,
+        price=product_fixture.price,
+    )
+
+
+# === ДОПОЛНИТЕЛЬНЫЕ ФИКСТУРЫ ДЛЯ TEST REVIEWS ===
+
+@pytest.fixture
+def paid_order_fixture(order_fixture):
+    """Заказ со статусом paid — разрешает оставить отзыв."""
+    order_fixture.status = "paid"
+    order_fixture.save()
+    return order_fixture
+
+
+@pytest.fixture
+def delivered_order_fixture(order_fixture):
+    """Заказ со статусом delivered — тоже разрешает отзыв."""
+    order_fixture.status = "delivered"
+    order_fixture.save()
+    return order_fixture
+
+
+@pytest.fixture
+def paid_order_item_fixture(db, paid_order_fixture, product_fixture):
+    """Товар в оплачённом заказе — завершённая покупка."""
+    from orders.models import OrderItem
+    return OrderItem.objects.create(
+        order=paid_order_fixture,
+        product=product_fixture,
+        quantity=1,
         price=product_fixture.price,
     )
 

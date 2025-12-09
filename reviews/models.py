@@ -52,13 +52,15 @@ class Review(models.Model):
             models.UniqueConstraint(
                 fields=["user", "product"],
                 name="unique_user_product_review"
-            )
+            ),
+            models.CheckConstraint(
+                check=models.Q(rating__gte=1) & models.Q(rating__lte=5),
+                name="rating_between_1_and_5",
+            ),
         ]
 
     def clean(self):
-        """
-        Рейтинг должен быть 1–5.
-        """
+        """Рейтинг должен быть 1–5."""
         if not (1 <= self.rating <= 5):
             raise ValidationError("Рейтинг должен быть от 1 до 5.")
 

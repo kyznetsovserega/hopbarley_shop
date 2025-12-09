@@ -20,11 +20,13 @@
             <form method="post" class="auth-form">
                 {% csrf_token %}
 
-                <!-- NON-FIELD ERRORS (пароли, сложность пароля) -->
-                {% if form.non_field_errors %}
+                <!-- GLOBAL FORM ERRORS (например, validate_password) -->
+                {% if form.errors %}
                     <div class="auth-error">
-                        {% for err in form.non_field_errors %}
-                            <p class="field-error">{{ err }}</p>
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <p class="field-error">{{ error }}</p>
+                            {% endfor %}
                         {% endfor %}
                     </div>
                 {% endif %}

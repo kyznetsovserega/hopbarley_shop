@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
+from products.views import ProductDetailView
 
 from products.models import Product
 from orders.models import Order
@@ -12,39 +13,38 @@ from .models import Review
 def add_review(request, slug):
     product = get_object_or_404(Product, slug=slug)
 
-    # 1. Проверка: пользователь должен сначала купить товар
-    has_bought = (
-        Order.objects
-        .filter(
-            user=request.user,
-            items__product=product,
-            status__in=["paid", "delivered"]  # статусы "успешного" заказа
-        )
-        .exists()
-    )
+    # Покупка
+    has_bought = Order.objects.filter(
+        user=request.user,
+        items__product=product,
+        status__in=["paid", "delivered"]
+    ).exists()
 
     if not has_bought:
-        messages.error(
-            request,
-            "Вы можете оставить отзыв только после покупки этого товара."
-        )
-        return redirect("products:product_detail", slug=product.slug)
+        messages.error(request, "Можно оставить отзыв только после покупки.")
+        return redirect("products:product_detail", slug=slug)
 
-    # 2. Проверка: только один отзыв на товар от одного пользователя
+    # Один отзыв
     if Review.objects.filter(user=request.user, product=product).exists():
-        messages.error(request, "Вы уже оставили отзыв для этого товара.")
-        return redirect("products:product_detail", slug=product.slug)
+        messages.error(request, "Вы уже оставили отзыв.")
+        return redirect("products:product_detail", slug=slug)
 
-    # 3. Обработка формы
+    # POST
     if request.method == "POST":
         form = ReviewForm(request.POST)
+
         if form.is_valid():
             review = form.save(commit=False)
             review.user = request.user
             review.product = product
             review.save()
-            messages.success(request, "Спасибо! Ваш отзыв сохранён.")
-        else:
-            messages.error(request, "Исправьте ошибки в форме перед отправкой.")
+            messages.success(request, "Спасибо! Ваш отзыв опубликован.")
+            return redirect("products:product_detail", slug=slug)
 
-    return redirect("products:product_detail", slug=product.slug)
+        # Ошибочная форма > показываем CBV с invalid_form
+        view = ProductDetailView.as_view(
+            extra_context={"invalid_form": form}
+        )
+        return view(request, slug=slug)
+
+    return redirect("products:product_detail", slug=slug)

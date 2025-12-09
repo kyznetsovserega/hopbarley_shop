@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Payment | Hop & Barley{% endblock %}
+
+{% block content %}
+<main class="checkout-page">
+    <div class="container">
+
+        <div class="fake-payment-card">
+
+            <h1 class="fake-payment-title">Bank Card Payment</h1>
+
+            <p class="fake-payment-text">
+                You are about to pay for order <strong>#{{ order_id }}</strong>.
+                <br>
+                Since this is a demo version, no real payment will be processed.
+            </p>
+
+            <div class="fake-payment-preview">
+                <img src="{% static '' %}" alt="Mock Card" />
+            </div>
+
+            <a href="{% url 'orders:fake_payment_success' order_id=order_id %}"
+               class="button button--primary fake-payment-button">
+                Pay Now
+            </a>
+
+            <p class="fake-payment-note">
+                * This is a payment simulation. No card details are required.
+            </p>
+        </div>
+
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Optional—small highlight animation
+    document.addEventListener("DOMContentLoaded", () => {
+        const card = document.querySelector(".fake-payment-card");
+        card.style.opacity = 0;
+        setTimeout(() => {
+            card.style.transition = "opacity 0.5s ease";
+            card.style.opacity = 1;
+        }, 100);
+    });
+</script>
+{% endblock %}

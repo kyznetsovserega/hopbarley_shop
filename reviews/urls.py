@@ -4,5 +4,5 @@ from .views import add_review
 app_name = "reviews"
 
 urlpatterns = [
-    path("add/<slug:slug>/", add_review, name="add"),
+    path("<slug:slug>/add/", add_review, name="add"),
 ]

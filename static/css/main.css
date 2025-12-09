@@ -118,6 +118,10 @@ header {
     gap: 12px;
 }
 
+.header__user-actions {
+    display: none;
+}
+
 .button {
     flex: 1 1 0;
     padding: 8px;
@@ -163,14 +167,6 @@ header {
     overflow: hidden;
     padding: 0 64px;
 }
-
-/*.hero-banner {*/
-/*    position: relative;*/
-/*    width: 100%;*/
-/*    height: 400px;*/
-/*    overflow: hidden;*/
-/*    margin-bottom: 32px;*/
-/*}*/
 
 .hero-banner__image {
     width: 100%;
@@ -557,12 +553,12 @@ footer {
     text-decoration: none;
 }
 
-
 /*
 ========================================
     Register Page Specific Styles
 ========================================
 */
+
 .auth-page-wrapper {
     position: relative;
     width: 100%;
@@ -587,8 +583,6 @@ footer {
     height: 100%;
     object-fit: cover;
 }
-
-
 
 .auth-form-container {
     position: relative;
@@ -628,7 +622,7 @@ footer {
 }
 
 .InputField {
-    width: 100%; /* 368px */
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -659,7 +653,6 @@ footer {
     box-shadow: 0 0 0 3px rgba(2, 84, 45, 0.2);
 }
 
-
 .CheckboxField {
     width: 100%;
 }
@@ -671,7 +664,6 @@ footer {
     color: var(--black-main);
 }
 
-/* ButtonGroup  */
 .ButtonGroup {
     width: 100%;
 }
@@ -682,20 +674,17 @@ footer {
     padding: 12px;
 }
 
-/* auth-switch - link "Already have an account?" */
 .auth-switch {
     margin-top: 0;
     font-size: 14px;
     color: var(--grey-text);
 }
 
-
 /*
 ========================================
     Login Page Specific Styles
 ========================================
 */
-
 .auth-container--login {
     width: 416px;
     padding: 24px;
@@ -712,7 +701,7 @@ footer {
     gap: 24px;
 }
 
-/* Forgot password  */
+/* Forgot password */
 .TextLink {
     width: 100%;
     text-align: left;
@@ -729,7 +718,6 @@ footer {
 .TextLink a:hover {
     text-decoration: underline;
 }
-
 
 /*
 ========================================
@@ -764,7 +752,6 @@ footer {
     height: 40px;
 }
 
-/* Button - "Cancel" */
 .button--cancel {
     background-color: transparent;
     color: var(--black-main);
@@ -776,14 +763,12 @@ footer {
     background-color: var(--slate-200);
 }
 
-
 /*
 ========================================
     Header User Actions (Logged-in state)
 ========================================
 */
 .header__user-actions {
-    display: none;
     align-items: center;
     gap: 24px;
 }
@@ -806,26 +791,25 @@ footer {
     padding: 8px 16px;
 }
 
-/*
-========================================
-    Logic for Hiding/Showing Auth Blocks
-========================================
-*/
+/* ========================================
+   FIXED BLOCK — Logic for Auth Buttons
+   ======================================== */
 
-body:not(.user-logged-in) .header__user-actions {
-    display: none;
-}
+/* Гость — показываем Sign in / Register */
 body:not(.user-logged-in) .header__auth-buttons {
     display: flex;
 }
+body:not(.user-logged-in) .header__user-actions {
+    display: none;
+}
 
+/* Авторизованный — показываем иконки */
 body.user-logged-in .header__auth-buttons {
     display: none;
 }
 body.user-logged-in .header__user-actions {
     display: flex;
 }
-
 
 /*
 ========================================
@@ -915,7 +899,7 @@ body.user-logged-in .header__user-actions {
     gap: 1em;
 }
 
-/*  Add to Cart" Button  */
+/* Add to Cart Button */
 .add-to-cart-button {
     width: 304px;
     height: 40px;
@@ -926,21 +910,21 @@ body.user-logged-in .header__user-actions {
 .add-to-cart-button .fa-check {
     display: none;
 }
+
 .add-to-cart-button.is-added {
     background-color: var(--dark-green);
     cursor: default;
 }
+
 .add-to-cart-button.is-added .fa-cart-shopping {
     display: none;
 }
+
 .add-to-cart-button.is-added .fa-check {
     display: inline-block;
 }
 
-/* --- Accordion Section  --- */
-.accordion-section {
-}
-
+/* Accordion Section */
 .accordion-item {
     width: 640px;
     background-color: white;
@@ -973,6 +957,7 @@ body.user-logged-in .header__user-actions {
     overflow: hidden;
     transition: max-height 0.3s ease, padding-top 0.3s ease;
 }
+
 .accordion-content ul {
     list-style-type: none;
     padding: 0;
@@ -981,6 +966,7 @@ body.user-logged-in .header__user-actions {
     flex-direction: column;
     gap: 8px;
 }
+
 .accordion-content li {
     font-size: 16px;
     line-height: 1.4;
@@ -990,11 +976,12 @@ body.user-logged-in .header__user-actions {
     max-height: 500px;
     padding-top: 16px;
 }
+
 .accordion-item.active .accordion-icon {
     transform: rotate(180deg);
 }
 
-/* --- Reviews Section --- */
+/* Reviews Section */
 .reviews-section {
     display: flex;
     flex-direction: column;
@@ -1075,6 +1062,7 @@ body.user-logged-in .header__user-actions {
     Cart Controls & Quantity Counter
 ========================================
 */
+
 .cart-controls {
     width: 304px;
     height: 40px;
@@ -1125,6 +1113,7 @@ body.user-logged-in .header__user-actions {
     Shopping Cart Page Styles
 ========================================
 */
+
 .cart-page-wrapper {
     background-color: var(--background-grey);
     padding: 64px 0;
@@ -1289,6 +1278,7 @@ body.user-logged-in .header__user-actions {
     Checkout Page Styles
 ========================================
 */
+
 .checkout-page-wrapper {
     background-color: var(--background-grey);
     padding: 64px 0;
@@ -1459,6 +1449,7 @@ body.user-logged-in .header__user-actions {
     Account Page Styles
 ========================================
 */
+
 .account-page-wrapper {
     background-color: var(--background-grey);
     padding: 64px 0;
@@ -1516,12 +1507,12 @@ body.user-logged-in .header__user-actions {
     background-color: var(--background-default);
     border-radius: 16px;
     border: 1px solid var(--border-default);
-    overflow: hidden; /* To clip corners of header */
+    overflow: hidden;
 }
 
 .order-table-header {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr; /* 3-column layout */
+    grid-template-columns: 2fr 1fr 1fr;
     background-color: var(--background-green);
     font-weight: 700;
 }
@@ -1568,12 +1559,12 @@ body.user-logged-in .header__user-actions {
     pointer-events: none;
 }
 
-
 /*
 ========================================
     Account Information Form Styles
 ========================================
 */
+
 .account-form-container {
     padding: 24px;
     background-color: var(--background-default);
@@ -1597,19 +1588,18 @@ body.user-logged-in .header__user-actions {
     gap: 24px;
 }
 
-/* button "Save"*/
 .button--full-width {
     width: 100%;
     height: 40px;
     padding: 12px;
 }
 
-
 /*
 ========================================
     Admin Panel Styles
 ========================================
 */
+
 .admin-page-wrapper {
     background-color: var(--background-grey);
     padding: 64px;
@@ -1731,6 +1721,7 @@ body.user-logged-in .header__user-actions {
     Admin Add/Edit Product Page Styles
 ========================================
 */
+
 .admin-form-layout {
     display: grid;
     grid-template-columns: 208px 1fr;
@@ -1739,7 +1730,6 @@ body.user-logged-in .header__user-actions {
     width: 100%;
 }
 
-/* Левая колонка */
 .admin-form-col-left {
     grid-column: 1 / 2;
     grid-row: 1 / 2;
@@ -1748,7 +1738,6 @@ body.user-logged-in .header__user-actions {
     gap: 24px;
 }
 
-/* Правая колонка */
 .admin-form-col-right {
     grid-column: 2 / 3;
     grid-row: 1 / 2;
@@ -1757,7 +1746,6 @@ body.user-logged-in .header__user-actions {
     gap: 24px;
 }
 
-/* Кнопки внизу */
 .admin-form-actions {
     grid-column: 2 / 3;
     grid-row: 2 / 3;
@@ -1770,7 +1758,6 @@ body.user-logged-in .header__user-actions {
     font-weight: 600;
 }
 
-/* Карточка загрузки изображения */
 .image-upload-card {
     width: 208px;
     height: 272px;
@@ -1813,7 +1800,6 @@ body.user-logged-in .header__user-actions {
     width: 100%;
 }
 
-/* Сategory */
 .category-tags {
     display: flex;
     gap: 8px;
@@ -1846,7 +1832,6 @@ body.user-logged-in .header__user-actions {
     display: inline-block;
 }
 
-/* Save, Hide, Delete */
 .admin-form-actions .button {
     height: 40px;
     padding: 12px 24px;
@@ -1868,6 +1853,7 @@ body.user-logged-in .header__user-actions {
     Admin Dashboard Page Styles
 ========================================
 */
+
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -1934,10 +1920,11 @@ body.user-logged-in .header__user-actions {
     Static Content Page Styles
 ========================================
 */
+
 .static-page-wrapper {
     background-color: var(--background-grey);
     padding: 80px 0;
-    min-height: 60vh; /* Минимальная высота, чтобы футер не прилипал к хедеру */
+    min-height: 60vh;
     display: flex;
     align-items: center;
 }
@@ -1982,7 +1969,6 @@ body.user-logged-in .header__user-actions {
 }
 
 /* ---my---*/
-
 .hidden {
     display: none;
 }
@@ -1990,7 +1976,6 @@ body.user-logged-in .header__user-actions {
 .keywords-list {
     margin-top: 10px;
 }
-
 
 /*
 ========================================
@@ -2002,7 +1987,6 @@ body.user-logged-in .header__user-actions {
     background-color: var(--background-grey);
     min-height: 60vh;
     padding: 80px 0;
-
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2015,10 +1999,8 @@ body.user-logged-in .header__user-actions {
     background-color: var(--background-default);
     border: 1px solid var(--border-default);
     border-radius: 16px;
-
     text-align: center;
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -2034,4 +2016,85 @@ body.user-logged-in .header__user-actions {
 .order-success-container p {
     font-size: 18px;
     color: var(--grey-text);
+}
+
+
+/* ORDER ITEMS — PRODUCT PREVIEW FIX */
+.order-items-list {
+  padding: 10px 0;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.order-item-image img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+  display: block;
+}
+
+.order-item-info {
+  flex-grow: 1;
+}
+
+.order-item-review {
+  white-space: nowrap;
+}
+
+.review-status.done {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+
+.fake-payment-card {
+    max-width: 540px;
+    margin: 40px auto;
+    padding: 32px;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+.fake-payment-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #1a1a1a;
+}
+
+.fake-payment-text {
+    font-size: 16px;
+    color: #444;
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.fake-payment-preview img {
+    max-width: 240px;
+    margin: 20px auto;
+    display: block;
+    opacity: 0.9;
+}
+
+.fake-payment-button {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+.fake-payment-note {
+    margin-top: 14px;
+    color: #777;
+    font-size: 13px;
 }

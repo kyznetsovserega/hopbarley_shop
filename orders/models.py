@@ -13,13 +13,15 @@ class Order(models.Model):
 
     # ---- Статусы заказа ----
     STATUS_PENDING = "pending"
+    STATUS_PENDING_PAYMENT = "pending_payment"
     STATUS_PAID = "paid"
     STATUS_SHIPPED = "shipped"
     STATUS_DELIVERED = "delivered"
     STATUS_CANCELLED = "cancelled"
 
     STATUS_CHOICES = [
-        (STATUS_PENDING, "Ожидает оплаты"),
+        (STATUS_PENDING, "Ожидает обработки"),
+        (STATUS_PENDING_PAYMENT, "Ожидает оплаты"),
         (STATUS_PAID, "Оплачено"),
         (STATUS_SHIPPED, "Отправлено"),
         (STATUS_DELIVERED, "Доставлено"),

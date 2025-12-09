@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 checkbox.addEventListener('change', function() {
                     const keyword = this.dataset.keyword;
                     if (this.checked) {
-                        // Create tag if not exists
                         if (!document.querySelector(`.keyword-tag[data-keyword="${keyword}"]`)) {
                             const newTag = document.createElement('span');
                             newTag.className = 'keyword-tag';
@@ -40,7 +39,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
 
-            // Remove tag → uncheck checkbox
             keywordsList.addEventListener('click', function(event) {
                 const keywordIcon = event.target.closest('.remove-keyword-icon');
                 if (keywordIcon) {
@@ -61,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const productPageContent = document.querySelector('.page-product');
     if (productPageContent) {
+
         // Accordion
         const accordionTitle = document.querySelector('.accordion-title');
         if (accordionTitle) {
@@ -69,33 +68,48 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Cart Counter Local Preview
+        // --- AUTO SCROLL TO REVIEW FORM (?review=1) ---
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get("review") === "1") {
+            const reviewForm = document.querySelector(".add-review-form");
+            if (reviewForm) {
+                reviewForm.scrollIntoView({ behavior: "smooth", block: "center" });
+                reviewForm.style.transition = "box-shadow 0.3s ease";
+                reviewForm.style.boxShadow = "0 0 12px 4px rgba(255, 140, 0, 0.6)";
+                setTimeout(() => reviewForm.style.boxShadow = "none", 2000);
+            }
+        }
+
+        // Cart Counter Preview (if used)
         const cartControls = document.querySelector('.cart-controls');
         if (cartControls) {
             const addToCartBtn = cartControls.querySelector('#add-to-cart-btn');
             const quantityCounter = cartControls.querySelector('#quantity-counter');
-            const decreaseBtn = quantityCounter.querySelector('[data-action="decrease"]');
-            const increaseBtn = quantityCounter.querySelector('[data-action="increase"]');
-            const quantityValueSpan = quantityCounter.querySelector('.quantity-value');
 
-            let quantity = 0;
+            if (addToCartBtn && quantityCounter) {
+                const decreaseBtn = quantityCounter.querySelector('[data-action="decrease"]');
+                const increaseBtn = quantityCounter.querySelector('[data-action="increase"]');
+                const quantityValueSpan = quantityCounter.querySelector('.quantity-value');
 
-            function updateView() {
-                if (quantity === 0) {
-                    addToCartBtn.classList.remove('is-hidden');
-                    quantityCounter.classList.add('is-hidden');
-                } else {
-                    addToCartBtn.classList.add('is-hidden');
-                    quantityCounter.classList.remove('is-hidden');
-                    quantityValueSpan.textContent = `${quantity} in cart`;
+                let quantity = 0;
+
+                function updateView() {
+                    if (quantity === 0) {
+                        addToCartBtn.classList.remove('is-hidden');
+                        quantityCounter.classList.add('is-hidden');
+                    } else {
+                        addToCartBtn.classList.add('is-hidden');
+                        quantityCounter.classList.remove('is-hidden');
+                        quantityValueSpan.textContent = `${quantity} in cart`;
+                    }
                 }
+
+                addToCartBtn.addEventListener('click', () => { quantity = 1; updateView(); });
+                decreaseBtn.addEventListener('click', () => { if (quantity > 0) quantity--; updateView(); });
+                increaseBtn.addEventListener('click', () => { quantity++; updateView(); });
+
+                updateView();
             }
-
-            addToCartBtn.addEventListener('click', () => { quantity = 1; updateView(); });
-            decreaseBtn.addEventListener('click', () => { if (quantity > 0) { quantity--; updateView(); } });
-            increaseBtn.addEventListener('click', () => { quantity++; updateView(); });
-
-            updateView();
         }
     }
 
@@ -113,9 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
             let total = 0;
             document.querySelectorAll('.cart-item').forEach(item => {
                 const priceText = item.querySelector('[data-item-total-price]').textContent;
-                if (priceText) {
-                    total += parseFloat(priceText.replace('$', ''));
-                }
+                if (priceText) total += parseFloat(priceText.replace('$', ''));
             });
             if (cartTotalPriceElem) {
                 cartTotalPriceElem.textContent = `$${total.toFixed(2)}`;
@@ -155,21 +167,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // ============================================================
-    // ACCOUNT PAGE (tabs + image upload preview)
+    // ACCOUNT PAGE (tabs + image preview)
     // ============================================================
 
     const accountAdminWrapper = document.querySelector('.account-page-wrapper, .admin-page-wrapper');
     if (accountAdminWrapper) {
 
-        // --- Tabs ---
         const accountTabs = document.querySelectorAll('.account-tab');
         const tabPanes = document.querySelectorAll('.tab-pane');
 
-        if (accountTabs.length > 0 && tabPanes.length > 0) {
+        if (accountTabs.length > 0) {
             accountTabs.forEach(tab => {
                 tab.addEventListener('click', function() {
-                    accountTabs.forEach(item => item.classList.remove('active'));
-                    tabPanes.forEach(pane => pane.classList.remove('active'));
+                    accountTabs.forEach(i => i.classList.remove('active'));
+                    tabPanes.forEach(p => p.classList.remove('active'));
 
                     this.classList.add('active');
                     const targetPane = document.querySelector(this.dataset.tabTarget);
@@ -178,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // --- Image Upload Preview (admin UI simulation) ---
+        // Upload image preview (if used)
         const uploadButton = document.getElementById('upload-image-btn');
         const fileInput = document.getElementById('image-upload-input');
 
