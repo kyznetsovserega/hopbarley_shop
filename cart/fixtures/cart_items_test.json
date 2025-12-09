@@ -1,0 +1,93 @@
+[
+  {
+    "model": "cart.cartitem",
+    "pk": 1,
+    "fields": { "user": 1, "product": 1, "quantity": 2, "session_key": null }
+  },
+  {
+    "model": "cart.cartitem",
+    "pk": 2,
+    "fields": { "user": 1, "product": 4, "quantity": 1, "session_key": null }
+  },
+
+  {
+    "model": "cart.cartitem",
+    "pk": 3,
+    "fields": { "user": 2, "product": 2, "quantity": 3, "session_key": null }
+  },
+  {
+    "model": "cart.cartitem",
+    "pk": 4,
+    "fields": { "user": 2, "product": 5, "quantity": 1, "session_key": null }
+  },
+  {
+    "model": "cart.cartitem",
+    "pk": 5,
+    "fields": { "user": 2, "product": 7, "quantity": 2, "session_key": null }
+  },
+
+  {
+    "model": "cart.cartitem",
+    "pk": 6,
+    "fields": { "user": 3, "product": 3, "quantity": 1, "session_key": null }
+  },
+  {
+    "model": "cart.cartitem",
+    "pk": 7,
+    "fields": { "user": 3, "product": 9, "quantity": 2, "session_key": null }
+  },
+
+  {
+    "model": "cart.cartitem",
+    "pk": 8,
+    "fields": { "user": 4, "product": 6, "quantity": 4, "session_key": null }
+  },
+
+  {
+    "model": "cart.cartitem",
+    "pk": 9,
+    "fields": { "user": 6, "product": 11, "quantity": 1, "session_key": null }
+  },
+  {
+    "model": "cart.cartitem",
+    "pk": 10,
+    "fields": { "user": 6, "product": 10, "quantity": 3, "session_key": null }
+  },
+
+  {
+    "model": "cart.cartitem",
+    "pk": 11,
+    "fields": { "user": 5, "product": 8, "quantity": 1, "session_key": null }
+  },
+
+  {
+    "model": "cart.cartitem",
+    "pk": 12,
+    "fields": { "user": null, "product": 12, "quantity": 2, "session_key": "guest_A1B2" }
+  },
+  {
+    "model": "cart.cartitem",
+    "pk": 13,
+    "fields": { "user": null, "product": 3, "quantity": 1, "session_key": "guest_C3D4" }
+  },
+  {
+    "model": "cart.cartitem",
+    "pk": 14,
+    "fields": { "user": null, "product": 4, "quantity": 2, "session_key": "guest_E5F6" }
+  },
+  {
+    "model": "cart.cartitem",
+    "pk": 15,
+    "fields": { "user": null, "product": 9, "quantity": 1, "session_key": "guest_G7H8" }
+  },
+  {
+    "model": "cart.cartitem",
+    "pk": 16,
+    "fields": { "user": null, "product": 6, "quantity": 3, "session_key": "guest_K9L1" }
+  },
+  {
+    "model": "cart.cartitem",
+    "pk": 17,
+    "fields": { "user": null, "product": 7, "quantity": 1, "session_key": "guest_M2N3" }
+  }
+]

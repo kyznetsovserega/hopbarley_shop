@@ -1,18 +1,96 @@
 from django.contrib import admin
+from django.db.models import F
+
 from cart.models import CartItem
 
 
 @admin.register(CartItem)
 class CartItemAdmin(admin.ModelAdmin):
     """
-    Админ-панель элементов корзины.
+    Админка корзины.
 
-    Позволяет просматривать корзины пользователей и гостей.
+    - отображение суммы позиции (total_price)
+    - оптимизированный queryset (select_related + аннотация)
+    - фильтрация по пользователю / продукту / типу корзины
+    - быстрый поиск по товарам, пользователям и session_key
+    - actions для чистки корзин
     """
 
-    list_display = ("id", "product", "quantity", "user", "session_key")
-    list_filter = ("user",)
-    search_fields = ("product__name", "session_key")
+    list_display = (
+        "id",
+        "product_name",
+        "quantity",
+        "total_price_display",
+        "owner",
+        "cart_type",
+        "session_key",
+    )
+
+    list_filter = (
+        "product",
+        "user",
+        "quantity",
+        ("session_key", admin.EmptyFieldListFilter),  # Guest / User разделение
+    )
+
+    search_fields = (
+        "product__name",
+        "user__username",
+        "user__email",
+        "session_key",
+    )
+
     ordering = ("id",)
 
-    readonly_fields = ()
+    # ------------------------------------------------------------------
+    # ORM оптимизация
+    # ------------------------------------------------------------------
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related("product", "user").annotate(
+            annotated_total=F("quantity") * F("product__price")
+        )
+
+    # ------------------------------------------------------------------
+    # Display helpers
+    # ------------------------------------------------------------------
+    @admin.display(description="Product")
+    def product_name(self, obj):
+        return f"{obj.product.name} ({obj.product.price}$)"
+
+    @admin.display(description="Total", ordering="annotated_total")
+    def total_price_display(self, obj):
+        return f"{obj.annotated_total:.2f}"
+
+    @admin.display(description="Owner")
+    def owner(self, obj):
+        if obj.user:
+            return f"{obj.user.username} ({obj.user.email})"
+        return "—"
+
+    @admin.display(description="Type")
+    def cart_type(self, obj):
+        return "User" if obj.user else "Guest"
+
+    # ------------------------------------------------------------------
+    # Actions
+    # ------------------------------------------------------------------
+    actions = ["delete_guest_carts", "delete_inactive_products", "clear_selected"]
+
+    @admin.action(description="Удалить все гостевые корзины")
+    def delete_guest_carts(self, request, queryset):
+        count = queryset.filter(user__isnull=True, session_key__isnull=False).count()
+        queryset.filter(user__isnull=True, session_key__isnull=False).delete()
+        self.message_user(request, f"Удалено гостевых позиций: {count}")
+
+    @admin.action(description="Удалить позиции с неактивными товарами")
+    def delete_inactive_products(self, request, queryset):
+        count = queryset.filter(product__is_active=False).count()
+        queryset.filter(product__is_active=False).delete()
+        self.message_user(request, f"Удалено: {count} позиций с неактивными товарами")
+
+    @admin.action(description="Удалить выбранные позиции")
+    def clear_selected(self, request, queryset):
+        count = queryset.count()
+        queryset.delete()
+        self.message_user(request, f"Удалено позиций: {count}")
