@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from rest_framework import serializers
+
 from cart.models import CartItem
 
 
@@ -8,14 +9,19 @@ class CartItemSerializer(serializers.ModelSerializer):
     """
     Сериализатор элемента корзины.
 
-    Используется в API для отображения товаров в корзине.
-    Выдаёт данные о товаре, количестве и итоговой стоимости позиции.
+    Предоставляет данные:
+        - информация о товаре
+        - количество единиц товара в корзине
+        - цена товара;
+        - итоговая стоимость позиции (price * quantity)
+
+    Используется в API корзины для отображения содержимого корзины.
     """
 
     product_title = serializers.CharField(
         source="product.name",
         read_only=True,
-        help_text="Название товара."
+        help_text="Название товара.",
     )
 
     product_price = serializers.DecimalField(
@@ -23,11 +29,11 @@ class CartItemSerializer(serializers.ModelSerializer):
         max_digits=10,
         decimal_places=2,
         read_only=True,
-        help_text="Цена товара за 1 единицу."
+        help_text="Цена товара за одну единицу.",
     )
 
     total_price = serializers.SerializerMethodField(
-        help_text="Итоговая стоимость позиции = цена × количество."
+        help_text="Итоговая стоимость позиции: цена * количество."
     )
 
     class Meta:
@@ -46,6 +52,11 @@ class CartItemSerializer(serializers.ModelSerializer):
             "total_price",
         ]
 
-    def get_total_price(self, obj):
-        """Возвращает итоговую стоимость позиции."""
+    def get_total_price(self, obj: CartItem):
+        """
+        Возвращает итоговую стоимость позиции.
+
+        Формула:
+            product.price * quantity
+        """
         return obj.product.price * obj.quantity

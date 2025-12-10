@@ -66,6 +66,13 @@ class CartService:
         """Получить все элементы корзины текущего владельца."""
         return CartItem.objects.filter(**self._owner_filter()).select_related("product")
 
+    def get_items_queryset(self):
+        """
+        Метод нужен только для API.
+        Возвращает QuerySet корзины текущего владельца.
+        """
+        return CartItem.objects.filter(**self._owner_filter()).select_related("product")
+
     def get_total(self):
         """Посчитать итоговую сумму корзины."""
         return sum(item.total_price for item in self.get_items())
