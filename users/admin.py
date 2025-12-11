@@ -1,17 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-from typing import Any
-from typing import List
-from typing import Tuple
+from typing import TYPE_CHECKING, Any, List, Tuple
 
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
-from django.db.models import Count
-from django.db.models import Max
-from django.db.models import QuerySet
-from django.db.models import Sum
+from django.db.models import Count, Max, QuerySet, Sum
 from django.http import HttpRequest
 
 from .models import UserProfile

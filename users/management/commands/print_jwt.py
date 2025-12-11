@@ -4,8 +4,7 @@ from typing import Any
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
-from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 User = get_user_model()
 

@@ -1,20 +1,13 @@
 from __future__ import annotations
 
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Tuple
+from typing import Any, Dict, List, Tuple
 
 from django.contrib import admin
-from django.db.models import Count
-from django.db.models import F
-from django.db.models import QuerySet
-from django.db.models import Sum
+from django.db.models import Count, F, QuerySet, Sum
 from django.http import HttpRequest
 from django.utils.html import format_html
 
-from .models import Order
-from .models import OrderItem
+from .models import Order, OrderItem
 
 
 # =====================================================================

@@ -12,9 +12,7 @@
 
 from __future__ import annotations
 
-from typing import Any
-from typing import Dict
-from typing import Iterable
+from typing import Any, Dict, Iterable
 
 from django.core.exceptions import ValidationError
 from django.db import transaction

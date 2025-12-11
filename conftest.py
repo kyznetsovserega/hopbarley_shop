@@ -4,8 +4,7 @@ from django.test import Client
 from django.urls import reverse
 from rest_framework.test import APIClient
 
-from products.models import Category
-from products.models import Product
+from products.models import Category, Product
 from reviews.models import Review
 
 # ======================================================================

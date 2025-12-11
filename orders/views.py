@@ -1,17 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-from typing import Any
-from typing import Dict
+from typing import TYPE_CHECKING, Any, Dict
 
 from django.core.exceptions import ValidationError
 from django.db.models import QuerySet
-from django.http import Http404
-from django.http import HttpRequest
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
-from django.shortcuts import render
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
+from django.shortcuts import redirect, render
 
 from cart.models import CartItem
 

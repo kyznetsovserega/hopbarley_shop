@@ -4,8 +4,7 @@ from typing import Any
 
 import pytest
 
-from products.models import Category
-from products.models import Product
+from products.models import Category, Product
 
 
 @pytest.mark.django_db

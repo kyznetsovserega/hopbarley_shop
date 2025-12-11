@@ -1,23 +1,15 @@
 from __future__ import annotations
 
-from typing import Any
-from typing import Dict
-from typing import List
+from typing import Any, Dict, List
 
 from django.contrib.auth import login
-from drf_spectacular.utils import OpenApiExample
-from drf_spectacular.utils import OpenApiRequest
-from drf_spectacular.utils import OpenApiResponse
-from drf_spectacular.utils import extend_schema
-from rest_framework import permissions
-from rest_framework import status
-from rest_framework import views
+from drf_spectacular.utils import OpenApiExample, OpenApiRequest, OpenApiResponse, extend_schema
+from rest_framework import permissions, status, views
 from rest_framework.request import Request
 from rest_framework.response import Response
 
 from api.serializers.users.profile_serializers import UserProfileSerializer
-from api.serializers.users.user_serializers import RegisterSerializer
-from api.serializers.users.user_serializers import UserSerializer
+from api.serializers.users.user_serializers import RegisterSerializer, UserSerializer
 from cart.utils import merge_session_cart_into_user_cart
 
 

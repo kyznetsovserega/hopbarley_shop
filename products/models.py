@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any
-from typing import Set
+from typing import Any, Set
 
 from django.db import models
 from django.urls import reverse

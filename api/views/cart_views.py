@@ -4,10 +4,7 @@ from typing import Any
 
 from django.core.exceptions import ValidationError
 from django.db.models import QuerySet
-from drf_spectacular.utils import OpenApiExample
-from drf_spectacular.utils import OpenApiRequest
-from drf_spectacular.utils import OpenApiResponse
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiExample, OpenApiRequest, OpenApiResponse, extend_schema
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request

@@ -14,16 +14,11 @@ Web-представления корзины.
 
 from __future__ import annotations
 
-from typing import Any
-from typing import Dict
+from typing import Any, Dict
 
 from django.contrib import messages
-from django.http import HttpRequest
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect
-from django.shortcuts import render
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from products.models import Product

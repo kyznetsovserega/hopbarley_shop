@@ -2,17 +2,14 @@ from __future__ import annotations
 
 from django.urls import path
 from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from api.views.cart_views import CartItemViewSet
 from api.views.order_views import OrderViewSet
 from api.views.products.category_views import CategoryViewSet
 from api.views.products.product_views import ProductViewSet
 from api.views.review_views import ReviewViewSet
-from api.views.user_views import MeView
-from api.views.user_views import RegisterView
-from api.views.user_views import UpdateProfileView
+from api.views.user_views import MeView, RegisterView, UpdateProfileView
 
 # ---------------------------------------------------------
 # DRF Router — добавляем ТОЛЬКО ViewSets

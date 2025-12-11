@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import django_filters
-from django.db.models import Q
-from django.db.models import QuerySet
+from django.db.models import Q, QuerySet
 
 from .models import Product
 

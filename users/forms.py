@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
-from typing import Dict
+from typing import Any, Dict
 
 from django import forms
 from django.contrib.auth.models import User

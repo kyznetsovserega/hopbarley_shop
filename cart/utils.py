@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-from typing import Any
-from typing import Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from django.db import transaction
 

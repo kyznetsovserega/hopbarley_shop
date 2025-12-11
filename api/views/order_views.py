@@ -1,18 +1,10 @@
 from __future__ import annotations
 
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Type
+from typing import Any, Dict, List, Type
 
 from django.db.models import QuerySet
-from drf_spectacular.utils import OpenApiExample
-from drf_spectacular.utils import OpenApiRequest
-from drf_spectacular.utils import OpenApiResponse
-from drf_spectacular.utils import extend_schema
-from rest_framework import permissions
-from rest_framework import status
-from rest_framework import viewsets
+from drf_spectacular.utils import OpenApiExample, OpenApiRequest, OpenApiResponse, extend_schema
+from rest_framework import permissions, status, viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
 from rest_framework.response import Response

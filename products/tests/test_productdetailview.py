@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from typing import Any
-from typing import Dict
+from typing import Any, Dict
 
 import pytest
 from django.urls import reverse
 
-from orders.models import Order
-from orders.models import OrderItem
+from orders.models import Order, OrderItem
 from reviews.models import Review
 
 

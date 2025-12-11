@@ -1,15 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-from typing import Any
-from typing import Dict
+from typing import TYPE_CHECKING, Any, Dict
 
-from django.db.models import Avg
-from django.db.models import Count
-from django.db.models import Q
-from django.db.models import QuerySet
-from django.http import HttpRequest
-from django.http import HttpResponse
+from django.db.models import Avg, Count, Q, QuerySet
+from django.http import HttpRequest, HttpResponse
 from django.views.generic import DetailView
 from django_filters.views import FilterView
 
@@ -18,8 +12,7 @@ from reviews.forms import ReviewForm
 from reviews.models import Review
 
 from .filter import ProductFilter
-from .models import Category
-from .models import Product
+from .models import Category, Product
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import AbstractUser as UserType

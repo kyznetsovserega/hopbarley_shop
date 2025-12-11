@@ -7,9 +7,7 @@ from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.utils.html import format_html
 
-from .models import Category
-from .models import Product
-from .models import ProductSpecification
+from .models import Category, Product, ProductSpecification
 
 # ============================================================
 # INLINE: Характеристики товара

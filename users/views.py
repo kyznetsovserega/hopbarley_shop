@@ -1,29 +1,21 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.contrib import messages
-from django.contrib.auth import authenticate
-from django.contrib.auth import login
-from django.contrib.auth import logout
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordChangeView
 from django.db.models import QuerySet
-from django.http import HttpRequest
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
-from django.shortcuts import render
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 
 from cart.utils import merge_session_cart_into_user_cart
 from orders.models import Order
 from reviews.models import Review
 
-from .forms import ProfileUpdateForm
-from .forms import RegisterForm
-from .forms import UserUpdateForm
+from .forms import ProfileUpdateForm, RegisterForm, UserUpdateForm
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import AbstractUser as UserType

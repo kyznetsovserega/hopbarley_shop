@@ -1,10 +1,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import TypedDict
+from typing import Any, Dict, List, TypedDict
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -12,8 +9,7 @@ from django.http import HttpRequest
 
 from cart.models import CartItem
 
-from .models import Order
-from .models import OrderItem
+from .models import Order, OrderItem
 
 
 class SnapshotItem(TypedDict):

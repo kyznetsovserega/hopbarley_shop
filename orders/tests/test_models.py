@@ -4,8 +4,7 @@ from typing import Any
 
 import pytest
 
-from orders.models import Order
-from orders.models import OrderItem
+from orders.models import Order, OrderItem
 
 
 # ============================================================================
