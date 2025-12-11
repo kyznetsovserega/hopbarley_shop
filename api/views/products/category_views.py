@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import Any, List, Type
+
+from django.db.models import QuerySet
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
+from rest_framework.request import Request
+from rest_framework.response import Response
 from drf_spectacular.utils import (
     extend_schema,
-    OpenApiExample,
     OpenApiResponse,
 )
 
@@ -28,10 +32,14 @@ from api.serializers.products.category_serializers import CategorySerializer
     ),
 )
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = CategorySerializer
-    permission_classes = [AllowAny]
+    """
+    ViewSet для работы с категориями товаров.
+    """
 
-    queryset = (
+    serializer_class: Type[CategorySerializer] = CategorySerializer
+    permission_classes: List[type[AllowAny]] = [AllowAny]
+
+    queryset: QuerySet[Category] = (
         Category.objects.all()
         .select_related("parent")
         .prefetch_related("children")
@@ -39,12 +47,12 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     )
 
     # ----------------------------------------------------------------------
-    # LIST endpoint — список категорий
+    # LIST — список категорий
     # ----------------------------------------------------------------------
     @extend_schema(
         summary="Получить список категорий",
         description=(
-            "Возвращает список всех категорий с одноуровневой деревовидной структурой.\n\n"
+            "Возвращает список всех категорий с одноуровневой структурой.\n\n"
             "Каждая категория включает:\n"
             "- `parent`: родитель\n"
             "- `children`: дочерние категории\n\n"
@@ -55,43 +63,14 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
             200: OpenApiResponse(
                 response=CategorySerializer(many=True),
                 description="Список категорий успешно получен.",
-                examples=[
-                    OpenApiExample(
-                        "Пример ответа",
-                        value=[
-                            {
-                                "id": 1,
-                                "name": "Hops",
-                                "slug": "hops",
-                                "description": "Aroma and bittering hops",
-                                "parent": None,
-                                "children": [
-                                    {
-                                        "id": 3,
-                                        "name": "Aroma Hops",
-                                        "slug": "aroma-hops",
-                                    }
-                                ]
-                            },
-                            {
-                                "id": 2,
-                                "name": "Malt",
-                                "slug": "malt",
-                                "description": "Base and specialty malts",
-                                "parent": None,
-                                "children": []
-                            }
-                        ]
-                    )
-                ]
             )
-        }
+        },
     )
-    def list(self, request, *args, **kwargs):
+    def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         return super().list(request, *args, **kwargs)
 
     # ----------------------------------------------------------------------
-    # RETRIEVE endpoint — получить категорию по ID
+    # RETRIEVE — категория по ID
     # ----------------------------------------------------------------------
     @extend_schema(
         summary="Получить категорию по ID",
@@ -103,10 +82,10 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
         responses={
             200: OpenApiResponse(
                 response=CategorySerializer,
-                description="Категория успешно получена."
+                description="Категория успешно получена.",
             ),
             404: OpenApiResponse(description="Категория не найдена."),
-        }
+        },
     )
-    def retrieve(self, request, *args, **kwargs):
+    def retrieve(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         return super().retrieve(request, *args, **kwargs)

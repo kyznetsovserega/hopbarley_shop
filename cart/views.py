@@ -14,6 +14,13 @@ Web-представления корзины.
 
 from __future__ import annotations
 
+from typing import Any, Dict
+
+from django.http import (
+    HttpRequest,
+    HttpResponse,
+    HttpResponseRedirect,
+)
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.contrib import messages
@@ -27,15 +34,9 @@ from .services import CartService
 # ADD TO CART
 # ======================================================================
 @require_POST
-def add_to_cart(request, product_id: int):
+def add_to_cart(request: HttpRequest, product_id: int) -> HttpResponseRedirect:
     """
     Добавление товара в корзину через веб-форму.
-
-    Логика:
-    - получаем товар
-    - инициализируем форму, передаём product + request
-    - при валидной форме > CartService.add()
-    - при ошибке stock > показываем сообщение пользователю
     """
     product = get_object_or_404(Product, id=product_id)
 
@@ -63,7 +64,7 @@ def add_to_cart(request, product_id: int):
 # ======================================================================
 # REMOVE ITEM
 # ======================================================================
-def remove_from_cart(request, item_id: int):
+def remove_from_cart(request: HttpRequest, item_id: int) -> HttpResponseRedirect:
     """
     Удаление элемента корзины.
     """
@@ -80,7 +81,7 @@ def remove_from_cart(request, item_id: int):
 # ======================================================================
 # INCREASE QUANTITY
 # ======================================================================
-def increase_quantity(request, item_id: int):
+def increase_quantity(request: HttpRequest, item_id: int) -> HttpResponseRedirect:
     """
     Увеличивает количество товара на 1.
     Проверки stock выполняет CartService.
@@ -98,10 +99,10 @@ def increase_quantity(request, item_id: int):
 # ======================================================================
 # DECREASE QUANTITY
 # ======================================================================
-def decrease_quantity(request, item_id: int):
+def decrease_quantity(request: HttpRequest, item_id: int) -> HttpResponseRedirect:
     """
     Уменьшает количество товара.
-    Если товар становится 1 > уменьшается до 0 → удаляется.
+    Если товар становится 1 > уменьшается до 0 и удаляется.
     """
     service = CartService(request)
 
@@ -116,7 +117,7 @@ def decrease_quantity(request, item_id: int):
 # ======================================================================
 # CLEAR CART
 # ======================================================================
-def clear_cart(request):
+def clear_cart(request: HttpRequest) -> HttpResponseRedirect:
     """
     Полностью очищает корзину текущего владельца (user или session_key).
     """
@@ -128,7 +129,7 @@ def clear_cart(request):
 # ======================================================================
 # CART DETAIL PAGE
 # ======================================================================
-def cart_detail(request):
+def cart_detail(request: HttpRequest) -> HttpResponse:
     """
     Страница корзины: список товаров + итоговая сумма.
     """
@@ -136,7 +137,9 @@ def cart_detail(request):
     items = service.get_items()
     total = service.get_total()
 
-    return render(request, "cart/cart_detail.html", {
+    context: Dict[str, Any] = {
         "items": items,
         "total": total,
-    })
+    }
+
+    return render(request, "cart/cart_detail.html", context)

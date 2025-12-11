@@ -1,19 +1,22 @@
+from __future__ import annotations
+
 from rest_framework import serializers
+
 from reviews.models import Review
 
 
 class ReviewSerializer(serializers.ModelSerializer):
     """
-    Сериализатор модели Review.
+    Сериализатор отзывов.
 
     Используется для:
         - вывода отзывов к товару
-        - создания отзывов от имени авторизованного пользователя
+        - создания отзыва авторизованным пользователем
 
-    Дополнительно возвращает username автора через поле user_name.
+    Возвращает username автора через поле user_name.
     """
 
-    user_name = serializers.CharField(
+    user_name: serializers.CharField = serializers.CharField(
         source="user.username",
         read_only=True,
         help_text="Имя пользователя, оставившего отзыв.",
@@ -30,7 +33,7 @@ class ReviewSerializer(serializers.ModelSerializer):
             "comment",
             "created_at",
         ]
-        read_only_fields = [
+        read_only_fields: list[str] = [
             "id",
             "user",
             "created_at",

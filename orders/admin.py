@@ -1,6 +1,11 @@
+from __future__ import annotations
+
+from typing import Any, Dict, List, Tuple
+
 from django.contrib import admin
+from django.db.models import Sum, Count, F, QuerySet
+from django.http import HttpRequest
 from django.utils.html import format_html
-from django.db.models import Sum, Count, F
 
 from .models import Order, OrderItem
 
@@ -16,37 +21,55 @@ class OrderItemInline(admin.TabularInline):
     raw_id_fields = ("product",)
     readonly_fields = ("product", "quantity", "price", "total")
 
-    def total(self, obj):
+    @admin.display(description="Сумма")
+    def total(self, obj: OrderItem) -> str:
         return f"{obj.quantity * obj.price:.2f}"
-    total.short_description = "Сумма"
 
 
 # =====================================================================
 # Actions
 # =====================================================================
+
 @admin.action(description="Отметить как оплаченные")
-def mark_as_paid(modeladmin, request, queryset):
+def mark_as_paid(
+    modeladmin: admin.ModelAdmin[Any],
+    request: HttpRequest,
+    queryset: QuerySet[Order]
+) -> None:
     queryset.update(status=Order.STATUS_PAID)
 
 
 @admin.action(description="Отменить заказ")
-def cancel_orders(modeladmin, request, queryset):
+def cancel_orders(
+    modeladmin: admin.ModelAdmin[Any],
+    request: HttpRequest,
+    queryset: QuerySet[Order]
+) -> None:
     queryset.update(status=Order.STATUS_CANCELLED)
 
 
 @admin.action(description="Отметить как отправленные")
-def mark_as_shipped(modeladmin, request, queryset):
+def mark_as_shipped(
+    modeladmin: admin.ModelAdmin[Any],
+    request: HttpRequest,
+    queryset: QuerySet[Order]
+) -> None:
     queryset.update(status=Order.STATUS_SHIPPED)
 
 
 # =====================================================================
 # Фильтр по сумме заказа
 # =====================================================================
+
 class TotalPriceFilter(admin.SimpleListFilter):
     title = "Сумма заказа"
     parameter_name = "total_price_range"
 
-    def lookups(self, request, model_admin):
+    def lookups(
+        self,
+        request: HttpRequest,
+        model_admin: admin.ModelAdmin[Any]
+    ) -> List[Tuple[str, str]]:
         return [
             ("0_50", "до 50"),
             ("50_100", "50 – 100"),
@@ -54,26 +77,28 @@ class TotalPriceFilter(admin.SimpleListFilter):
             ("200_plus", "более 200"),
         ]
 
-    def queryset(self, request, queryset):
-        value = self.value()
-        if not value:
-            return queryset
-
-        if value == "0_50":
-            return queryset.filter(total_price__lt=50)
-        if value == "50_100":
-            return queryset.filter(total_price__gte=50, total_price__lt=100)
-        if value == "100_200":
-            return queryset.filter(total_price__gte=100, total_price__lt=200)
-        if value == "200_plus":
-            return queryset.filter(total_price__gte=200)
-
-        return queryset
+    def queryset(
+        self,
+        request: HttpRequest,
+        qs: QuerySet[Order]
+    ) -> QuerySet[Order]:
+        match self.value():
+            case "0_50":
+                return qs.filter(total_price__lt=50)
+            case "50_100":
+                return qs.filter(total_price__gte=50, total_price__lt=100)
+            case "100_200":
+                return qs.filter(total_price__gte=100, total_price__lt=200)
+            case "200_plus":
+                return qs.filter(total_price__gte=200)
+            case _:
+                return qs
 
 
 # =====================================================================
 # ORDER ADMIN
 # =====================================================================
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
 
@@ -122,42 +147,39 @@ class OrderAdmin(admin.ModelAdmin):
     actions = (mark_as_paid, mark_as_shipped, cancel_orders)
 
     # ----------------------------------------------------------------------
-    # Оптимизация запросов
+    # OPTIMIZED QUERYSET
     # ----------------------------------------------------------------------
-    def get_queryset(self, request):
-        qs = (
-            super().get_queryset(request)
-            .prefetch_related("items")
-            .select_related("user")
-        )
-        return qs
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Order]:
+        qs: QuerySet[Order] = super().get_queryset(request)
+        return qs.select_related("user").prefetch_related("items")
 
     # ----------------------------------------------------------------------
     # АГРЕГИРОВАННАЯ АНАЛИТИКА
     # ----------------------------------------------------------------------
-    def changelist_view(self, request, extra_context=None):
+    def changelist_view(
+        self,
+        request: HttpRequest,
+        extra_context: Dict[str, Any] | None = None
+    ) -> Any:
+
         qs = self.get_queryset(request)
 
-        # АГРЕГАТЫ
-        stats = qs.aggregate(
+        # агрегаты
+        stats: Dict[str, Any] = qs.aggregate(
             total_orders=Count("id"),
             total_revenue=Sum("total_price"),
         )
 
-        # Средний чек считаем в Python
         total_orders = stats.get("total_orders") or 0
         total_revenue = stats.get("total_revenue") or 0
 
         avg_check = total_revenue / total_orders if total_orders > 0 else 0
         stats["avg_check"] = avg_check
 
-        # Количество заказов в статусе PENDING
         pending = qs.filter(status=Order.STATUS_PENDING).count()
 
-        # Топ 5 товаров
         top_products = (
-            OrderItem.objects
-            .values(name=F("product__name"))
+            OrderItem.objects.values(name=F("product__name"))
             .annotate(total_qty=Sum("quantity"))
             .order_by("-total_qty")[:5]
         )
@@ -172,15 +194,16 @@ class OrderAdmin(admin.ModelAdmin):
     # ----------------------------------------------------------------------
     # UI helpers
     # ----------------------------------------------------------------------
-    def buyer(self, obj):
+    @admin.display(description="Клиент")
+    def buyer(self, obj: Order) -> str:
         return obj.full_name or "—"
-    buyer.short_description = "Клиент"
 
-    def contact_phone(self, obj):
+    @admin.display(description="Телефон")
+    def contact_phone(self, obj: Order) -> str:
         return obj.phone or "—"
-    contact_phone.short_description = "Телефон"
 
-    def status_colored(self, obj):
+    @admin.display(description="Статус")
+    def status_colored(self, obj: Order) -> str:
         colors = {
             Order.STATUS_PENDING: "gray",
             Order.STATUS_PENDING_PAYMENT: "orange",
@@ -195,12 +218,12 @@ class OrderAdmin(admin.ModelAdmin):
             color,
             obj.get_status_display(),
         )
-    status_colored.short_description = "Статус"
 
 
 # =====================================================================
 # ORDER ITEM ADMIN
 # =====================================================================
+
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
     list_display = (
@@ -211,6 +234,7 @@ class OrderItemAdmin(admin.ModelAdmin):
         "price",
         "total",
     )
+
     raw_id_fields = ("product", "order")
 
     search_fields = (
@@ -218,5 +242,6 @@ class OrderItemAdmin(admin.ModelAdmin):
         "order__id",
     )
 
-    def total(self, obj):
+    @admin.display(description="Сумма")
+    def total(self, obj: OrderItem) -> str:
         return f"{obj.quantity * obj.price:.2f}"

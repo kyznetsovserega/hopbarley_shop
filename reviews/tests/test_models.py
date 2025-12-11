@@ -1,5 +1,10 @@
+from __future__ import annotations
+
+from typing import Any
+
 import pytest
 from django.core.exceptions import ValidationError
+
 from reviews.models import Review
 
 
@@ -7,7 +12,11 @@ from reviews.models import Review
 # 1. Создание отзыва
 # --------------------------------------------------------
 @pytest.mark.django_db
-def test_review_creation(review_fixture, product_fixture, user_fixture):
+def test_review_creation(
+    review_fixture: Any,
+    product_fixture: Any,
+    user_fixture: Any,
+) -> None:
     review = review_fixture
 
     assert isinstance(review, Review)
@@ -18,14 +27,19 @@ def test_review_creation(review_fixture, product_fixture, user_fixture):
 
     # связь с продуктом
     assert product_fixture.reviews.count() == 1
-    assert product_fixture.reviews.first() == review
+
+    first = product_fixture.reviews.first()
+    assert first is not None
+    assert first == review
 
 
 # --------------------------------------------------------
 # 2. Строковое представление (__str__)
 # --------------------------------------------------------
 @pytest.mark.django_db
-def test_review_str(review_fixture):
+def test_review_str(
+    review_fixture: Any,
+) -> None:
     text = str(review_fixture)
 
     assert "testuser" in text
@@ -34,10 +48,13 @@ def test_review_str(review_fixture):
 
 
 # --------------------------------------------------------
-# 3. Нельзя создать два отзыва от одного пользователя к одному товару
+# 3. Уникальность: нет двух отзывов от одного пользователя к одному товару
 # --------------------------------------------------------
 @pytest.mark.django_db
-def test_review_unique_constraint(user_fixture, product_fixture):
+def test_review_unique_constraint(
+    user_fixture: Any,
+    product_fixture: Any,
+) -> None:
     Review.objects.create(
         user=user_fixture,
         product=product_fixture,
@@ -46,7 +63,6 @@ def test_review_unique_constraint(user_fixture, product_fixture):
     )
 
     with pytest.raises(Exception):
-        # Должно нарушить UniqueConstraint
         Review.objects.create(
             user=user_fixture,
             product=product_fixture,
@@ -59,7 +75,10 @@ def test_review_unique_constraint(user_fixture, product_fixture):
 # 4. Валидация рейтинга (clean)
 # --------------------------------------------------------
 @pytest.mark.django_db
-def test_review_rating_validation(user_fixture, product_fixture):
+def test_review_rating_validation(
+    user_fixture: Any,
+    product_fixture: Any,
+) -> None:
     review = Review(
         user=user_fixture,
         product=product_fixture,

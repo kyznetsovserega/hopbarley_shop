@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Dict, List, Optional
 
+from django.db.models import QuerySet
 from rest_framework import serializers
 
 from products.models import Category
@@ -11,11 +12,8 @@ class CategorySerializer(serializers.ModelSerializer):
     """
     Сериализатор модели Category.
 
-    Формирует:
-        - сведения о родительской категории (parent)
-        - список дочерних категорий первого уровня (children)
-
-    Реализация исключает рекурсивную вложенность.
+    Возвращает сведения о родительской категории (parent)
+    и список дочерних категорий первого уровня (children).
     """
 
     parent = serializers.SerializerMethodField()
@@ -32,40 +30,42 @@ class CategorySerializer(serializers.ModelSerializer):
             "children",
         ]
 
-    def get_parent(self, obj: Category) -> dict | None:
+    def get_parent(self, obj: Category) -> Optional[Dict[str, Any]]:
         """
-        Возвращает информацию о родительской категории.
+        Возвращает краткую информацию о родительской категории:
 
-        Формат:
-            {
-                "id": ...,
-                "name": ...,
-                "slug": ...
-            }
+        {
+            "id": ...,
+            "name": ...,
+            "slug": ...
+        }
         """
-        if obj.parent:
-            return {
-                "id": obj.parent.id,
-                "name": obj.parent.name,
-                "slug": obj.parent.slug,
-            }
-        return None
+        parent = obj.parent
+        if parent is None:
+            return None
 
-    def get_children(self, obj: Category) -> list[dict[str, Any]]:
-        """
-        Возвращает одноуровневый список дочерних категорий.
+        return {
+            "id": parent.id,
+            "name": parent.name,
+            "slug": parent.slug,
+        }
 
-        Формат:
-            [
-                {"id": ..., "name": ..., "slug": ...},
-                ...
-            ]
+    def get_children(self, obj: Category) -> List[Dict[str, Any]]:
         """
+        Возвращает одноуровневый список дочерних категорий:
+
+        [
+            {"id": ..., "name": ..., "slug": ...},
+            ...
+        ]
+        """
+        children: QuerySet[Category] = obj.children.all()
+
         return [
             {
                 "id": child.id,
                 "name": child.name,
                 "slug": child.slug,
             }
-            for child in obj.children.all()
+            for child in children
         ]

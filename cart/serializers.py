@@ -1,15 +1,9 @@
-"""
-Сериализатор корзины.
-
-Включает:
-- данные товара
-- текущую цену товара
-- итоговую цену позиции (total_price)
-"""
-
 from __future__ import annotations
 
+from decimal import Decimal
+
 from rest_framework import serializers
+
 from cart.models import CartItem
 
 
@@ -43,6 +37,8 @@ class CartSerializer(serializers.ModelSerializer):
             "total_price",
         ]
 
-    def get_total_price(self, obj):
-        """Возвращает итоговую стоимость позиции."""
-        return obj.product.price * obj.quantity
+    def get_total_price(self, obj: CartItem) -> Decimal:
+        """
+        Возвращает итоговую стоимость позиции (цена * количество).
+        """
+        return obj.product.price * Decimal(obj.quantity)

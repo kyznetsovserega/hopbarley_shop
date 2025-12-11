@@ -1,13 +1,14 @@
 from __future__ import annotations
 
+from typing import Any, List, Type
+
+from django.db.models import QuerySet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework.permissions import AllowAny
-from drf_spectacular.utils import (
-    extend_schema,
-    OpenApiResponse,
-    OpenApiExample,
-)
+from rest_framework.request import Request
+from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from products.models import Product
 from api.serializers.products.product_serializers import ProductSerializer
@@ -28,31 +29,32 @@ from api.serializers.products.product_serializers import ProductSerializer
     ),
 )
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = ProductSerializer
+    """
+    API ViewSet для модели Product.
+    """
+
+    serializer_class: Type[ProductSerializer] = ProductSerializer
     permission_classes = [AllowAny]
     lookup_field = "slug"
 
-    # Базовый queryset
-    queryset = (
+    # ---- queryset ----
+    queryset: QuerySet[Product] = (
         Product.objects.filter(is_active=True)
         .select_related("category")
         .prefetch_related("specifications")
     )
 
-    filter_backends = [
+    # ---- фильтры, сортировка, поиск ----
+    filter_backends: List[Any] = [
         filters.SearchFilter,
         filters.OrderingFilter,
         DjangoFilterBackend,
     ]
 
-    # Поиск
-    search_fields = ["name", "description"]
+    search_fields: List[str] = ["name", "description"]
+    ordering_fields: List[str] = ["price", "created_at"]
 
-    # Сортировка
-    ordering_fields = ["price", "created_at"]
-
-    # Фильтры
-    filterset_fields = {
+    filterset_fields: dict[str, List[str]] = {
         "category__id": ["exact"],
         "price": ["gte", "lte"],
     }
@@ -64,7 +66,7 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
         summary="Список товаров",
         description=(
             "Возвращает список товаров с поддержкой поиска, сортировки и фильтров.\n\n"
-            "**Примеры фильтрации:**\n"
+            "**Примеры запросов:**\n"
             "- `/api/products/?search=hop`\n"
             "- `/api/products/?ordering=-price`\n"
             "- `/api/products/?category__id=2`\n"
@@ -74,46 +76,10 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
             200: OpenApiResponse(
                 response=ProductSerializer(many=True),
                 description="Список товаров успешно получен.",
-                examples=[
-                    OpenApiExample(
-                        "Пример ответа",
-                        value=[
-                            {
-                                "id": 1,
-                                "name": "Citra Hops",
-                                "slug": "citra-hops",
-                                "short_description": "Aroma hop for IPAs",
-                                "description": "Ideal for IPA brewing...",
-                                "unit": "kg",
-                                "price": "5.99",
-                                "old_price": "6.50",
-                                "stock": 40,
-                                "image": "/media/products/citra.jpg",
-                                "is_active": True,
-                                "tags": ["aroma", "citra"],
-                                "is_discounted": True,
-                                "discount_percent": 10,
-                                "specifications": [
-                                    {"id": 1, "name": "Alpha Acid", "value": "12%"}
-                                ],
-                                "category": {
-                                    "id": 2,
-                                    "name": "Hops",
-                                    "slug": "hops",
-                                    "description": "Aroma and bittering hops",
-                                    "parent": None,
-                                    "children": [],
-                                },
-                                "created_at": "2025-01-01T00:00:00Z",
-                                "updated_at": "2025-01-01T00:00:00Z",
-                            }
-                        ],
-                    )
-                ],
             )
         },
     )
-    def list(self, request, *args, **kwargs):
+    def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         return super().list(request, *args, **kwargs)
 
     # ----------------------------------------------------------------------
@@ -123,8 +89,7 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
         summary="Детальная информация о товаре",
         description=(
             "Возвращает всю информацию о товаре по его `slug`.\n\n"
-            "Пример запроса:\n"
-            "`/api/products/citra-hops/`"
+            "Пример: `/api/products/citra-hops/`"
         ),
         responses={
             200: OpenApiResponse(
@@ -134,5 +99,5 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
             404: OpenApiResponse(description="Товар не найден."),
         },
     )
-    def retrieve(self, request, *args, **kwargs):
+    def retrieve(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         return super().retrieve(request, *args, **kwargs)

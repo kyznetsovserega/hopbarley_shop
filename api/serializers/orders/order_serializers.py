@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any, Dict, List
+
 from rest_framework import serializers
 
 from orders.models import Order
@@ -14,12 +16,11 @@ class OrderSerializer(serializers.ModelSerializer):
         - отображения информации о заказе
         - формирования структуры заказа при его создании
 
-    Содержит вложенный список товарных позиций (OrderItem), который является
-    snapshot-данными — то есть каждая позиция содержит цену и название товара
-    на момент оформления заказа.
+    Включает snapshot-данные товарных позиций (OrderItem).
     """
 
-    items = OrderItemSerializer(
+    # Вложенный список позиций заказа
+    items: List[Dict[str, Any]] = OrderItemSerializer(
         many=True,
         read_only=True,
         help_text="Список товарных позиций, входящих в заказ.",

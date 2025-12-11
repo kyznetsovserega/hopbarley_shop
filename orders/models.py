@@ -1,3 +1,8 @@
+from __future__ import annotations
+
+from decimal import Decimal
+from typing import Optional
+
 from django.db import models
 from django.conf import settings
 from products.models import Product
@@ -6,9 +11,6 @@ from products.models import Product
 class Order(models.Model):
     """
     Модель заказа.
-
-    Хранит информацию о заказчике, статус заказа, способ оплаты,
-    контактные данные и привязанные товары.
     """
 
     # ---- Статусы заказа ----
@@ -133,7 +135,7 @@ class Order(models.Model):
         verbose_name_plural = 'Заказы'
         ordering = ['-created_at']
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'Order #{self.id} ({self.get_status_display()})'
 
     @property
@@ -147,9 +149,6 @@ class Order(models.Model):
 class OrderItem(models.Model):
     """
     Позиция товара внутри заказа.
-
-    Хранит snapshot товара:
-    цена и количество фиксируются в момент покупки.
     """
 
     order = models.ForeignKey(
@@ -181,12 +180,12 @@ class OrderItem(models.Model):
         help_text="Цена товара на момент оформления заказа (snapshot)."
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'{self.product.name} × {self.quantity}'
 
     @property
-    def total(self) -> float:
+    def total(self) -> Decimal:
         """
         Полная стоимость конкретной позиции (цена x количество).
         """
-        return self.quantity * self.price
+        return self.price * self.quantity

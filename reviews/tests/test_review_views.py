@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Any
+
 import pytest
 from decimal import Decimal
 from django.urls import reverse
@@ -10,14 +14,18 @@ from reviews.models import Review
 # 1. Пользователь НЕ покупал > отзыв запрещён
 # ----------------------------------------------------------------------
 @pytest.mark.django_db
-def test_add_review_not_purchased(client_web, product_fixture, user_fixture):
+def test_add_review_not_purchased(
+    client_web: Any,
+    product_fixture: Any,
+    user_fixture: Any,
+) -> None:
     client_web.force_login(user_fixture)
 
     url = reverse("reviews:add", args=[product_fixture.slug])
 
     response = client_web.post(url, {
         "rating": 5,
-        "comment": "Should NOT work"
+        "comment": "Should NOT work",
     })
 
     # должен быть редирект (messages + redirect)
@@ -31,7 +39,11 @@ def test_add_review_not_purchased(client_web, product_fixture, user_fixture):
 # 2. Пользователь покупал > отзыв разрешён
 # ----------------------------------------------------------------------
 @pytest.mark.django_db
-def test_add_review_purchased(client_web, product_fixture, user_fixture):
+def test_add_review_purchased(
+    client_web: Any,
+    product_fixture: Any,
+    user_fixture: Any,
+) -> None:
     client_web.force_login(user_fixture)
 
     # создаём успешный заказ
@@ -63,6 +75,7 @@ def test_add_review_purchased(client_web, product_fixture, user_fixture):
     assert product_fixture.reviews.count() == 1
 
     review = product_fixture.reviews.first()
+    assert review is not None
     assert review.rating == 4
     assert review.comment == "Great product"
     assert review.user == user_fixture
@@ -72,7 +85,11 @@ def test_add_review_purchased(client_web, product_fixture, user_fixture):
 # 3. Повторный отзыв тем же пользователем > запрещён
 # ----------------------------------------------------------------------
 @pytest.mark.django_db
-def test_add_review_unique(client_web, product_fixture, user_fixture):
+def test_add_review_unique(
+    client_web: Any,
+    product_fixture: Any,
+    user_fixture: Any,
+) -> None:
     client_web.force_login(user_fixture)
 
     # создаём оплаченный заказ, иначе add_review не будет доступен
@@ -111,5 +128,6 @@ def test_add_review_unique(client_web, product_fixture, user_fixture):
     assert product_fixture.reviews.count() == 1
 
     review = product_fixture.reviews.first()
+    assert review is not None
     assert review.comment == "First review"
     assert review.rating == 5

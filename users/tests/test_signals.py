@@ -1,25 +1,30 @@
+from __future__ import annotations
+
+from typing import Any
+
 import pytest
 from django.contrib.auth.models import User
+
 from users.models import UserProfile
 
 
 @pytest.mark.django_db
-def test_userprofile_created_by_signal():
-    user = User.objects.create_user(
+def test_userprofile_created_by_signal() -> None:
+    user: Any = User.objects.create_user(
         username="john",
         email="john@example.com",
-        password="12345"
+        password="12345",
     )
 
     assert UserProfile.objects.filter(user=user).exists()
 
 
 @pytest.mark.django_db
-def test_userprofile_saved_on_user_save():
-    user = User.objects.create_user(
+def test_userprofile_saved_on_user_save() -> None:
+    user: Any = User.objects.create_user(
         username="john",
         email="john@example.com",
-        password="12345"
+        password="12345",
     )
 
     # изменить email

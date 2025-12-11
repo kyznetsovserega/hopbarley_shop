@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any, Dict, List
+
 from rest_framework import serializers
 
 from products.models import Product
@@ -17,11 +19,13 @@ class ProductSerializer(serializers.ModelSerializer):
         - вычисляемые поля скидки (is_discounted, discount_percent)
     """
 
-    category = CategorySerializer(read_only=True)
-    specifications = ProductSpecificationSerializer(many=True, read_only=True)
+    category: CategorySerializer = CategorySerializer(read_only=True)
+    specifications: List[Dict[str, Any]] = ProductSpecificationSerializer(
+        many=True, read_only=True
+    )
 
-    is_discounted = serializers.BooleanField(read_only=True)
-    discount_percent = serializers.IntegerField(read_only=True)
+    is_discounted: serializers.BooleanField = serializers.BooleanField(read_only=True)
+    discount_percent: serializers.IntegerField = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Product

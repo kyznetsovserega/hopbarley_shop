@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django import forms
 
 
@@ -43,7 +45,7 @@ class CheckoutForm(forms.Form):
     PAYMENT_CHOICES = [
         ("cash", "Наличными при получении"),
         ("card", "Банковская карта"),
-        ("cod", "Оплата при получении (COD)"),  # важно для тестов
+        ("cod", "Оплата при получении (COD)"),
     ]
 
     payment_method = forms.ChoiceField(
@@ -53,22 +55,22 @@ class CheckoutForm(forms.Form):
         widget=forms.RadioSelect,
     )
 
-    # --- Кастомная валидация обязательных полей ---
+    # --- КАСТОМНАЯ ВАЛИДАЦИЯ ОБЯЗАТЕЛЬНЫХ ПОЛЕЙ ---
 
-    def clean_full_name(self):
-        value = self.cleaned_data.get("full_name", "").strip()
+    def clean_full_name(self) -> str:
+        value: str = (self.cleaned_data.get("full_name") or "").strip()
         if not value:
             raise forms.ValidationError("Поле обязательно.")
         return value
 
-    def clean_shipping_address(self):
-        value = self.cleaned_data.get("shipping_address", "").strip()
+    def clean_shipping_address(self) -> str:
+        value: str = (self.cleaned_data.get("shipping_address") or "").strip()
         if not value:
             raise forms.ValidationError("Поле обязательно.")
         return value
 
-    def clean_phone(self):
-        value = self.cleaned_data.get("phone", "").strip()
+    def clean_phone(self) -> str:
+        value: str = (self.cleaned_data.get("phone") or "").strip()
         if not value:
             raise forms.ValidationError("Поле обязательно.")
         return value

@@ -1,30 +1,54 @@
 from __future__ import annotations
 
+from typing import Dict, Any, List, TypedDict
 from decimal import Decimal
+
 from django.db import transaction
 from django.core.exceptions import ValidationError
+from django.http import HttpRequest
 
 from cart.models import CartItem
 from .models import Order, OrderItem
 
 
-@transaction.atomic
-def create_order_from_cart(request, form_data):
-    """
-    Создаёт заказ из корзины.
+class SnapshotItem(TypedDict):
+    """Типизированная структура для снимка корзины перед созданием заказа."""
+    product: Any
+    qty: int
+    price: Decimal
 
-    Твой сценарий (учебный):
-    - ВСЕГДА списываем stock
-    - ВСЕГДА очищаем корзину
-    - Если method=card > переходим на fake-payment (имитация)
+
+@transaction.atomic
+def create_order_from_cart(
+    request: HttpRequest,
+    form_data: Dict[str, Any],
+) -> Order:
+    """
+    Создаёт заказ на основе корзины пользователя.
+
+    Этапы:
+    1. Получение session_key.
+    2. Загрузка корзины (для анонимных — по session_key).
+    3. Валидация формы.
+    4. Проверка остатков и создание snapshot данных.
+    5. Определение статуса заказа.
+    6. Создание Order и OrderItem.
+    7. Списание товара.
+    8. Очистка корзины.
+
+    Возвращает:
+        Order — созданный объект заказа.
+
+    Исключения:
+        ValidationError — если корзина пуста или недостаточно товара.
     """
 
     # ---------------------------
     # 1. Session key
     # ---------------------------
-    if not request.session.session_key:
-        request.session.create()
-    session_key = request.session.session_key
+    if request.session.get("session_key") is None:
+        request.session.save()
+    session_key: str = request.session.session_key
 
     # ---------------------------
     # 2. Загрузка корзины
@@ -38,57 +62,58 @@ def create_order_from_cart(request, form_data):
         raise ValidationError("Корзина пуста")
 
     # ---------------------------
-    # 3. Поля формы
+    # 3. Извлечение данных формы
     # ---------------------------
-    full_name = form_data["full_name"].strip()
-    email = form_data.get("email", "").strip()
-    phone = form_data["phone"].strip()
-    shipping_address = form_data["shipping_address"].strip()
-    comment = form_data.get("comment", "").strip()
-    payment_method = form_data.get("payment_method", "cash")
+    full_name: str = form_data["full_name"].strip()
+    email: str = form_data.get("email", "").strip()
+    phone: str = form_data["phone"].strip()
+    shipping_address: str = form_data["shipping_address"].strip()
+    comment: str = form_data.get("comment", "").strip()
+    payment_method: str = form_data.get("payment_method", "cash")
 
     # ---------------------------
-    # 4. Проверка остатков (только проверка)
+    # 4. Проверка остатков
     # ---------------------------
-    total_price = Decimal(0)
-    snapshot = []
+    total_price: Decimal = Decimal(0)
+    snapshot: List[SnapshotItem] = []
 
     for cart_item in cart_items.select_for_update():
         product = cart_item.product
-        qty = cart_item.quantity
+        qty: int = cart_item.quantity
 
         if product.stock < qty:
             raise ValidationError("Недостаточно товара")
 
-        snapshot.append({
-            "product": product,
-            "qty": qty,
-            "price": product.price,
-        })
+        snapshot.append(
+            SnapshotItem(
+                product=product,
+                qty=qty,
+                price=product.price,
+            )
+        )
 
         total_price += product.price * qty
 
     # ---------------------------
-    # 5. Статус заказа
+    # 5. Определение статуса
     # ---------------------------
+    status: str
     if payment_method == "card":
-        status = Order.STATUS_PENDING_PAYMENT   # ожидает фейковую оплату
+        status = Order.STATUS_PENDING_PAYMENT
     else:
-        status = Order.STATUS_PENDING           # оформлен, ожидает подтверждения
+        status = Order.STATUS_PENDING
 
     # ---------------------------
     # 6. Создание заказа
     # ---------------------------
-    order = Order.objects.create(
+    order: Order = Order.objects.create(
         user=request.user if request.user.is_authenticated else None,
         session_key=session_key,
-
         full_name=full_name,
         email=email,
         phone=phone,
         shipping_address=shipping_address,
         comment=comment,
-
         payment_method=payment_method,
         status=status,
         total_price=total_price,
@@ -106,14 +131,16 @@ def create_order_from_cart(request, form_data):
         )
 
     # ---------------------------
-    # 8. СПИСАНИЕ ТОВАРА — ВСЕГДА
+    # 8. Списание товара
     # ---------------------------
     for item in snapshot:
-        item["product"].stock -= item["qty"]
-        item["product"].save(update_fields=["stock"])
+        product = item["product"]
+        product.stock -= item["qty"]
+        product.save(update_fields=["stock"])
 
-
-    #  Очистка корзины
+    # ---------------------------
+    # 9. Очистка корзины
+    # ---------------------------
     cart_items.delete()
 
     return order

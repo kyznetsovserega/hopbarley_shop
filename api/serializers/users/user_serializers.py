@@ -1,18 +1,15 @@
 from __future__ import annotations
 
+from typing import Dict, Any
+
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
 
 class UserSerializer(serializers.ModelSerializer):
     """
-    Сериализатор данных пользователя.
-
-    Используется:
-        - в эндпоинте /me/
-        - при выводе связанных данных (например, в отзывах или заказах)
-
-    Возвращает базовую информацию о пользователе.
+    Базовый сериализатор пользователя.
+    Используется для /me/, заказов, отзывов.
     """
 
     class Meta:
@@ -29,23 +26,21 @@ class UserSerializer(serializers.ModelSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     """
-    Сериализатор для регистрации пользователя.
+    Сериализатор регистрации пользователя.
 
-    Обрабатывает:
-        - username
-        - email
-        - password (write_only)
-
-    Создаёт пользователя с корректным хешированием пароля.
+    Корректно создаёт пользователя через create_user().
     """
 
-    password = serializers.CharField(write_only=True)
+    password: serializers.CharField = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
         fields = ["username", "email", "password"]
 
-    def create(self, validated_data: dict) -> User:
+    def create(self, validated_data: Dict[str, Any]) -> User:
+        """
+        Создание пользователя с хешированным паролем.
+        """
         return User.objects.create_user(
             username=validated_data["username"],
             email=validated_data.get("email"),

@@ -1,9 +1,15 @@
 from __future__ import annotations
 
+from typing import Any
 from django.core.exceptions import ValidationError
-from rest_framework import permissions, viewsets
+
+from django.db.models import QuerySet
+from rest_framework.permissions import AllowAny
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.request import Request
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
 from drf_spectacular.utils import (
     extend_schema,
     OpenApiExample,
@@ -13,6 +19,7 @@ from drf_spectacular.utils import (
 
 from api.serializers.cart_serializers import CartItemSerializer
 from cart.services import CartService
+from cart.models import CartItem
 
 
 @extend_schema(
@@ -20,94 +27,61 @@ from cart.services import CartService
     summary="Управление корзиной",
     description=(
         "API корзины. Работает для гостей и авторизованных пользователей.\n\n"
-        "**Как определяется корзина:**\n"
-        "- Гость > корзина по `session_key`.\n"
-        "- Авторизованный пользователь > корзина по `user.id`.\n\n"
-        "CartService автоматически выбирает нужный тип корзины."
+        "**Принцип:**\n"
+        "- Гость → корзина по session_key\n"
+        "- Пользователь → корзина по user.id"
     ),
 )
-class CartItemViewSet(viewsets.ModelViewSet):
+class CartItemViewSet(ModelViewSet):
     serializer_class = CartItemSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [AllowAny]
     lookup_field = "pk"
 
-    # ----------------------------------------------------------------------
-    # LIST
-    # ----------------------------------------------------------------------
-    @extend_schema(
-        summary="Получить содержимое корзины",
-        description=(
-            "Возвращает список товарных позиций корзины.\n\n"
-            "Корзина может быть гостевой (session) или пользовательской."
-        ),
-        responses={200: CartItemSerializer(many=True)},
-    )
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
-
-    def get_queryset(self):
+    # ---------------------------------------------------
+    # QUERYSET
+    # ---------------------------------------------------
+    def get_queryset(self) -> QuerySet[CartItem]:
         service = CartService(self.request)
         return service.get_items_queryset()
 
-    # ----------------------------------------------------------------------
-    # CREATE — добавить товар
-    # ----------------------------------------------------------------------
+    # ---------------------------------------------------
+    # LIST
+    # ---------------------------------------------------
+    @extend_schema(
+        summary="Получить содержимое корзины",
+        responses={200: CartItemSerializer(many=True)},
+    )
+    def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        return super().list(request, *args, **kwargs)
+
+    # ---------------------------------------------------
+    # CREATE
+    # ---------------------------------------------------
     @extend_schema(
         summary="Добавить товар в корзину",
-        description=(
-            "Добавляет товар в корзину.\n\n"
-            "**Правила:**\n"
-            "- Если товар уже есть в корзине > количество увеличивается.\n"
-            "- Количество должно быть ≥ 1.\n"
-            "- Ошибка, если товар не найден или количество неверно."
-        ),
         request=OpenApiRequest(
-            request=dict,  # ← исправлено
+            request=dict,
             examples=[
                 OpenApiExample(
-                    "Пример запроса",
+                    "Добавление",
                     value={"product": 1, "quantity": 2},
                 )
             ],
         ),
         responses={
-            201: OpenApiResponse(
-                response=CartItemSerializer,
-                description="Товар успешно добавлен в корзину.",
-                examples=[
-                    OpenApiExample(
-                        "Успешный ответ",
-                        value={
-                            "id": 12,
-                            "product": 1,
-                            "product_title": "Citra Hops",
-                            "product_price": "5.99",
-                            "quantity": 2,
-                            "total_price": "11.98",
-                        },
-                    )
-                ],
-            ),
-            400: OpenApiResponse(
-                description="Ошибка валидации.",
-                examples=[
-                    OpenApiExample(
-                        "Ошибка",
-                        value={"detail": "Поле 'product' является обязательным."},
-                    )
-                ],
-            ),
+            201: OpenApiResponse(response=CartItemSerializer),
+            400: OpenApiResponse(description="Ошибка валидации"),
         },
     )
-    def create(self, request, *args, **kwargs):
+    def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         product_id = request.data.get("product")
-        quantity = request.data.get("quantity", 1)
+        quantity_raw = request.data.get("quantity", 1)
 
         if not product_id:
-            return Response({"detail": "Поле 'product' является обязательным."}, status=400)
+            return Response({"detail": "Поле 'product' обязательное"}, status=400)
 
         try:
-            quantity = int(quantity)
+            quantity: int = int(quantity_raw)
         except Exception:
             return Response({"detail": "Quantity must be a number"}, status=400)
 
@@ -119,47 +93,23 @@ class CartItemViewSet(viewsets.ModelViewSet):
         except ValidationError as e:
             return Response({"detail": str(e)}, status=400)
 
-        return Response(self.get_serializer(item).data, status=201)
+        serializer = self.get_serializer(item)
+        return Response(serializer.data, status=201)
 
-    # ----------------------------------------------------------------------
-    # UPDATE — изменить количество
-    # ----------------------------------------------------------------------
+    # ---------------------------------------------------
+    # UPDATE
+    # ---------------------------------------------------
     @extend_schema(
-        summary="Изменить количество товара в корзине",
-        description=(
-            "Обновляет количество товара.\n\n"
-            "**Правила:**\n"
-            "- Количество должно быть ≥ 1.\n"
-            "- Ошибка, если количество неверное или товар отсутствует."
-        ),
+        summary="Изменить количество товара",
         request=OpenApiRequest(
-            request=dict,  # ← исправлено
-            examples=[
-                OpenApiExample(
-                    "Пример запроса",
-                    value={"quantity": 5},
-                )
-            ],
+            request=dict,
+            examples=[OpenApiExample("Изменение", value={"quantity": 5})],
         ),
-        responses={
-            200: OpenApiResponse(
-                response=CartItemSerializer,
-                description="Количество обновлено.",
-            ),
-            400: OpenApiResponse(
-                description="Ошибка данных.",
-                examples=[
-                    OpenApiExample(
-                        "Ошибка",
-                        value={"detail": "Quantity must be >= 1"},
-                    )
-                ],
-            ),
-        },
+        responses={200: CartItemSerializer, 400: OpenApiResponse()},
     )
-    def update(self, request, *args, **kwargs):
+    def update(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         service = CartService(request)
-        item = service._get_cart_item(kwargs["pk"])
+        item = service._get_cart_item(int(kwargs["pk"]))
 
         try:
             new_qty = int(request.data.get("quantity"))
@@ -169,7 +119,7 @@ class CartItemViewSet(viewsets.ModelViewSet):
         if new_qty < 1:
             return Response({"detail": "Quantity must be >= 1"}, status=400)
 
-        diff = new_qty - item.quantity
+        diff: int = new_qty - item.quantity
 
         try:
             if diff > 0:
@@ -183,29 +133,27 @@ class CartItemViewSet(viewsets.ModelViewSet):
         item.refresh_from_db()
         return Response(self.get_serializer(item).data)
 
-    # ----------------------------------------------------------------------
-    # DESTROY — удалить позицию
-    # ----------------------------------------------------------------------
+    # ---------------------------------------------------
+    # DELETE (DESTROY)
+    # ---------------------------------------------------
     @extend_schema(
         summary="Удалить товар из корзины",
-        description="Удаляет товарную позицию из корзины пользователя или гостя.",
-        responses={204: OpenApiResponse(description="Товар удалён из корзины.")},
+        responses={204: OpenApiResponse(description="Удалено")},
     )
-    def destroy(self, request, *args, **kwargs):
+    def destroy(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         service = CartService(request)
-        service.remove(kwargs["pk"])
+        service.remove(int(kwargs["pk"]))
         return Response(status=204)
 
-    # ----------------------------------------------------------------------
-    # CLEAR — очистить корзину
-    # ----------------------------------------------------------------------
+    # ---------------------------------------------------
+    # CLEAR — кастомный метод
+    # ---------------------------------------------------
     @extend_schema(
         summary="Очистить корзину",
-        description="Удаляет все позиции из корзины.",
         responses={200: OpenApiResponse(description="Корзина очищена.")},
     )
     @action(detail=False, methods=["delete"])
-    def clear(self, request):
+    def clear(self, request: Request) -> Response:
         service = CartService(request)
         service.clear()
         return Response({"detail": "Cart cleared"})
