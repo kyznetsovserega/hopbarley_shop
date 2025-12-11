@@ -24,3 +24,4 @@
 ![Coverage](https://img.shields.io/badge/coverage-82%25-yellow)
 ![Mypy](https://img.shields.io/badge/mypy-strict-blue)
 ![Flake8](https://img.shields.io/badge/flake8-passing-brightgreen)
+# Trigger
