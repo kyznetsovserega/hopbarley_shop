@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from typing import Any
 
 import pytest
-from decimal import Decimal
 from django.urls import reverse
 
-from orders.models import Order, OrderItem
+from orders.models import Order
+from orders.models import OrderItem
 from reviews.models import Review
 
 
@@ -23,10 +24,13 @@ def test_add_review_not_purchased(
 
     url = reverse("reviews:add", args=[product_fixture.slug])
 
-    response = client_web.post(url, {
-        "rating": 5,
-        "comment": "Should NOT work",
-    })
+    response = client_web.post(
+        url,
+        {
+            "rating": 5,
+            "comment": "Should NOT work",
+        },
+    )
 
     # должен быть редирект (messages + redirect)
     assert response.status_code == 302
@@ -64,10 +68,13 @@ def test_add_review_purchased(
 
     url = reverse("reviews:add", args=[product_fixture.slug])
 
-    response = client_web.post(url, {
-        "rating": 4,
-        "comment": "Great product",
-    })
+    response = client_web.post(
+        url,
+        {
+            "rating": 4,
+            "comment": "Great product",
+        },
+    )
 
     assert response.status_code == 302  # redirect to product detail
 
@@ -117,10 +124,13 @@ def test_add_review_unique(
 
     url = reverse("reviews:add", args=[product_fixture.slug])
 
-    response = client_web.post(url, {
-        "rating": 3,
-        "comment": "Second review",
-    })
+    response = client_web.post(
+        url,
+        {
+            "rating": 3,
+            "comment": "Second review",
+        },
+    )
 
     assert response.status_code == 302  # redirect after error message
 

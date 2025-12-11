@@ -1,11 +1,17 @@
 from __future__ import annotations
 
-from typing import Any, List, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING
+from typing import Any
+from typing import List
+from typing import Tuple
 
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
-from django.db.models import Count, Sum, Max, QuerySet
+from django.db.models import Count
+from django.db.models import Max
+from django.db.models import QuerySet
+from django.db.models import Sum
 from django.http import HttpRequest
 
 from .models import UserProfile
@@ -25,6 +31,7 @@ else:
 # =========================================================
 # INLINE
 # =========================================================
+
 
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
@@ -47,8 +54,10 @@ class UserProfileInline(admin.StackedInline):
 # FILTERS
 # =========================================================
 
+
 class HasOrdersFilter(admin.SimpleListFilter):
     """Пользователи с заказами / без заказов."""
+
     title = "Has Orders"
     parameter_name = "has_orders"
 
@@ -78,13 +87,12 @@ class HasOrdersFilter(admin.SimpleListFilter):
 
 class BigSpendersFilter(admin.SimpleListFilter):
     """Фильтр пользователей с суммой заказов > 200$."""
+
     title = "Top Customers"
     parameter_name = "top_customers"
 
     def lookups(
-        self,
-        request: HttpRequest,
-        model_admin: admin.ModelAdmin[Any]
+        self, request: HttpRequest, model_admin: admin.ModelAdmin[Any]
     ) -> List[Tuple[str, str]]:
         return [
             ("200", "> 200$ spent"),
@@ -107,6 +115,7 @@ class BigSpendersFilter(admin.SimpleListFilter):
 
 class CityFilter(admin.SimpleListFilter):
     """Фильтр по городу."""
+
     title = "City"
     parameter_name = "city"
 
@@ -124,11 +133,9 @@ class CityFilter(admin.SimpleListFilter):
         return [(str(c), str(c)) for c in cities]
 
     def queryset(
-        self,
-        request: HttpRequest,
-        qs: QuerySet[UserType]
+        self, request: HttpRequest, qs: QuerySet[UserType]
     ) -> QuerySet[UserType]:
-        if (city := self.value()):
+        if city := self.value():
             return qs.filter(profile__city=city)
         return qs
 
@@ -136,6 +143,7 @@ class CityFilter(admin.SimpleListFilter):
 # =========================================================
 # CUSTOM USER ADMIN
 # =========================================================
+
 
 class CustomUserAdmin(UserAdmin):
     """

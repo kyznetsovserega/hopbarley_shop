@@ -1,18 +1,24 @@
 from __future__ import annotations
 
-from typing import Dict, Any, List, TypedDict
 from decimal import Decimal
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import TypedDict
 
-from django.db import transaction
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.http import HttpRequest
 
 from cart.models import CartItem
-from .models import Order, OrderItem
+
+from .models import Order
+from .models import OrderItem
 
 
 class SnapshotItem(TypedDict):
     """Типизированная структура для снимка корзины перед созданием заказа."""
+
     product: Any
     qty: int
     price: Decimal
@@ -54,9 +60,13 @@ def create_order_from_cart(
     # 2. Загрузка корзины
     # ---------------------------
     if request.user.is_authenticated:
-        cart_items = CartItem.objects.filter(user=request.user).select_related("product")
+        cart_items = CartItem.objects.filter(user=request.user).select_related(
+            "product"
+        )
     else:
-        cart_items = CartItem.objects.filter(session_key=session_key).select_related("product")
+        cart_items = CartItem.objects.filter(session_key=session_key).select_related(
+            "product"
+        )
 
     if not cart_items.exists():
         raise ValidationError("Корзина пуста")

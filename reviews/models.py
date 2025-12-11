@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db import models
 
 from products.models import Product
 
@@ -50,8 +50,7 @@ class Review(models.Model):
         ordering = ["-created_at"]
         constraints = [
             models.UniqueConstraint(
-                fields=["user", "product"],
-                name="unique_user_product_review"
+                fields=["user", "product"], name="unique_user_product_review"
             ),
             models.CheckConstraint(
                 check=models.Q(rating__gte=1) & models.Q(rating__lte=5),

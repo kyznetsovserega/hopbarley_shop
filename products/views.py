@@ -1,17 +1,25 @@
 from __future__ import annotations
 
-from typing import Any, TYPE_CHECKING, Dict
+from typing import TYPE_CHECKING
+from typing import Any
+from typing import Dict
 
-from django.db.models import Q, Avg, Count, QuerySet
-from django.http import HttpRequest, HttpResponse
-from django_filters.views import FilterView
+from django.db.models import Avg
+from django.db.models import Count
+from django.db.models import Q
+from django.db.models import QuerySet
+from django.http import HttpRequest
+from django.http import HttpResponse
 from django.views.generic import DetailView
+from django_filters.views import FilterView
 
-from .models import Product, Category
-from .filter import ProductFilter
 from orders.models import OrderItem
 from reviews.forms import ReviewForm
 from reviews.models import Review
+
+from .filter import ProductFilter
+from .models import Category
+from .models import Product
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import AbstractUser as UserType
@@ -22,6 +30,7 @@ else:
 # -------------------------------------------------------------------------
 #  PRODUCT LIST VIEW
 # -------------------------------------------------------------------------
+
 
 class ProductListView(FilterView):
     """
@@ -35,17 +44,15 @@ class ProductListView(FilterView):
     paginate_by = 12
 
     def get_queryset(self) -> QuerySet[Product]:
-        queryset: QuerySet[Product] = (
-            Product.objects.filter(is_active=True)
-            .select_related("category")
-        )
+        queryset: QuerySet[Product] = Product.objects.filter(
+            is_active=True
+        ).select_related("category")
 
         # Поиск
         q = self.request.GET.get("q")
         if q:
             queryset = queryset.filter(
-                Q(name__icontains=q) |
-                Q(description__icontains=q)
+                Q(name__icontains=q) | Q(description__icontains=q)
             )
 
         # django-filter
@@ -69,10 +76,8 @@ class ProductListView(FilterView):
         context: Dict[str, Any] = super().get_context_data(**kwargs)
 
         # Список корневых категорий
-        context["categories"] = (
-            Category.objects
-            .filter(parent__isnull=True)
-            .exclude(slug="default")
+        context["categories"] = Category.objects.filter(parent__isnull=True).exclude(
+            slug="default"
         )
 
         # Keywords (SEO)
@@ -102,6 +107,7 @@ class ProductListView(FilterView):
 # -------------------------------------------------------------------------
 #  PRODUCT DETAIL VIEW
 # -------------------------------------------------------------------------
+
 
 class ProductDetailView(DetailView):
     """

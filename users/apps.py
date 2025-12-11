@@ -13,5 +13,5 @@ class UsersConfig(AppConfig):
     name = "users"
 
     def ready(self) -> None:
-        # Импорт сигналов при старте приложения
-        import users.signals
+        # Импортируем сигналы ради side-effect, поэтому noqa
+        import users.signals  # noqa: F401

@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from rest_framework import permissions, viewsets
+from drf_spectacular.utils import OpenApiExample
+from drf_spectacular.utils import OpenApiRequest
+from drf_spectacular.utils import OpenApiResponse
+from drf_spectacular.utils import extend_schema
+from rest_framework import permissions
+from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
-from drf_spectacular.utils import (
-    extend_schema,
-    OpenApiExample,
-    OpenApiResponse,
-    OpenApiRequest,
-)
 
 from api.serializers.review_serializers import ReviewSerializer
 from orders.models import Order

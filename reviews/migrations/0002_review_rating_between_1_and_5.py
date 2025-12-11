@@ -7,14 +7,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('products', '0003_product_unit'),
-        ('reviews', '0001_initial'),
+        ("products", "0003_product_unit"),
+        ("reviews", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddConstraint(
-            model_name='review',
-            constraint=models.CheckConstraint(condition=models.Q(('rating__gte', 1), ('rating__lte', 5)), name='rating_between_1_and_5'),
+            model_name="review",
+            constraint=models.CheckConstraint(
+                condition=models.Q(("rating__gte", 1), ("rating__lte", 5)),
+                name="rating_between_1_and_5",
+            ),
         ),
     ]

@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-from django.urls import reverse
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 
 @pytest.mark.django_db
@@ -25,7 +25,6 @@ def test_profile_update(client: Any) -> None:
             "first_name": "John",
             "last_name": "Smith",
             "email": "new@example.com",
-
             "phone": "+123456",
             "city": "London",
             "address": "Baker St",

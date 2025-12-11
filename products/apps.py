@@ -10,4 +10,4 @@ class ProductsConfig(AppConfig):
     name = "products"
 
     def ready(self) -> None:
-        import products.signals
+        import products.signals  # noqa: F401

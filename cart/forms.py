@@ -36,16 +36,14 @@ class AddToCartForm(forms.Form):
         *args: Any,
         product: Product,
         request: HttpRequest | None = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.product = product
         self.request = request
 
         # МАКСИМУМ динамически ограничиваем stock'ом
-        self.fields["quantity"].widget.attrs.update(
-            {"max": self.product.stock}
-        )
+        self.fields["quantity"].widget.attrs.update({"max": self.product.stock})
 
     # -----------------------------------------------------
     # Основная валидация
@@ -68,8 +66,7 @@ class AddToCartForm(forms.Form):
 
         # Проверяем, есть ли уже CartItem для этого товара
         existing_item = CartItem.objects.filter(
-            product=self.product,
-            **owner_filter
+            product=self.product, **owner_filter
         ).first()
 
         current_qty = existing_item.quantity if existing_item else 0
@@ -77,8 +74,6 @@ class AddToCartForm(forms.Form):
 
         # ПРОВЕРКА остатков
         if total_qty > self.product.stock:
-            raise ValidationError(
-                f"Доступно только {self.product.stock} шт."
-            )
+            raise ValidationError(f"Доступно только {self.product.stock} шт.")
 
         return qty

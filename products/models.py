@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from typing import Optional, Set, Any
-from decimal import Decimal
 import re
+from typing import Any
+from typing import Set
 
 from django.db import models
-from django.utils.text import slugify
 from django.urls import reverse
+from django.utils.text import slugify
 
 
 class Category(models.Model):
@@ -107,12 +107,35 @@ class Product(models.Model):
             words = text.split()
 
             stop_words: Set[str] = {
-                "the", "and", "or", "for", "with", "from", "made",
-                "of", "to", "a", "in", "on", "at", "is", "this", "an",
-                "и", "для", "под", "над", "при", "из", "от", "до",
+                "the",
+                "and",
+                "or",
+                "for",
+                "with",
+                "from",
+                "made",
+                "of",
+                "to",
+                "a",
+                "in",
+                "on",
+                "at",
+                "is",
+                "this",
+                "an",
+                "и",
+                "для",
+                "под",
+                "над",
+                "при",
+                "из",
+                "от",
+                "до",
             }
 
-            tags_set: Set[str] = {w for w in words if len(w) > 2 and w not in stop_words}
+            tags_set: Set[str] = {
+                w for w in words if len(w) > 2 and w not in stop_words
+            }
             if tags_set:
                 self.tags = ", ".join(sorted(tags_set))
 

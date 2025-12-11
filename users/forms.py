@@ -1,19 +1,20 @@
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
+from typing import Dict
 
 from django import forms
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 
 from .models import UserProfile
 
-
 # =========================================================
 # REGISTER FORM
 # =========================================================
+
 
 class RegisterForm(forms.ModelForm):
     """
@@ -35,7 +36,9 @@ class RegisterForm(forms.ModelForm):
         model = User
         fields = ("username", "email")
         widgets = {
-            "username": forms.TextInput(attrs={"placeholder": "Введите имя пользователя"}),
+            "username": forms.TextInput(
+                attrs={"placeholder": "Введите имя пользователя"}
+            ),
             "email": forms.EmailInput(attrs={"placeholder": "Введите email"}),
         }
 
@@ -101,6 +104,7 @@ class RegisterForm(forms.ModelForm):
 # USER UPDATE FORM
 # =========================================================
 
+
 class UserUpdateForm(forms.ModelForm):
     """
     Обновление данных встроенной модели User:
@@ -142,6 +146,7 @@ class UserUpdateForm(forms.ModelForm):
 # =========================================================
 # PROFILE UPDATE FORM
 # =========================================================
+
 
 class ProfileUpdateForm(forms.ModelForm):
     """

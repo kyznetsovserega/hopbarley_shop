@@ -1,19 +1,19 @@
 from __future__ import annotations
 
-from typing import Any, List, Type
+from typing import Any
+from typing import List
+from typing import Type
 
 from django.db.models import QuerySet
+from drf_spectacular.utils import OpenApiResponse
+from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
-from drf_spectacular.utils import (
-    extend_schema,
-    OpenApiResponse,
-)
 
-from products.models import Category
 from api.serializers.products.category_serializers import CategorySerializer
+from products.models import Category
 
 
 @extend_schema(

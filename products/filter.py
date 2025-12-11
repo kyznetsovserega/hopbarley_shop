@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import django_filters
-from django.db.models import Q, QuerySet
+from django.db.models import Q
+from django.db.models import QuerySet
 
 from .models import Product
 
@@ -21,26 +22,19 @@ class ProductFilter(django_filters.FilterSet):
     # SEARCH (name + description)
     # ---------------------------------------------------------------
     def search(
-        self,
-        queryset: QuerySet[Product],
-        name: str,
-        value: str
+        self, queryset: QuerySet[Product], name: str, value: str
     ) -> QuerySet[Product]:
         if not value:
             return queryset
         return queryset.filter(
-            Q(name__icontains=value) |
-            Q(description__icontains=value)
+            Q(name__icontains=value) | Q(description__icontains=value)
         )
 
     # ---------------------------------------------------------------
     # KEYWORDS FILTER
     # ---------------------------------------------------------------
     def filter_keywords(
-        self,
-        queryset: QuerySet[Product],
-        name: str,
-        value: str
+        self, queryset: QuerySet[Product], name: str, value: str
     ) -> QuerySet[Product]:
         if not value:
             return queryset
@@ -54,10 +48,7 @@ class ProductFilter(django_filters.FilterSet):
     # CATEGORY FILTER
     # ---------------------------------------------------------------
     def filter_category(
-        self,
-        queryset: QuerySet[Product],
-        name: str,
-        value: str
+        self, queryset: QuerySet[Product], name: str, value: str
     ) -> QuerySet[Product]:
         if not value:
             return queryset

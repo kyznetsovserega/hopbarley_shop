@@ -9,38 +9,64 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cart', '0001_initial'),
-        ('products', '0003_product_unit'),
+        ("cart", "0001_initial"),
+        ("products", "0003_product_unit"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='cartitem',
-            name='product',
-            field=models.ForeignKey(help_text='Товар, добавленный в корзину.', on_delete=django.db.models.deletion.CASCADE, related_name='cart_items', to='products.product'),
+            model_name="cartitem",
+            name="product",
+            field=models.ForeignKey(
+                help_text="Товар, добавленный в корзину.",
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="cart_items",
+                to="products.product",
+            ),
         ),
         migrations.AlterField(
-            model_name='cartitem',
-            name='quantity',
-            field=models.PositiveIntegerField(default=1, help_text='Количество товара. Минимум 1.', validators=[django.core.validators.MinValueValidator(1)]),
+            model_name="cartitem",
+            name="quantity",
+            field=models.PositiveIntegerField(
+                default=1,
+                help_text="Количество товара. Минимум 1.",
+                validators=[django.core.validators.MinValueValidator(1)],
+            ),
         ),
         migrations.AlterField(
-            model_name='cartitem',
-            name='session_key',
-            field=models.CharField(blank=True, db_index=True, help_text='Сессионный ключ гостевой корзины.', max_length=255, null=True),
+            model_name="cartitem",
+            name="session_key",
+            field=models.CharField(
+                blank=True,
+                db_index=True,
+                help_text="Сессионный ключ гостевой корзины.",
+                max_length=255,
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='cartitem',
-            name='user',
-            field=models.ForeignKey(blank=True, help_text='Владелец корзины. Null — если корзина гостевая.', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='cart_items', to=settings.AUTH_USER_MODEL),
+            model_name="cartitem",
+            name="user",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="Владелец корзины. Null — если корзина гостевая.",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="cart_items",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddConstraint(
-            model_name='cartitem',
-            constraint=models.UniqueConstraint(fields=('user', 'product'), name='unique_user_product'),
+            model_name="cartitem",
+            constraint=models.UniqueConstraint(
+                fields=("user", "product"), name="unique_user_product"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='cartitem',
-            constraint=models.UniqueConstraint(fields=('session_key', 'product'), name='unique_session_product'),
+            model_name="cartitem",
+            constraint=models.UniqueConstraint(
+                fields=("session_key", "product"), name="unique_session_product"
+            ),
         ),
     ]

@@ -3,7 +3,9 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-from products.models import Category, Product
+
+from products.models import Category
+from products.models import Product
 
 
 @pytest.mark.django_db

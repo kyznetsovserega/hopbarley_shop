@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-from django.urls import reverse
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 from users.models import UserProfile
 

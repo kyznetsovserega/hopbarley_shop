@@ -1,29 +1,29 @@
 from __future__ import annotations
 
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
+from typing import Any
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate
+from django.contrib.auth import login
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordChangeView
-from django.http import (
-    HttpRequest,
-    HttpResponse,
-    HttpResponseRedirect,
-)
-from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
 from django.db.models import QuerySet
+from django.http import HttpRequest
+from django.http import HttpResponse
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
+from django.shortcuts import render
+from django.urls import reverse_lazy
 
-from orders.models import Order
 from cart.utils import merge_session_cart_into_user_cart
+from orders.models import Order
 from reviews.models import Review
 
-from .forms import (
-    RegisterForm,
-    UserUpdateForm,
-    ProfileUpdateForm,
-)
+from .forms import ProfileUpdateForm
+from .forms import RegisterForm
+from .forms import UserUpdateForm
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import AbstractUser as UserType
@@ -59,9 +59,7 @@ def login_view(request: HttpRequest) -> HttpResponse:
             if user is not None:
                 login(request, user)
 
-                merge_session_cart_into_user_cart(
-                    user, request.session.session_key
-                )
+                merge_session_cart_into_user_cart(user, request.session.session_key)
 
                 return redirect("account")
 
@@ -86,9 +84,7 @@ def register_view(request: HttpRequest) -> HttpResponse:
             user: UserType = form.save()
             login(request, user)
 
-            merge_session_cart_into_user_cart(
-                user, request.session.session_key
-            )
+            merge_session_cart_into_user_cart(user, request.session.session_key)
 
             return redirect("account")
     else:

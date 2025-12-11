@@ -1,21 +1,23 @@
 from __future__ import annotations
 
-from typing import Any, Dict, TYPE_CHECKING
+from typing import TYPE_CHECKING
+from typing import Any
+from typing import Dict
 
 from django.core.exceptions import ValidationError
-from django.http import (
-    Http404,
-    HttpRequest,
-    HttpResponse,
-    HttpResponseRedirect,
-)
-from django.shortcuts import render, redirect
 from django.db.models import QuerySet
+from django.http import Http404
+from django.http import HttpRequest
+from django.http import HttpResponse
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
+from django.shortcuts import render
 
 from cart.models import CartItem
+
 from .forms import CheckoutForm
-from .services import create_order_from_cart
 from .models import Order
+from .services import create_order_from_cart
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import AbstractUser as UserType
@@ -39,13 +41,12 @@ def checkout_view(request: HttpRequest) -> HttpResponse:
 
     # --- 2. Корзина ---
     if request.user.is_authenticated:
-        cart_items: QuerySet[CartItem] = (
-            CartItem.objects.filter(user=request.user).select_related("product")
-        )
+        cart_items: QuerySet[CartItem] = CartItem.objects.filter(
+            user=request.user
+        ).select_related("product")
     else:
-        cart_items = (
-            CartItem.objects.filter(session_key=session_key)
-            .select_related("product")
+        cart_items = CartItem.objects.filter(session_key=session_key).select_related(
+            "product"
         )
 
     cart_total = sum(item.total_price for item in cart_items)
@@ -167,9 +168,7 @@ def fake_payment_view(request: HttpRequest, order_id: int) -> HttpResponse:
 # ======================================================================
 # FAKE PAYMENT SUCCESS
 # ======================================================================
-def fake_payment_success(
-    request: HttpRequest, order_id: int
-) -> HttpResponseRedirect:
+def fake_payment_success(request: HttpRequest, order_id: int) -> HttpResponseRedirect:
     """
     После псевдо-оплаты:
     - статус заказа становится paid

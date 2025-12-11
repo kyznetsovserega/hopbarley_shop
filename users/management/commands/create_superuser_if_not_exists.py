@@ -27,7 +27,5 @@ class Command(BaseCommand):
         )
 
         self.stdout.write(
-            self.style.SUCCESS(
-                f"Superuser '{username}' created (password: {password})"
-            )
+            self.style.SUCCESS(f"Superuser '{username}' created (password: {password})")
         )

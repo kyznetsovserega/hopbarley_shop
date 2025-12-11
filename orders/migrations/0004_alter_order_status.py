@@ -6,13 +6,26 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('orders', '0003_alter_order_comment_alter_order_email_and_more'),
+        ("orders", "0003_alter_order_comment_alter_order_email_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='order',
-            name='status',
-            field=models.CharField(choices=[('pending', 'Ожидает обработки'), ('pending_payment', 'Ожидает оплаты'), ('paid', 'Оплачено'), ('shipped', 'Отправлено'), ('delivered', 'Доставлено'), ('cancelled', 'Отменено')], default='pending', help_text='Текущий статус заказа.', max_length=20, verbose_name='Статус заказа'),
+            model_name="order",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("pending", "Ожидает обработки"),
+                    ("pending_payment", "Ожидает оплаты"),
+                    ("paid", "Оплачено"),
+                    ("shipped", "Отправлено"),
+                    ("delivered", "Доставлено"),
+                    ("cancelled", "Отменено"),
+                ],
+                default="pending",
+                help_text="Текущий статус заказа.",
+                max_length=20,
+                verbose_name="Статус заказа",
+            ),
         ),
     ]

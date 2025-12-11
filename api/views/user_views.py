@@ -1,23 +1,23 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any
+from typing import Dict
+from typing import List
 
 from django.contrib.auth import login
-from rest_framework import permissions, status, views
+from drf_spectacular.utils import OpenApiExample
+from drf_spectacular.utils import OpenApiRequest
+from drf_spectacular.utils import OpenApiResponse
+from drf_spectacular.utils import extend_schema
+from rest_framework import permissions
+from rest_framework import status
+from rest_framework import views
 from rest_framework.request import Request
 from rest_framework.response import Response
-from drf_spectacular.utils import (
-    extend_schema,
-    OpenApiExample,
-    OpenApiRequest,
-    OpenApiResponse,
-)
 
-from api.serializers.users.user_serializers import (
-    UserSerializer,
-    RegisterSerializer,
-)
 from api.serializers.users.profile_serializers import UserProfileSerializer
+from api.serializers.users.user_serializers import RegisterSerializer
+from api.serializers.users.user_serializers import UserSerializer
 from cart.utils import merge_session_cart_into_user_cart
 
 
@@ -50,9 +50,7 @@ from cart.utils import merge_session_cart_into_user_cart
     },
 )
 class RegisterView(views.APIView):
-    permission_classes: List[type[permissions.BasePermission]] = [
-        permissions.AllowAny
-    ]
+    permission_classes: List[type[permissions.BasePermission]] = [permissions.AllowAny]
 
     def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         serializer = RegisterSerializer(data=request.data)
@@ -153,9 +151,7 @@ class UpdateProfileView(views.APIView):
         user_data: Dict[str, Any] = data.get("user", {})
         profile_data: Dict[str, Any] = data.get("profile", {})
 
-        user_serializer = UserSerializer(
-            user, data=user_data, partial=True
-        )
+        user_serializer = UserSerializer(user, data=user_data, partial=True)
         profile_serializer = UserProfileSerializer(
             profile, data=profile_data, partial=True
         )

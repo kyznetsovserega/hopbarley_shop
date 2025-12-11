@@ -1,10 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
+
+from orders.models import Order
+from products.models import Product
 from products.views import ProductDetailView
 
-from products.models import Product
-from orders.models import Order
 from .forms import ReviewForm
 from .models import Review
 
@@ -15,9 +17,7 @@ def add_review(request, slug):
 
     # Покупка
     has_bought = Order.objects.filter(
-        user=request.user,
-        items__product=product,
-        status__in=["paid", "delivered"]
+        user=request.user, items__product=product, status__in=["paid", "delivered"]
     ).exists()
 
     if not has_bought:
@@ -42,9 +42,7 @@ def add_review(request, slug):
             return redirect("products:product_detail", slug=slug)
 
         # Ошибочная форма > показываем CBV с invalid_form
-        view = ProductDetailView.as_view(
-            extra_context={"invalid_form": form}
-        )
+        view = ProductDetailView.as_view(extra_context={"invalid_form": form})
         return view(request, slug=slug)
 
     return redirect("products:product_detail", slug=slug)

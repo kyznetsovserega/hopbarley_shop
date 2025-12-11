@@ -12,12 +12,14 @@
 
 from __future__ import annotations
 
-from typing import Iterable, Dict, Any
+from typing import Any
+from typing import Dict
+from typing import Iterable
 
-from django.db.models import QuerySet
-from django.http import HttpRequest
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import QuerySet
+from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 
 from cart.models import CartItem
@@ -65,20 +67,14 @@ class CartService:
     # ---------------------------------------------
     def get_items(self) -> Iterable[CartItem]:
         """Возвращает все элементы корзины текущего владельца."""
-        return (
-            CartItem.objects.filter(**self._owner_filter())
-            .select_related("product")
-        )
+        return CartItem.objects.filter(**self._owner_filter()).select_related("product")
 
     def get_items_queryset(self) -> QuerySet[CartItem]:
         """
         Метод нужен только для API (DRF ViewSet).
         Возвращает QuerySet корзины текущего владельца.
         """
-        return (
-            CartItem.objects.filter(**self._owner_filter())
-            .select_related("product")
-        )
+        return CartItem.objects.filter(**self._owner_filter()).select_related("product")
 
     def get_total(self) -> float:
         """Посчитать итоговую сумму корзины."""

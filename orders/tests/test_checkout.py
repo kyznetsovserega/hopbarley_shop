@@ -3,16 +3,16 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-from django.urls import reverse
 from django.test import Client
+from django.urls import reverse
 
 from cart.models import CartItem
 from orders.models import Order
 
-
 # ============================================================================
 # 1. SUCCESS CHECKOUT
 # ============================================================================
+
 
 @pytest.mark.django_db
 def test_checkout_success(
@@ -61,6 +61,7 @@ def test_checkout_success(
 # 2. EMPTY CART
 # ============================================================================
 
+
 @pytest.mark.django_db
 def test_checkout_empty_cart(
     web_session_key: str,
@@ -86,6 +87,7 @@ def test_checkout_empty_cart(
 # ============================================================================
 # 3. NOT ENOUGH STOCK
 # ============================================================================
+
 
 @pytest.mark.django_db
 def test_checkout_not_enough_stock(
@@ -124,6 +126,7 @@ def test_checkout_not_enough_stock(
 # ============================================================================
 # 4. MISSING REQUIRED FIELDS
 # ============================================================================
+
 
 @pytest.mark.django_db
 def test_checkout_missing_required_fields(

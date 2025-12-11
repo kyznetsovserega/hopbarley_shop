@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from typing import Any, TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
+from typing import Any
+from typing import Optional
 
 from django.db import transaction
+
 from cart.models import CartItem
 
 if TYPE_CHECKING:
@@ -35,12 +38,10 @@ def merge_session_cart_into_user_cart(
 
     with transaction.atomic():
         for item in session_items:
-            existing = (
-                CartItem.objects.filter(
-                    user=user,
-                    product=item.product,
-                ).first()
-            )
+            existing = CartItem.objects.filter(
+                user=user,
+                product=item.product,
+            ).first()
 
             if existing:
                 existing.quantity += item.quantity

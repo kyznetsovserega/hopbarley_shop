@@ -1,25 +1,22 @@
 from __future__ import annotations
 
 from typing import Any
+
 from django.core.exceptions import ValidationError
-
 from django.db.models import QuerySet
-from rest_framework.permissions import AllowAny
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.request import Request
+from drf_spectacular.utils import OpenApiExample
+from drf_spectacular.utils import OpenApiRequest
+from drf_spectacular.utils import OpenApiResponse
+from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny
+from rest_framework.request import Request
 from rest_framework.response import Response
-
-from drf_spectacular.utils import (
-    extend_schema,
-    OpenApiExample,
-    OpenApiResponse,
-    OpenApiRequest,
-)
+from rest_framework.viewsets import ModelViewSet
 
 from api.serializers.cart_serializers import CartItemSerializer
-from cart.services import CartService
 from cart.models import CartItem
+from cart.services import CartService
 
 
 @extend_schema(

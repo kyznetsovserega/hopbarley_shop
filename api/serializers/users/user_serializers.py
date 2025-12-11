@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Dict, Any
+from typing import Any
+from typing import Dict
 
 from django.contrib.auth.models import User
 from rest_framework import serializers

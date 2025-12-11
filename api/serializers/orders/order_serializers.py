@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any
+from typing import Dict
+from typing import List
 
 from rest_framework import serializers
 
 from orders.models import Order
+
 from .order_item_serializers import OrderItemSerializer
 
 
@@ -43,8 +46,8 @@ class OrderSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             "id",
-            "status",          # Меняется только через бизнес-логику
-            "total_price",     # Расчётная сумма заказа
-            "created_at",      # Дата оформления
-            "items",           # Snapshot позиций
+            "status",  # Меняется только через бизнес-логику
+            "total_price",  # Расчётная сумма заказа
+            "created_at",  # Дата оформления
+            "items",  # Snapshot позиций
         ]

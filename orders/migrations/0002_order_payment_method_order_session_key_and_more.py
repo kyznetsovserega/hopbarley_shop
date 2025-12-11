@@ -6,23 +6,38 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('orders', '0001_initial'),
+        ("orders", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='order',
-            name='payment_method',
-            field=models.CharField(choices=[('cash', 'Наличными при получении'), ('card', 'Банковская карта')], default='cash', max_length=20, verbose_name='Способ оплаты'),
+            model_name="order",
+            name="payment_method",
+            field=models.CharField(
+                choices=[
+                    ("cash", "Наличными при получении"),
+                    ("card", "Банковская карта"),
+                ],
+                default="cash",
+                max_length=20,
+                verbose_name="Способ оплаты",
+            ),
         ),
         migrations.AddField(
-            model_name='order',
-            name='session_key',
-            field=models.CharField(blank=True, max_length=40, null=True, verbose_name='Session Key'),
+            model_name="order",
+            name="session_key",
+            field=models.CharField(
+                blank=True, max_length=40, null=True, verbose_name="Session Key"
+            ),
         ),
         migrations.AlterField(
-            model_name='orderitem',
-            name='price',
-            field=models.DecimalField(decimal_places=2, help_text='Цена товара на момент оформления заказа', max_digits=10, verbose_name='Цена на момент покупки'),
+            model_name="orderitem",
+            name="price",
+            field=models.DecimalField(
+                decimal_places=2,
+                help_text="Цена товара на момент оформления заказа",
+                max_digits=10,
+                verbose_name="Цена на момент покупки",
+            ),
         ),
     ]

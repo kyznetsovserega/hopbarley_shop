@@ -3,8 +3,9 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-from cart.utils import merge_session_cart_into_user_cart
+
 from cart.models import CartItem
+from cart.utils import merge_session_cart_into_user_cart
 
 
 @pytest.mark.django_db

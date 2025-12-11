@@ -3,16 +3,18 @@ from __future__ import annotations
 from typing import Any
 
 from django.contrib import admin
-from django.http import HttpRequest
 from django.db.models import QuerySet
+from django.http import HttpRequest
 from django.utils.html import format_html
 
-from .models import Category, Product, ProductSpecification
-
+from .models import Category
+from .models import Product
+from .models import ProductSpecification
 
 # ============================================================
 # INLINE: Характеристики товара
 # ============================================================
+
 
 class ProductSpecificationInline(admin.TabularInline):
     model = ProductSpecification
@@ -27,6 +29,7 @@ class ProductSpecificationInline(admin.TabularInline):
 # ============================================================
 # CATEGORY ADMIN
 # ============================================================
+
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -44,6 +47,7 @@ class CategoryAdmin(admin.ModelAdmin):
 # ============================================================
 # ACTIONS
 # ============================================================
+
 
 @admin.action(description="Сделать активными")
 def activate_products(
@@ -66,6 +70,7 @@ def deactivate_products(
 # ============================================================
 # PRODUCT ADMIN
 # ============================================================
+
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -94,17 +99,20 @@ class ProductAdmin(admin.ModelAdmin):
     actions = [activate_products, deactivate_products]
 
     fieldsets = (
-        ("Основная информация", {
-            "fields": (
-                "name",
-                "slug",
-                "category",
-                "price",
-                "old_price",
-                "is_active",
-                "stock",
-            )
-        }),
+        (
+            "Основная информация",
+            {
+                "fields": (
+                    "name",
+                    "slug",
+                    "category",
+                    "price",
+                    "old_price",
+                    "is_active",
+                    "stock",
+                )
+            },
+        ),
         ("Описание", {"fields": ("short_description", "description")}),
         ("Изображение", {"fields": ("image", "preview_image")}),
         ("SEO / Теги", {"fields": ("tags",)}),

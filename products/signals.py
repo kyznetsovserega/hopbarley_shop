@@ -10,9 +10,7 @@ from .models import Product
 
 
 @receiver(post_migrate)
-def generate_tags_after_migrate(
-    sender: type[AppConfig], **kwargs: Any
-) -> None:
+def generate_tags_after_migrate(sender: type[AppConfig], **kwargs: Any) -> None:
     """
     Генерация тегов для товаров после применения миграций.
     Запускается только для приложения `products`.

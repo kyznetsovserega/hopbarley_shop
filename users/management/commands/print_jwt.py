@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from django.core.management.base import BaseCommand
+from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.tokens import RefreshToken
 
 User = get_user_model()
 
@@ -25,4 +26,6 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("\n AUTO-GENERATED JWT TOKEN"))
         self.stdout.write(self.style.SUCCESS(f"ACCESS:  {access}"))
         self.stdout.write(self.style.SUCCESS(f"REFRESH: {refresh}"))
-        self.stdout.write(self.style.SUCCESS("✔ Используйте этот токен в Swagger >> Авторизоваться"))
+        self.stdout.write(
+            self.style.SUCCESS("✔ Используйте этот токен в Swagger >> Авторизоваться")
+        )

@@ -1,13 +1,20 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Tuple
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Tuple
 
 from django.contrib import admin
-from django.db.models import Sum, Count, F, QuerySet
+from django.db.models import Count
+from django.db.models import F
+from django.db.models import QuerySet
+from django.db.models import Sum
 from django.http import HttpRequest
 from django.utils.html import format_html
 
-from .models import Order, OrderItem
+from .models import Order
+from .models import OrderItem
 
 
 # =====================================================================
@@ -30,29 +37,24 @@ class OrderItemInline(admin.TabularInline):
 # Actions
 # =====================================================================
 
+
 @admin.action(description="Отметить как оплаченные")
 def mark_as_paid(
-    modeladmin: admin.ModelAdmin[Any],
-    request: HttpRequest,
-    queryset: QuerySet[Order]
+    modeladmin: admin.ModelAdmin[Any], request: HttpRequest, queryset: QuerySet[Order]
 ) -> None:
     queryset.update(status=Order.STATUS_PAID)
 
 
 @admin.action(description="Отменить заказ")
 def cancel_orders(
-    modeladmin: admin.ModelAdmin[Any],
-    request: HttpRequest,
-    queryset: QuerySet[Order]
+    modeladmin: admin.ModelAdmin[Any], request: HttpRequest, queryset: QuerySet[Order]
 ) -> None:
     queryset.update(status=Order.STATUS_CANCELLED)
 
 
 @admin.action(description="Отметить как отправленные")
 def mark_as_shipped(
-    modeladmin: admin.ModelAdmin[Any],
-    request: HttpRequest,
-    queryset: QuerySet[Order]
+    modeladmin: admin.ModelAdmin[Any], request: HttpRequest, queryset: QuerySet[Order]
 ) -> None:
     queryset.update(status=Order.STATUS_SHIPPED)
 
@@ -61,14 +63,13 @@ def mark_as_shipped(
 # Фильтр по сумме заказа
 # =====================================================================
 
+
 class TotalPriceFilter(admin.SimpleListFilter):
     title = "Сумма заказа"
     parameter_name = "total_price_range"
 
     def lookups(
-        self,
-        request: HttpRequest,
-        model_admin: admin.ModelAdmin[Any]
+        self, request: HttpRequest, model_admin: admin.ModelAdmin[Any]
     ) -> List[Tuple[str, str]]:
         return [
             ("0_50", "до 50"),
@@ -77,11 +78,7 @@ class TotalPriceFilter(admin.SimpleListFilter):
             ("200_plus", "более 200"),
         ]
 
-    def queryset(
-        self,
-        request: HttpRequest,
-        qs: QuerySet[Order]
-    ) -> QuerySet[Order]:
+    def queryset(self, request: HttpRequest, qs: QuerySet[Order]) -> QuerySet[Order]:
         match self.value():
             case "0_50":
                 return qs.filter(total_price__lt=50)
@@ -98,6 +95,7 @@ class TotalPriceFilter(admin.SimpleListFilter):
 # =====================================================================
 # ORDER ADMIN
 # =====================================================================
+
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
@@ -157,9 +155,7 @@ class OrderAdmin(admin.ModelAdmin):
     # АГРЕГИРОВАННАЯ АНАЛИТИКА
     # ----------------------------------------------------------------------
     def changelist_view(
-        self,
-        request: HttpRequest,
-        extra_context: Dict[str, Any] | None = None
+        self, request: HttpRequest, extra_context: Dict[str, Any] | None = None
     ) -> Any:
 
         qs = self.get_queryset(request)
@@ -223,6 +219,7 @@ class OrderAdmin(admin.ModelAdmin):
 # =====================================================================
 # ORDER ITEM ADMIN
 # =====================================================================
+
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):

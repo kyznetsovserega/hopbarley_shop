@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any
+from typing import Dict
+from typing import List
 
 from rest_framework import serializers
 
 from products.models import Product
+
 from .category_serializers import CategorySerializer
 from .specification_serializers import ProductSpecificationSerializer
 
@@ -25,7 +28,9 @@ class ProductSerializer(serializers.ModelSerializer):
     )
 
     is_discounted: serializers.BooleanField = serializers.BooleanField(read_only=True)
-    discount_percent: serializers.IntegerField = serializers.IntegerField(read_only=True)
+    discount_percent: serializers.IntegerField = serializers.IntegerField(
+        read_only=True
+    )
 
     class Meta:
         model = Product
