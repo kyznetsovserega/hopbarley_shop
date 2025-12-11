@@ -1,11 +1,6 @@
 from __future__ import annotations
 
-from drf_spectacular.utils import (
-    OpenApiExample,
-    OpenApiRequest,
-    OpenApiResponse,
-    extend_schema,
-)
+from drf_spectacular.utils import OpenApiExample, OpenApiRequest, OpenApiResponse, extend_schema
 from rest_framework import permissions, viewsets
 from rest_framework.exceptions import ValidationError
 
