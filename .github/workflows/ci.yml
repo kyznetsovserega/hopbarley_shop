@@ -6,10 +6,6 @@ on:
   pull_request:
     branches: [dev, main]
 
-defaults:
-  run:
-    working-directory: ${{ github.workspace }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -40,23 +36,30 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
+        working-directory: ${{ github.workspace }}
 
       - name: Run flake8
         run: flake8 .
+        working-directory: ${{ github.workspace }}
 
       - name: Run black check
         run: black --check .
+        working-directory: ${{ github.workspace }}
 
       - name: Run isort check
         run: isort . --check-only
+        working-directory: ${{ github.workspace }}
 
       - name: Run mypy
         run: mypy .
+        working-directory: ${{ github.workspace }}
 
       - name: Run tests
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/hopbarley
         run: pytest --disable-warnings --maxfail=1 --cov=.
+        working-directory: ${{ github.workspace }}
 
       - name: Build Docker image
         run: docker build -t hopbarley-shop .
+        working-directory: ${{ github.workspace }}
