@@ -1,4 +1,3 @@
-
 name: CI
 
 on:
@@ -6,6 +5,10 @@ on:
     branches: [dev, main, feature/**]
   pull_request:
     branches: [dev, main]
+
+defaults:
+  run:
+    working-directory: ${{ github.workspace }}
 
 jobs:
   build:
@@ -53,9 +56,7 @@ jobs:
       - name: Run tests
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/hopbarley
-        run: |
-          pytest --disable-warnings --maxfail=1 --cov=.
+        run: pytest --disable-warnings --maxfail=1 --cov=.
 
       - name: Build Docker image
         run: docker build -t hopbarley-shop .
-
