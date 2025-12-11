@@ -1,6 +1,11 @@
 from django.urls import path
 
-from .views import checkout_view, fake_payment_success, fake_payment_view, order_success_view
+from .views import (
+    checkout_view,
+    fake_payment_success,
+    fake_payment_view,
+    order_success_view,
+)
 
 app_name = "orders"
 
