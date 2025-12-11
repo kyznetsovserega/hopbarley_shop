@@ -59,14 +59,10 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name="cartitem",
-            constraint=models.UniqueConstraint(
-                fields=("user", "product"), name="unique_user_product"
-            ),
+            constraint=models.UniqueConstraint(fields=("user", "product"), name="unique_user_product"),
         ),
         migrations.AddConstraint(
             model_name="cartitem",
-            constraint=models.UniqueConstraint(
-                fields=("session_key", "product"), name="unique_session_product"
-            ),
+            constraint=models.UniqueConstraint(fields=("session_key", "product"), name="unique_session_product"),
         ),
     ]

@@ -48,9 +48,7 @@ class Migration(migrations.Migration):
                 ("address", models.TextField(blank=True, verbose_name="Адрес")),
                 (
                     "date_of_birth",
-                    models.DateField(
-                        blank=True, null=True, verbose_name="Дата рождения"
-                    ),
+                    models.DateField(blank=True, null=True, verbose_name="Дата рождения"),
                 ),
                 (
                     "created_at",

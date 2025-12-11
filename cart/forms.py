@@ -65,9 +65,7 @@ class AddToCartForm(forms.Form):
             owner_filter = {"session_key": session_key}
 
         # Проверяем, есть ли уже CartItem для этого товара
-        existing_item = CartItem.objects.filter(
-            product=self.product, **owner_filter
-        ).first()
+        existing_item = CartItem.objects.filter(product=self.product, **owner_filter).first()
 
         current_qty = existing_item.quantity if existing_item else 0
         total_qty = current_qty + qty

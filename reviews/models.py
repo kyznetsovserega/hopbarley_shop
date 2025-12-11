@@ -49,9 +49,7 @@ class Review(models.Model):
         verbose_name_plural = "Отзывы"
         ordering = ["-created_at"]
         constraints = [
-            models.UniqueConstraint(
-                fields=["user", "product"], name="unique_user_product_review"
-            ),
+            models.UniqueConstraint(fields=["user", "product"], name="unique_user_product_review"),
             models.CheckConstraint(
                 check=models.Q(rating__gte=1) & models.Q(rating__lte=5),
                 name="rating_between_1_and_5",

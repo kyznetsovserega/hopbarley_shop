@@ -19,10 +19,7 @@ from cart.utils import merge_session_cart_into_user_cart
 @extend_schema(
     tags=["Users"],
     summary="Регистрация нового пользователя",
-    description=(
-        "Создаёт нового пользователя, выполняет автоматический вход "
-        "и переносит корзину из сессии."
-    ),
+    description=("Создаёт нового пользователя, выполняет автоматический вход " "и переносит корзину из сессии."),
     request=OpenApiRequest(
         request=Dict[str, Any],
         examples=[
@@ -79,9 +76,7 @@ class RegisterView(views.APIView):
     },
 )
 class MeView(views.APIView):
-    permission_classes: List[type[permissions.BasePermission]] = [
-        permissions.IsAuthenticated
-    ]
+    permission_classes: List[type[permissions.BasePermission]] = [permissions.IsAuthenticated]
 
     def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         user = request.user
@@ -129,9 +124,7 @@ class MeView(views.APIView):
     },
 )
 class UpdateProfileView(views.APIView):
-    permission_classes: List[type[permissions.BasePermission]] = [
-        permissions.IsAuthenticated
-    ]
+    permission_classes: List[type[permissions.BasePermission]] = [permissions.IsAuthenticated]
 
     def patch(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         user = request.user
@@ -144,9 +137,7 @@ class UpdateProfileView(views.APIView):
         profile_data: Dict[str, Any] = data.get("profile", {})
 
         user_serializer = UserSerializer(user, data=user_data, partial=True)
-        profile_serializer = UserProfileSerializer(
-            profile, data=profile_data, partial=True
-        )
+        profile_serializer = UserProfileSerializer(profile, data=profile_data, partial=True)
 
         user_valid = user_serializer.is_valid()
         profile_valid = profile_serializer.is_valid()

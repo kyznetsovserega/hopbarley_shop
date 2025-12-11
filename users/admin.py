@@ -85,9 +85,7 @@ class BigSpendersFilter(admin.SimpleListFilter):
     title = "Top Customers"
     parameter_name = "top_customers"
 
-    def lookups(
-        self, request: HttpRequest, model_admin: admin.ModelAdmin[Any]
-    ) -> List[Tuple[str, str]]:
+    def lookups(self, request: HttpRequest, model_admin: admin.ModelAdmin[Any]) -> List[Tuple[str, str]]:
         return [
             ("200", "> 200$ spent"),
             ("500", "> 500$ spent"),
@@ -118,17 +116,10 @@ class CityFilter(admin.SimpleListFilter):
         request: HttpRequest,
         model_admin: admin.ModelAdmin[Any],
     ) -> List[Tuple[str, str]]:
-        cities = (
-            UserProfile.objects.exclude(city="")
-            .order_by("city")
-            .values_list("city", flat=True)
-            .distinct()
-        )
+        cities = UserProfile.objects.exclude(city="").order_by("city").values_list("city", flat=True).distinct()
         return [(str(c), str(c)) for c in cities]
 
-    def queryset(
-        self, request: HttpRequest, qs: QuerySet[UserType]
-    ) -> QuerySet[UserType]:
+    def queryset(self, request: HttpRequest, qs: QuerySet[UserType]) -> QuerySet[UserType]:
         if city := self.value():
             return qs.filter(profile__city=city)
         return qs

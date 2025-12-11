@@ -67,9 +67,7 @@ class Migration(migrations.Migration):
                 ("price", models.DecimalField(decimal_places=2, max_digits=10)),
                 (
                     "old_price",
-                    models.DecimalField(
-                        blank=True, decimal_places=2, max_digits=10, null=True
-                    ),
+                    models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True),
                 ),
                 (
                     "image",
@@ -81,9 +79,7 @@ class Migration(migrations.Migration):
                 ("updated_at", models.DateTimeField(auto_now=True)),
                 (
                     "tags",
-                    models.CharField(
-                        blank=True, help_text="Separated keywords", max_length=255
-                    ),
+                    models.CharField(blank=True, help_text="Separated keywords", max_length=255),
                 ),
                 (
                     "category",

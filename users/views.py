@@ -127,9 +127,7 @@ def account_view(request: HttpRequest) -> HttpResponse:
 
     orders: QuerySet[Order] = Order.objects.filter(user=user).order_by("-created_at")
 
-    reviewed_product_ids: set[int] = set(
-        Review.objects.filter(user=user).values_list("product_id", flat=True)
-    )
+    reviewed_product_ids: set[int] = set(Review.objects.filter(user=user).values_list("product_id", flat=True))
 
     return render(
         request,

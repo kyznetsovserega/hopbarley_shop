@@ -30,9 +30,7 @@ class Migration(migrations.Migration):
                 ("quantity", models.PositiveIntegerField(default=1)),
                 (
                     "session_key",
-                    models.CharField(
-                        blank=True, db_index=True, max_length=255, null=True
-                    ),
+                    models.CharField(blank=True, db_index=True, max_length=255, null=True),
                 ),
                 (
                     "product",

@@ -50,9 +50,7 @@ class CartItemAdmin(admin.ModelAdmin):
     # ------------------------------------------------------------------
     def get_queryset(self, request: HttpRequest) -> QuerySet[CartItem]:
         qs: QuerySet[CartItem] = super().get_queryset(request)
-        return qs.select_related("product", "user").annotate(
-            annotated_total=F("quantity") * F("product__price")
-        )
+        return qs.select_related("product", "user").annotate(annotated_total=F("quantity") * F("product__price"))
 
     # ------------------------------------------------------------------
     # Display helpers

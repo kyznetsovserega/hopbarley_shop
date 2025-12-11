@@ -25,6 +25,4 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("\n AUTO-GENERATED JWT TOKEN"))
         self.stdout.write(self.style.SUCCESS(f"ACCESS:  {access}"))
         self.stdout.write(self.style.SUCCESS(f"REFRESH: {refresh}"))
-        self.stdout.write(
-            self.style.SUCCESS("✔ Используйте этот токен в Swagger >> Авторизоваться")
-        )
+        self.stdout.write(self.style.SUCCESS("✔ Используйте этот токен в Swagger >> Авторизоваться"))

@@ -53,15 +53,11 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "shipping_address",
-                    models.TextField(
-                        blank=True, null=True, verbose_name="Адрес доставки"
-                    ),
+                    models.TextField(blank=True, null=True, verbose_name="Адрес доставки"),
                 ),
                 (
                     "created_at",
-                    models.DateTimeField(
-                        auto_now_add=True, verbose_name="Дата создания"
-                    ),
+                    models.DateTimeField(auto_now_add=True, verbose_name="Дата создания"),
                 ),
                 (
                     "updated_at",
@@ -69,21 +65,15 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "full_name",
-                    models.CharField(
-                        blank=True, max_length=255, null=True, verbose_name="ФИО"
-                    ),
+                    models.CharField(blank=True, max_length=255, null=True, verbose_name="ФИО"),
                 ),
                 (
                     "email",
-                    models.EmailField(
-                        blank=True, max_length=254, null=True, verbose_name="Email"
-                    ),
+                    models.EmailField(blank=True, max_length=254, null=True, verbose_name="Email"),
                 ),
                 (
                     "phone",
-                    models.CharField(
-                        blank=True, max_length=32, null=True, verbose_name="Телефон"
-                    ),
+                    models.CharField(blank=True, max_length=32, null=True, verbose_name="Телефон"),
                 ),
                 (
                     "comment",

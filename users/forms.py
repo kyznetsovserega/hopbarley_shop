@@ -35,9 +35,7 @@ class RegisterForm(forms.ModelForm):
         model = User
         fields = ("username", "email")
         widgets = {
-            "username": forms.TextInput(
-                attrs={"placeholder": "Введите имя пользователя"}
-            ),
+            "username": forms.TextInput(attrs={"placeholder": "Введите имя пользователя"}),
             "email": forms.EmailInput(attrs={"placeholder": "Введите email"}),
         }
 

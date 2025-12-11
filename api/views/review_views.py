@@ -68,11 +68,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         if not product_id:
             return Review.objects.none()
 
-        return (
-            Review.objects.filter(product_id=product_id)
-            .select_related("user", "product")
-            .order_by("-created_at")
-        )
+        return Review.objects.filter(product_id=product_id).select_related("user", "product").order_by("-created_at")
 
     # ----------------------------------------------------------------------
     # POST /api/reviews/
@@ -111,10 +107,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
                     OpenApiExample(
                         "Пользователь не покупал товар",
                         value={
-                            "detail": (
-                                "Оставлять отзывы могут только пользователи, "
-                                "которые покупали этот товар."
-                            )
+                            "detail": ("Оставлять отзывы могут только пользователи, " "которые покупали этот товар.")
                         },
                     ),
                     OpenApiExample(
@@ -137,10 +130,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         ).exists()
 
         if not has_bought:
-            raise ValidationError(
-                "Оставлять отзывы могут только пользователи, "
-                "которые покупали этот товар."
-            )
+            raise ValidationError("Оставлять отзывы могут только пользователи, " "которые покупали этот товар.")
 
         # Проверяем повторный отзыв
         if Review.objects.filter(user=user, product=product).exists():

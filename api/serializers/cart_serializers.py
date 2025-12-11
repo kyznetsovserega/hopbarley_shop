@@ -32,9 +32,7 @@ class CartItemSerializer(serializers.ModelSerializer):
         help_text="Цена товара за единицу.",
     )
 
-    total_price = serializers.SerializerMethodField(
-        help_text="Итоговая стоимость позиции."
-    )
+    total_price = serializers.SerializerMethodField(help_text="Итоговая стоимость позиции.")
 
     class Meta:
         model = CartItem

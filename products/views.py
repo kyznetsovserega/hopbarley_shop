@@ -37,16 +37,12 @@ class ProductListView(FilterView):
     paginate_by = 12
 
     def get_queryset(self) -> QuerySet[Product]:
-        queryset: QuerySet[Product] = Product.objects.filter(
-            is_active=True
-        ).select_related("category")
+        queryset: QuerySet[Product] = Product.objects.filter(is_active=True).select_related("category")
 
         # Поиск
         q = self.request.GET.get("q")
         if q:
-            queryset = queryset.filter(
-                Q(name__icontains=q) | Q(description__icontains=q)
-            )
+            queryset = queryset.filter(Q(name__icontains=q) | Q(description__icontains=q))
 
         # django-filter
         queryset = self.filterset_class(
@@ -69,17 +65,11 @@ class ProductListView(FilterView):
         context: Dict[str, Any] = super().get_context_data(**kwargs)
 
         # Список корневых категорий
-        context["categories"] = Category.objects.filter(parent__isnull=True).exclude(
-            slug="default"
-        )
+        context["categories"] = Category.objects.filter(parent__isnull=True).exclude(slug="default")
 
         # Keywords (SEO)
         keywords_set: set[str] = set()
-        tags_qs = (
-            Product.objects.exclude(tags__exact="")
-            .values_list("tags", flat=True)
-            .distinct()
-        )
+        tags_qs = Product.objects.exclude(tags__exact="").values_list("tags", flat=True).distinct()
 
         for tag_string in tags_qs:
             for kw in tag_string.replace(";", ",").split(","):
@@ -184,8 +174,6 @@ class ProductDetailView(DetailView):
         context["already_reviewed"] = already_reviewed
 
         # Форма: пустая или с ошибками
-        context["review_form"] = (
-            self.invalid_form if self.invalid_form else ReviewForm()
-        )
+        context["review_form"] = self.invalid_form if self.invalid_form else ReviewForm()
 
         return context

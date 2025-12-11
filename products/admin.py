@@ -125,8 +125,7 @@ class ProductAdmin(admin.ModelAdmin):
     def preview(self, obj: Product) -> str:
         if obj.image:
             return format_html(
-                '<img src="{}" style="width:50px;height:50px;'
-                'object-fit:cover;border-radius:4px;" />',
+                '<img src="{}" style="width:50px;height:50px;' 'object-fit:cover;border-radius:4px;" />',
                 obj.image.url,
             )
         return "-"

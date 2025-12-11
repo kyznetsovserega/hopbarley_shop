@@ -37,9 +37,7 @@ class Migration(migrations.Migration):
                 ("comment", models.TextField(blank=True, verbose_name="Комментарий")),
                 (
                     "created_at",
-                    models.DateTimeField(
-                        auto_now_add=True, verbose_name="Дата создания"
-                    ),
+                    models.DateTimeField(auto_now_add=True, verbose_name="Дата создания"),
                 ),
                 (
                     "product",
@@ -66,11 +64,7 @@ class Migration(migrations.Migration):
                 "verbose_name": "Отзыв",
                 "verbose_name_plural": "Отзывы",
                 "ordering": ["-created_at"],
-                "constraints": [
-                    models.UniqueConstraint(
-                        fields=("user", "product"), name="unique_user_product_review"
-                    )
-                ],
+                "constraints": [models.UniqueConstraint(fields=("user", "product"), name="unique_user_product_review")],
             },
         ),
     ]

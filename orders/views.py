@@ -35,13 +35,9 @@ def checkout_view(request: HttpRequest) -> HttpResponse:
 
     # --- 2. Корзина ---
     if request.user.is_authenticated:
-        cart_items: QuerySet[CartItem] = CartItem.objects.filter(
-            user=request.user
-        ).select_related("product")
+        cart_items: QuerySet[CartItem] = CartItem.objects.filter(user=request.user).select_related("product")
     else:
-        cart_items = CartItem.objects.filter(session_key=session_key).select_related(
-            "product"
-        )
+        cart_items = CartItem.objects.filter(session_key=session_key).select_related("product")
 
     cart_total = sum(item.total_price for item in cart_items)
 

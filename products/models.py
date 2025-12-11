@@ -132,9 +132,7 @@ class Product(models.Model):
                 "до",
             }
 
-            tags_set: Set[str] = {
-                w for w in words if len(w) > 2 and w not in stop_words
-            }
+            tags_set: Set[str] = {w for w in words if len(w) > 2 and w not in stop_words}
             if tags_set:
                 self.tags = ", ".join(sorted(tags_set))
 

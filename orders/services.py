@@ -56,13 +56,9 @@ def create_order_from_cart(
     # 2. Загрузка корзины
     # ---------------------------
     if request.user.is_authenticated:
-        cart_items = CartItem.objects.filter(user=request.user).select_related(
-            "product"
-        )
+        cart_items = CartItem.objects.filter(user=request.user).select_related("product")
     else:
-        cart_items = CartItem.objects.filter(session_key=session_key).select_related(
-            "product"
-        )
+        cart_items = CartItem.objects.filter(session_key=session_key).select_related("product")
 
     if not cart_items.exists():
         raise ValidationError("Корзина пуста")

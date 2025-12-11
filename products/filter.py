@@ -20,21 +20,15 @@ class ProductFilter(django_filters.FilterSet):
     # ---------------------------------------------------------------
     # SEARCH (name + description)
     # ---------------------------------------------------------------
-    def search(
-        self, queryset: QuerySet[Product], name: str, value: str
-    ) -> QuerySet[Product]:
+    def search(self, queryset: QuerySet[Product], name: str, value: str) -> QuerySet[Product]:
         if not value:
             return queryset
-        return queryset.filter(
-            Q(name__icontains=value) | Q(description__icontains=value)
-        )
+        return queryset.filter(Q(name__icontains=value) | Q(description__icontains=value))
 
     # ---------------------------------------------------------------
     # KEYWORDS FILTER
     # ---------------------------------------------------------------
-    def filter_keywords(
-        self, queryset: QuerySet[Product], name: str, value: str
-    ) -> QuerySet[Product]:
+    def filter_keywords(self, queryset: QuerySet[Product], name: str, value: str) -> QuerySet[Product]:
         if not value:
             return queryset
 
@@ -46,9 +40,7 @@ class ProductFilter(django_filters.FilterSet):
     # ---------------------------------------------------------------
     # CATEGORY FILTER
     # ---------------------------------------------------------------
-    def filter_category(
-        self, queryset: QuerySet[Product], name: str, value: str
-    ) -> QuerySet[Product]:
+    def filter_category(self, queryset: QuerySet[Product], name: str, value: str) -> QuerySet[Product]:
         if not value:
             return queryset
         return queryset.filter(category__slug=value)

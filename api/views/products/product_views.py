@@ -39,9 +39,7 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
 
     # ---- queryset ----
     queryset: QuerySet[Product] = (
-        Product.objects.filter(is_active=True)
-        .select_related("category")
-        .prefetch_related("specifications")
+        Product.objects.filter(is_active=True).select_related("category").prefetch_related("specifications")
     )
 
     # ---- фильтры, сортировка, поиск ----
@@ -87,10 +85,7 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     # ----------------------------------------------------------------------
     @extend_schema(
         summary="Детальная информация о товаре",
-        description=(
-            "Возвращает всю информацию о товаре по его `slug`.\n\n"
-            "Пример: `/api/products/citra-hops/`"
-        ),
+        description=("Возвращает всю информацию о товаре по его `slug`.\n\n" "Пример: `/api/products/citra-hops/`"),
         responses={
             200: OpenApiResponse(
                 response=ProductSerializer,

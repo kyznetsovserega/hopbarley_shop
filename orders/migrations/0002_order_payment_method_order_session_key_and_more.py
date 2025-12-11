@@ -26,9 +26,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="order",
             name="session_key",
-            field=models.CharField(
-                blank=True, max_length=40, null=True, verbose_name="Session Key"
-            ),
+            field=models.CharField(blank=True, max_length=40, null=True, verbose_name="Session Key"),
         ),
         migrations.AlterField(
             model_name="orderitem",

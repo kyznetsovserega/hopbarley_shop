@@ -32,23 +32,17 @@ class OrderItemInline(admin.TabularInline):
 
 
 @admin.action(description="Отметить как оплаченные")
-def mark_as_paid(
-    modeladmin: admin.ModelAdmin[Any], request: HttpRequest, queryset: QuerySet[Order]
-) -> None:
+def mark_as_paid(modeladmin: admin.ModelAdmin[Any], request: HttpRequest, queryset: QuerySet[Order]) -> None:
     queryset.update(status=Order.STATUS_PAID)
 
 
 @admin.action(description="Отменить заказ")
-def cancel_orders(
-    modeladmin: admin.ModelAdmin[Any], request: HttpRequest, queryset: QuerySet[Order]
-) -> None:
+def cancel_orders(modeladmin: admin.ModelAdmin[Any], request: HttpRequest, queryset: QuerySet[Order]) -> None:
     queryset.update(status=Order.STATUS_CANCELLED)
 
 
 @admin.action(description="Отметить как отправленные")
-def mark_as_shipped(
-    modeladmin: admin.ModelAdmin[Any], request: HttpRequest, queryset: QuerySet[Order]
-) -> None:
+def mark_as_shipped(modeladmin: admin.ModelAdmin[Any], request: HttpRequest, queryset: QuerySet[Order]) -> None:
     queryset.update(status=Order.STATUS_SHIPPED)
 
 
@@ -61,9 +55,7 @@ class TotalPriceFilter(admin.SimpleListFilter):
     title = "Сумма заказа"
     parameter_name = "total_price_range"
 
-    def lookups(
-        self, request: HttpRequest, model_admin: admin.ModelAdmin[Any]
-    ) -> List[Tuple[str, str]]:
+    def lookups(self, request: HttpRequest, model_admin: admin.ModelAdmin[Any]) -> List[Tuple[str, str]]:
         return [
             ("0_50", "до 50"),
             ("50_100", "50 – 100"),
@@ -147,9 +139,7 @@ class OrderAdmin(admin.ModelAdmin):
     # ----------------------------------------------------------------------
     # АГРЕГИРОВАННАЯ АНАЛИТИКА
     # ----------------------------------------------------------------------
-    def changelist_view(
-        self, request: HttpRequest, extra_context: Dict[str, Any] | None = None
-    ) -> Any:
+    def changelist_view(self, request: HttpRequest, extra_context: Dict[str, Any] | None = None) -> Any:
 
         qs = self.get_queryset(request)
 

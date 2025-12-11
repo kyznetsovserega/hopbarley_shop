@@ -8,9 +8,7 @@ from cart.models import CartItem
 
 
 class CartSerializer(serializers.ModelSerializer):
-    product_title = serializers.CharField(
-        source="product.name", read_only=True, help_text="Название товара."
-    )
+    product_title = serializers.CharField(source="product.name", read_only=True, help_text="Название товара.")
 
     product_price = serializers.DecimalField(
         source="product.price",
@@ -20,9 +18,7 @@ class CartSerializer(serializers.ModelSerializer):
         help_text="Цена товара.",
     )
 
-    total_price = serializers.SerializerMethodField(
-        help_text="Итоговая стоимость (количество * цена)."
-    )
+    total_price = serializers.SerializerMethodField(help_text="Итоговая стоимость (количество * цена).")
 
     class Meta:
         model = CartItem

@@ -37,10 +37,7 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes: List[type[AllowAny]] = [AllowAny]
 
     queryset: QuerySet[Category] = (
-        Category.objects.all()
-        .select_related("parent")
-        .prefetch_related("children")
-        .order_by("name")
+        Category.objects.all().select_related("parent").prefetch_related("children").order_by("name")
     )
 
     # ----------------------------------------------------------------------
@@ -71,11 +68,7 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     # ----------------------------------------------------------------------
     @extend_schema(
         summary="Получить категорию по ID",
-        description=(
-            "Возвращает данные одной категории.\n\n"
-            "Пример запроса:\n"
-            "`/api/categories/1/`"
-        ),
+        description=("Возвращает данные одной категории.\n\n" "Пример запроса:\n" "`/api/categories/1/`"),
         responses={
             200: OpenApiResponse(
                 response=CategorySerializer,
