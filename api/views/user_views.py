@@ -3,12 +3,7 @@ from __future__ import annotations
 from typing import Any, Dict, List
 
 from django.contrib.auth import login
-from drf_spectacular.utils import (
-    OpenApiExample,
-    OpenApiRequest,
-    OpenApiResponse,
-    extend_schema,
-)
+from drf_spectacular.utils import OpenApiExample, OpenApiRequest, OpenApiResponse, extend_schema
 from rest_framework import permissions, status, views
 from rest_framework.request import Request
 from rest_framework.response import Response

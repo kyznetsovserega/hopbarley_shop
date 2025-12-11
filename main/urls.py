@@ -5,11 +5,7 @@ from django.shortcuts import redirect
 from django.urls import include, path
 
 # Swagger / OpenAPI
-from drf_spectacular.views import (
-    SpectacularAPIView,
-    SpectacularRedocView,
-    SpectacularSwaggerView,
-)
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 from users.views import account_view
 
