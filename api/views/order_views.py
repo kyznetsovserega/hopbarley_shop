@@ -3,7 +3,12 @@ from __future__ import annotations
 from typing import Any, Dict, List, Type
 
 from django.db.models import QuerySet
-from drf_spectacular.utils import OpenApiExample, OpenApiRequest, OpenApiResponse, extend_schema
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiRequest,
+    OpenApiResponse,
+    extend_schema,
+)
 from rest_framework import permissions, status, viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
