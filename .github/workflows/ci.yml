@@ -1,0 +1,61 @@
+
+name: CI
+
+on:
+  push:
+    branches: [dev, main, feature/**]
+  pull_request:
+    branches: [dev, main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: hopbarley
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run flake8
+        run: flake8 .
+
+      - name: Run black check
+        run: black --check .
+
+      - name: Run isort check
+        run: isort . --check-only
+
+      - name: Run mypy
+        run: mypy .
+
+      - name: Run tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/hopbarley
+        run: |
+          pytest --disable-warnings --maxfail=1 --cov=.
+
+      - name: Build Docker image
+        run: docker build -t hopbarley-shop .
+

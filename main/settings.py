@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
+import dj_database_url
 
 from dotenv import load_dotenv
 
@@ -98,16 +99,25 @@ WSGI_APPLICATION = "main.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DJANGO_DB_NAME", "hopbarley_shop_db"),
-        "USER": os.getenv("DJANGO_DB_USER", "user"),
-        "PASSWORD": os.getenv("DJANGO_DB_PASSWORD", "password"),
-        "HOST": os.getenv("DJANGO_DB_HOST", "localhost"),
-        "PORT": os.getenv("DJANGO_DB_PORT", "5432"),
+# Если есть DATABASE_URL > используем его (CI)
+database_url = os.getenv("DATABASE_URL")
+
+if database_url:
+    DATABASES = {
+        "default": dj_database_url.parse(database_url, conn_max_age=600),
     }
-}
+else:
+    # Локальный Docker / dev окружение
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DJANGO_DB_NAME", "hopbarley_shop_db"),
+            "USER": os.getenv("DJANGO_DB_USER", "user"),
+            "PASSWORD": os.getenv("DJANGO_DB_PASSWORD", "password"),
+            "HOST": os.getenv("DJANGO_DB_HOST", "localhost"),
+            "PORT": os.getenv("DJANGO_DB_PORT", "5432"),
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -176,6 +186,11 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "Hop & Barley API",
     "DESCRIPTION": "API для интернет-магазина Hop & Barley. Каталог, корзина, заказы, отзывы, пользователи.",
     "VERSION": "1.0.0",
-    "SERVE_INCLUDE_SCHEMA": False,  # не отображать JSON в Swagger
-    "COMPONENT_SPLIT_REQUEST": True,  # корректное отображение POST body
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
 }
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

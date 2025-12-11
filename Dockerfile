@@ -6,7 +6,6 @@ WORKDIR /app
 COPY requirements.txt /app/
 
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install pytest pytest-django
 
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
