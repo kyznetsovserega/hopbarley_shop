@@ -33,7 +33,10 @@ SECRET_KEY = "django-insecure-v$z50+ud4-@w=o*9eg$bvz%f3e%syoq@maw9*4@63mlgpu7w4*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.100.3"]
+ALLOWED_HOSTS = os.getenv(
+    "DJANGO_ALLOWED_HOSTS",
+    "localhost,127.0.0.1",
+).split(",")
 
 # EMAIL CONFIG — dev mode (консольный вывод)
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
@@ -51,13 +54,15 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # ---my apps---
+    # Third-party
     "django_extensions",
     "django_filters",
-    # Third-party
     "rest_framework",
     "drf_spectacular",
     "drf_spectacular_sidecar",
+    "graphene_django",
     # Local apps
+    "graphql_api",
     "products.apps.ProductsConfig",
     "users.apps.UsersConfig",
     "orders",
@@ -65,6 +70,10 @@ INSTALLED_APPS = [
     "cart",
     "api",
 ]
+
+GRAPHENE = {
+    "SCHEMA": "graphql_api.schema.schema",
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -164,7 +173,6 @@ MEDIA_ROOT = BASE_DIR / "media"
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # -------------------------
 # Django REST Framework
