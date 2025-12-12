@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Optional, List
 
 import graphene
+from django.db import models
 from django.db.models import Q, QuerySet
 from graphene import ResolveInfo
 
