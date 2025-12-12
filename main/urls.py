@@ -6,11 +6,7 @@ from django.urls import include, path
 from django.views.decorators.csrf import csrf_exempt
 
 # Swagger / OpenAPI
-from drf_spectacular.views import (
-    SpectacularAPIView,
-    SpectacularRedocView,
-    SpectacularSwaggerView,
-)
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 # GraphQL
 from graphene_django.views import GraphQLView

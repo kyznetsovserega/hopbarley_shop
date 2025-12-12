@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-from typing import Optional, List
+from typing import List, Optional
 
 import graphene
 from django.db import models
 from django.db.models import Q, QuerySet
 from graphene import ResolveInfo
 
-from products.models import Product, Category
-from graphql_api.types.product_types import ProductType, CategoryType
-
+from graphql_api.types.product_types import CategoryType, ProductType
+from products.models import Category, Product
 
 # ================================
 # Глобальные настройки для сортировки

@@ -3,11 +3,7 @@ from __future__ import annotations
 import graphene
 from graphene_django import DjangoObjectType
 
-from products.models import (
-    Product,
-    Category,
-    ProductSpecification,
-)
+from products.models import Category, Product, ProductSpecification
 
 
 class CategoryType(DjangoObjectType):

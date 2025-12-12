@@ -3,7 +3,7 @@ from __future__ import annotations
 import graphene
 from graphene import ResolveInfo
 
-from graphql_api.types.user_types import UserType, UserProfileType
+from graphql_api.types.user_types import UserProfileType, UserType
 
 
 class UserQuery(graphene.ObjectType):

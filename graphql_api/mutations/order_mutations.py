@@ -3,13 +3,13 @@ from __future__ import annotations
 from typing import Any, Dict
 
 import graphene
-from graphene import ResolveInfo
 from django.core.exceptions import ValidationError
 from django.http import HttpRequest
+from graphene import ResolveInfo
 
+from graphql_api.types.order_types import OrderType
 from orders.models import Order
 from orders.services import create_order_from_cart
-from graphql_api.types.order_types import OrderType
 
 
 class CreateOrderInput(graphene.InputObjectType):

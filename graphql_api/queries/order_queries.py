@@ -6,9 +6,9 @@ import graphene
 from django.db.models import QuerySet, Sum
 from graphene import ResolveInfo
 
-from orders.models import Order, OrderItem
 from graphql_api.types.order_types import OrderType
 from graphql_api.types.product_types import ProductType
+from orders.models import Order, OrderItem
 from products.models import Product
 
 

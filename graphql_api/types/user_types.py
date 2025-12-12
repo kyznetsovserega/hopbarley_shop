@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import graphene
-from graphene_django import DjangoObjectType
 from django.contrib.auth import get_user_model
+from graphene_django import DjangoObjectType
 
 from users.models import UserProfile
 

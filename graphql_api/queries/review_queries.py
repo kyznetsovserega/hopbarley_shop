@@ -5,8 +5,8 @@ from typing import Iterable
 import graphene
 from graphene import ResolveInfo
 
-from reviews.models import Review
 from graphql_api.types.review_types import ReviewType
+from reviews.models import Review
 
 
 class ReviewQuery(graphene.ObjectType):

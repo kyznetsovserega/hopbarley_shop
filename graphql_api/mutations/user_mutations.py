@@ -4,9 +4,9 @@ from datetime import date
 from typing import Optional
 
 import graphene
-from graphene import ResolveInfo
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from graphene import ResolveInfo
 
 from graphql_api.types.user_types import UserProfileType, UserType
 from users.models import UserProfile
