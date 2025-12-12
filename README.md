@@ -1,4 +1,9 @@
 # Hop & Barley Shop  
+[![CI](https://github.com/kyznetsovserega/hopbarley_shop/actions/workflows/ci.yml/badge.svg?branch=dev)](
+https://github.com/kyznetsovserega/hopbarley_shop/actions/workflows/ci.yml
+)
+
+
 **Django / Django REST Framework / PostgreSQL / Docker**
 
 Учебный проект — полноценный интернет-магазин, реализованный на **Django**  
