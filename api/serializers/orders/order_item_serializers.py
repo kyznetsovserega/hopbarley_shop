@@ -11,21 +11,19 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     Содержит:
         - имя товара на момент покупки (product_name)
-        - изображение товара (product_image)
-        - количество единиц (quantity)
-        - цена товара на момент оформления (price)
-        - итоговая стоимость позиции (price × quantity) (total)
-
-    Используется в составе OrderSerializer для отображения состава заказа.
+        - изображение товара на момент покупки (product_image)
+        - количество (quantity)
+        - цена на момент оформления (price)
+        - итоговая стоимость позиции (total)
     """
 
-    product_name = serializers.CharField(
+    product_name: serializers.CharField = serializers.CharField(
         source="product.name",
         read_only=True,
         help_text="Название товара на момент покупки.",
     )
 
-    product_image = serializers.ImageField(
+    product_image: serializers.ImageField = serializers.ImageField(
         source="product.image",
         read_only=True,
         help_text="Изображение товара на момент покупки.",

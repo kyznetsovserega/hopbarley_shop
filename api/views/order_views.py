@@ -1,14 +1,13 @@
 from __future__ import annotations
 
+from typing import Any, Dict, List, Type
+
+from django.db.models import QuerySet
+from drf_spectacular.utils import OpenApiExample, OpenApiRequest, OpenApiResponse, extend_schema
 from rest_framework import permissions, status, viewsets
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.request import Request
 from rest_framework.response import Response
-from drf_spectacular.utils import (
-    extend_schema,
-    OpenApiResponse,
-    OpenApiExample,
-    OpenApiRequest,
-)
 
 from api.serializers.orders.order_serializers import OrderSerializer
 from orders.models import Order
@@ -21,39 +20,39 @@ from orders.services import create_order_from_cart
     description=(
         "API оформления и просмотра заказов.\n\n"
         "**Особенности:**\n"
-        "- Гость может оформить заказ (`POST /api/orders/`).\n"
+        "- Гость может оформить заказ (`POST`).\n"
         "- Авторизованный пользователь может просматривать только свои заказы.\n"
-        "- Пользователь НЕ может изменять или удалять заказ через API.\n\n"
-        "**Типовые сценарии:**\n"
-        "- Оформление заказа через корзину\n"
-        "- Просмотр истории заказов\n"
-        "- Получение информации о заказе"
+        "- Редактирование/удаление заказа запрещены.\n"
     ),
 )
 class OrderViewSet(viewsets.ModelViewSet):
-    serializer_class = OrderSerializer
+    """
+    ViewSet для оформления заказов и просмотра истории заказов.
+    """
+
+    serializer_class: Type[OrderSerializer] = OrderSerializer
 
     # ----------------------------------------------------------------------
     # PERMISSIONS
     # ----------------------------------------------------------------------
-    def get_permissions(self):
+    def get_permissions(self) -> List[permissions.BasePermission]:
         """
         POST доступен всем (гость может оформить заказ),
-        остальные методы доступны только авторизованным пользователям.
+        остальное — только авторизованным пользователям.
         """
         if self.request.method == "POST":
             return [permissions.AllowAny()]
         return [permissions.IsAuthenticated()]
 
     # ----------------------------------------------------------------------
-    # QUERYSET
+    # QUERYSET — только свои заказы
     # ----------------------------------------------------------------------
     @extend_schema(
         summary="Список заказов пользователя",
         description=(
-            "Возвращает список заказов текущего пользователя.\n\n"
-            "**Гость** > всегда пустой список.\n"
-            "**Пользователь** > только его собственные заказы.\n"
+            "Возвращает список заказов текущего пользователя.\n"
+            "- Гость > пустой список\n"
+            "- Пользователь > только его собственные\n"
         ),
         responses={
             200: OpenApiResponse(
@@ -62,7 +61,7 @@ class OrderViewSet(viewsets.ModelViewSet):
             )
         },
     )
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Order]:
         user = self.request.user
 
         if not user.is_authenticated:
@@ -76,31 +75,31 @@ class OrderViewSet(viewsets.ModelViewSet):
     @extend_schema(
         summary="Получить заказ по ID",
         description=(
-            "Возвращает подробную информацию о заказе.\n\n"
-            "**Важно:** пользователь может просматривать только свои заказы.\n"
-            "Если он пытается открыть чужой заказ → ошибка 403."
+            "Возвращает информацию о заказе.\n\n"
+            "Пользователь может смотреть только свои заказы.\n"
+            "Чужой заказ > 403."
         ),
         responses={
             200: OpenApiResponse(
                 response=OrderSerializer,
-                description="Информация о заказе успешно получена.",
+                description="Информация о заказе.",
             ),
             403: OpenApiResponse(
-                description="Нет доступа к заказу.",
+                description="Нет доступа.",
                 examples=[
                     OpenApiExample(
-                        "Попытка доступа к чужому заказу",
+                        "Чужой заказ",
                         value={"detail": "Вы не можете просматривать этот заказ."},
                     )
                 ],
             ),
-            404: OpenApiResponse(description="Заказ не найден."),
+            404: OpenApiResponse(description="Не найден."),
         },
     )
-    def retrieve(self, request, *args, **kwargs):
-        order = self.get_object()
+    def retrieve(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        order: Order = self.get_object()
 
-        if order.user != request.user:
+        if order.user_id != request.user.id:
             raise PermissionDenied("Вы не можете просматривать этот заказ.")
 
         return super().retrieve(request, *args, **kwargs)
@@ -111,26 +110,14 @@ class OrderViewSet(viewsets.ModelViewSet):
     @extend_schema(
         summary="Оформить заказ",
         description=(
-            "Создаёт заказ на основе корзины.\n\n"
-            "**Гость:**\n"
-            "- Корзина определяется по `session_key`.\n"
-            "- Заказ создаётся без привязки к пользователю.\n\n"
-            "**Пользователь:**\n"
-            "- Корзина привязана к `user.id`.\n"
-            "- Заказ записывается на пользователя.\n\n"
-            "**В теле запроса передаются:**\n"
-            "- Полное имя (`full_name`)\n"
-            "- Email (`email`)\n"
-            "- Телефон (`phone`)\n"
-            "- Адрес доставки (`shipping_address`)\n"
-            "- Способ оплаты (`payment_method`)\n"
-            "- Комментарий (опционально)"
+            "Создаёт заказ на основе корзины (гостевой или пользовательской).\n\n"
+            "**В запросе:** full_name, email, phone, shipping_address, payment_method, comment\n"
         ),
         request=OpenApiRequest(
-            request=dict,
+            request=Dict[str, Any],
             examples=[
                 OpenApiExample(
-                    "Пример заказа",
+                    "Пример",
                     value={
                         "full_name": "John Smith",
                         "email": "john@example.com",
@@ -139,7 +126,7 @@ class OrderViewSet(viewsets.ModelViewSet):
                         "payment_method": "card",
                         "comment": "Позвонить перед доставкой",
                     },
-                ),
+                )
             ],
         ),
         responses={
@@ -147,27 +134,17 @@ class OrderViewSet(viewsets.ModelViewSet):
                 response=OrderSerializer,
                 description="Заказ успешно создан.",
             ),
-            400: OpenApiResponse(
-                description="Ошибка оформления заказа.",
-                examples=[
-                    OpenApiExample(
-                        "Недостаточно данных",
-                        value={"detail": "Не удалось создать заказ."},
-                    )
-                ],
-            ),
+            400: OpenApiResponse(description="Ошибка оформления заказа."),
         },
     )
-    def create(self, request, *args, **kwargs) -> Response:
+    def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         try:
-            order = create_order_from_cart(request, request.data)
+            order: Order = create_order_from_cart(request, request.data)
         except Exception as e:
             return Response(
                 {"detail": str(e)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        return Response(
-            OrderSerializer(order).data,
-            status=status.HTTP_201_CREATED,
-        )
+        serializer = OrderSerializer(order)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

@@ -12,6 +12,6 @@ class UsersConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "users"
 
-    def ready(self):
-        # Импорт сигналов при старте приложения
-        import users.signals
+    def ready(self) -> None:
+        # Импортируем сигналы ради side-effect, поэтому noqa
+        import users.signals  # noqa: F401

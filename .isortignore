@@ -1,0 +1,10 @@
+.venv/
+venv/
+env/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+staticfiles/
+static/
+media/
+**/migrations/

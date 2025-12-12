@@ -16,21 +16,62 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='UserProfile',
+            name="UserProfile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('phone', models.CharField(blank=True, max_length=20, validators=[django.core.validators.RegexValidator(message='Телефон может содержать только цифры и символы + - ( )', regex='^[0-9+\\-() ]*$')], verbose_name='Телефон')),
-                ('city', models.CharField(blank=True, max_length=100, verbose_name='Город')),
-                ('address', models.TextField(blank=True, verbose_name='Адрес')),
-                ('date_of_birth', models.DateField(blank=True, null=True, verbose_name='Дата рождения')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Создан')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Обновлён')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='profile', to=settings.AUTH_USER_MODEL, verbose_name='Пользователь')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "phone",
+                    models.CharField(
+                        blank=True,
+                        max_length=20,
+                        validators=[
+                            django.core.validators.RegexValidator(
+                                message="Телефон может содержать только цифры и символы + - ( )",
+                                regex="^[0-9+\\-() ]*$",
+                            )
+                        ],
+                        verbose_name="Телефон",
+                    ),
+                ),
+                (
+                    "city",
+                    models.CharField(blank=True, max_length=100, verbose_name="Город"),
+                ),
+                ("address", models.TextField(blank=True, verbose_name="Адрес")),
+                (
+                    "date_of_birth",
+                    models.DateField(blank=True, null=True, verbose_name="Дата рождения"),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="Создан"),
+                ),
+                (
+                    "updated_at",
+                    models.DateTimeField(auto_now=True, verbose_name="Обновлён"),
+                ),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="profile",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="Пользователь",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Профиль пользователя',
-                'verbose_name_plural': 'Профили пользователей',
-                'ordering': ['-created_at'],
+                "verbose_name": "Профиль пользователя",
+                "verbose_name_plural": "Профили пользователей",
+                "ordering": ["-created_at"],
             },
         ),
     ]

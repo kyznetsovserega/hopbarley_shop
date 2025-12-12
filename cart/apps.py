@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from django.apps import AppConfig
 
 
@@ -7,9 +8,10 @@ class CartConfig(AppConfig):
     name = "cart"
     verbose_name = "Корзина"
 
-    def ready(self):
+    def ready(self) -> None:
         """
         Метод вызывается при загрузке приложения.
         Оставлен для возможного подключения сигналов (merge корзины, логирование).
         """
-        pass
+
+        return None

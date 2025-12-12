@@ -1,20 +1,15 @@
 from __future__ import annotations
 
-from django.contrib.auth import login
-from rest_framework import permissions, status, views
-from rest_framework.response import Response
-from drf_spectacular.utils import (
-    extend_schema,
-    OpenApiExample,
-    OpenApiRequest,
-    OpenApiResponse,
-)
+from typing import Any, Dict, List
 
-from api.serializers.users.user_serializers import (
-    UserSerializer,
-    RegisterSerializer,
-)
+from django.contrib.auth import login
+from drf_spectacular.utils import OpenApiExample, OpenApiRequest, OpenApiResponse, extend_schema
+from rest_framework import permissions, status, views
+from rest_framework.request import Request
+from rest_framework.response import Response
+
 from api.serializers.users.profile_serializers import UserProfileSerializer
+from api.serializers.users.user_serializers import RegisterSerializer, UserSerializer
 from cart.utils import merge_session_cart_into_user_cart
 
 
@@ -24,18 +19,9 @@ from cart.utils import merge_session_cart_into_user_cart
 @extend_schema(
     tags=["Users"],
     summary="Регистрация нового пользователя",
-    description=(
-        "Создаёт нового пользователя, выполняет автоматический вход "
-        "и переносит корзину из сессии.\n\n"
-        "**Используется для WEB-регистрации.**\n\n"
-        "**Что происходит:**\n"
-        "- Проверка данных\n"
-        "- Создание пользователя\n"
-        "- Session-based login\n"
-        "- Перенос корзины (если есть session_key)"
-    ),
+    description=("Создаёт нового пользователя, выполняет автоматический вход " "и переносит корзину из сессии."),
     request=OpenApiRequest(
-        request=dict,
+        request=Dict[str, Any],
         examples=[
             OpenApiExample(
                 "Пример запроса",
@@ -48,31 +34,20 @@ from cart.utils import merge_session_cart_into_user_cart
         ],
     ),
     responses={
-        201: OpenApiResponse(
-            response=UserSerializer,
-            description="Пользователь успешно зарегистрирован.",
-        ),
-        400: OpenApiResponse(
-            description="Ошибка регистрации.",
-            examples=[
-                OpenApiExample(
-                    "Некорректные данные",
-                    value={"email": ["Введите корректный адрес."]},
-                )
-            ],
-        ),
+        201: OpenApiResponse(response=UserSerializer),
+        400: OpenApiResponse(description="Ошибка регистрации."),
     },
 )
 class RegisterView(views.APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes: List[type[permissions.BasePermission]] = [permissions.AllowAny]
 
-    def post(self, request) -> Response:
+    def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         user = serializer.save()
 
-        # Вход (session login)
+        # session login
         login(request, user)
 
         # перенос корзины
@@ -92,45 +67,20 @@ class RegisterView(views.APIView):
 @extend_schema(
     tags=["Users"],
     summary="Получить данные текущего пользователя",
-    description=(
-        "Возвращает информацию о текущем пользователе.\n\n"
-        "**Требуется JWT-аутентификация.**\n\n"
-        "Ответ включает:\n"
-        "- данные модели User\n"
-        "- данные модели UserProfile"
-    ),
     responses={
         200: OpenApiResponse(
-            description="Данные пользователя успешно получены.",
-            examples=[
-                OpenApiExample(
-                    "Пример ответа",
-                    value={
-                        "user": {
-                            "id": 4,
-                            "username": "sergey",
-                            "email": "sergey@example.com",
-                            "first_name": "",
-                            "last_name": "",
-                        },
-                        "profile": {
-                            "phone": "+1234567",
-                            "city": "Moscow",
-                            "address": "Red Square, 1",
-                            "date_of_birth": "1990-10-10",
-                        },
-                    },
-                )
-            ],
+            response=Dict[str, Any],
+            description="Данные текущего пользователя.",
         ),
         401: OpenApiResponse(description="Требуется авторизация."),
     },
 )
 class MeView(views.APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes: List[type[permissions.BasePermission]] = [permissions.IsAuthenticated]
 
-    def get(self, request) -> Response:
+    def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         user = request.user
+
         return Response(
             {
                 "user": UserSerializer(user).data,
@@ -144,15 +94,10 @@ class MeView(views.APIView):
 # ======================================================================
 @extend_schema(
     tags=["Users"],
-    summary="Обновить данные профиля пользователя",
-    description=(
-        "Позволяет обновить данные модели User и UserProfile.\n\n"
-        "**Требуется JWT-аутентификация.**\n\n"
-        "Изменения применяются атомарно: если сериализатор User или "
-        "UserProfile не проходит валидацию, возвращается ошибка обоих."
-    ),
+    summary="Обновить данные профиля",
+    description="Атомарное обновление User + UserProfile.",
     request=OpenApiRequest(
-        request=dict,
+        request=Dict[str, Any],
         examples=[
             OpenApiExample(
                 "Пример запроса",
@@ -173,41 +118,26 @@ class MeView(views.APIView):
         ],
     ),
     responses={
-        200: OpenApiResponse(
-            description="Данные успешно обновлены.",
-        ),
-        400: OpenApiResponse(
-            description="Ошибка валидации.",
-            examples=[
-                OpenApiExample(
-                    "Пример ошибки",
-                    value={
-                        "user_errors": {"email": ["Этот email уже используется."]},
-                        "profile_errors": {"phone": ["Некорректный формат номера."]},
-                    },
-                )
-            ],
-        ),
+        200: OpenApiResponse(description="Данные успешно обновлены."),
+        400: OpenApiResponse(description="Ошибка валидации."),
         401: OpenApiResponse(description="Требуется авторизация."),
     },
 )
 class UpdateProfileView(views.APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes: List[type[permissions.BasePermission]] = [permissions.IsAuthenticated]
 
-    def patch(self, request) -> Response:
+    def patch(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         user = request.user
         profile = user.profile
 
-        # Разделяем входящие данные
-        user_data = request.data.get("user", {})
-        profile_data = request.data.get("profile", {})
+        data: Dict[str, Any] = request.data
 
-        user_serializer = UserSerializer(
-            user, data=user_data, partial=True
-        )
-        profile_serializer = UserProfileSerializer(
-            profile, data=profile_data, partial=True
-        )
+        # разделяем user / profile
+        user_data: Dict[str, Any] = data.get("user", {})
+        profile_data: Dict[str, Any] = data.get("profile", {})
+
+        user_serializer = UserSerializer(user, data=user_data, partial=True)
+        profile_serializer = UserProfileSerializer(profile, data=profile_data, partial=True)
 
         user_valid = user_serializer.is_valid()
         profile_valid = profile_serializer.is_valid()

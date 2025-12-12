@@ -1,16 +1,16 @@
 import pytest
 from django.contrib.auth import get_user_model
-from django.urls import reverse
 from django.test import Client
+from django.urls import reverse
 from rest_framework.test import APIClient
 
 from products.models import Category, Product
 from reviews.models import Review
 
-
 # ======================================================================
 # USERS
 # ======================================================================
+
 
 @pytest.fixture
 def user_fixture(db):
@@ -26,6 +26,7 @@ def user_fixture(db):
 # ======================================================================
 # PRODUCTS
 # ======================================================================
+
 
 @pytest.fixture
 def category_fixture(db):
@@ -52,6 +53,7 @@ def product_fixture(db, category_fixture):
 # REVIEWS
 # ======================================================================
 
+
 @pytest.fixture
 def review_fixture(db, user_fixture, product_fixture):
     """Готовый отзыв (используется для тестов списка)."""
@@ -67,10 +69,12 @@ def review_fixture(db, user_fixture, product_fixture):
 # ORDERS
 # ======================================================================
 
+
 @pytest.fixture
 def order_fixture(db, user_fixture):
     """Базовый заказ (по умолчанию pending)."""
     from orders.models import Order
+
     return Order.objects.create(
         user=user_fixture,
         status="pending",
@@ -83,6 +87,7 @@ def order_fixture(db, user_fixture):
 def order_item_fixture(db, order_fixture, product_fixture):
     """Item заказа — НЕ делает покупку завершённой."""
     from orders.models import OrderItem
+
     return OrderItem.objects.create(
         order=order_fixture,
         product=product_fixture,
@@ -92,6 +97,7 @@ def order_item_fixture(db, order_fixture, product_fixture):
 
 
 # === ДОПОЛНИТЕЛЬНЫЕ ФИКСТУРЫ ДЛЯ TEST REVIEWS ===
+
 
 @pytest.fixture
 def paid_order_fixture(order_fixture):
@@ -113,6 +119,7 @@ def delivered_order_fixture(order_fixture):
 def paid_order_item_fixture(db, paid_order_fixture, product_fixture):
     """Товар в оплачённом заказе — завершённая покупка."""
     from orders.models import OrderItem
+
     return OrderItem.objects.create(
         order=paid_order_fixture,
         product=product_fixture,
@@ -125,6 +132,7 @@ def paid_order_item_fixture(db, paid_order_fixture, product_fixture):
 # EMAIL SETTINGS
 # ======================================================================
 
+
 @pytest.fixture(autouse=True)
 def email_settings(settings):
     settings.DEFAULT_FROM_EMAIL = "noreply@test.com"
@@ -135,17 +143,20 @@ def email_settings(settings):
 # CHECKOUT POST HELPER
 # ======================================================================
 
+
 @pytest.fixture
 def checkout_post(client_web, web_session_key):
     def do_post(data):
         client_web.cookies["sessionid"] = web_session_key
         return client_web.post(reverse("orders:checkout"), data)
+
     return do_post
 
 
 # ======================================================================
 # API CLIENTS
 # ======================================================================
+
 
 @pytest.fixture
 def client():
@@ -172,6 +183,7 @@ def client_api():
 # SESSION FIXTURES
 # ======================================================================
 
+
 @pytest.fixture
 def session_key(client):
     session = client.session
@@ -192,9 +204,11 @@ def web_session_key(client_web):
 # CART FIXTURES
 # ======================================================================
 
+
 @pytest.fixture
 def cart_item_fixture(db, session_key, product_fixture):
     from cart.models import CartItem
+
     return CartItem.objects.create(
         session_key=session_key,
         product=product_fixture,
@@ -205,6 +219,7 @@ def cart_item_fixture(db, session_key, product_fixture):
 @pytest.fixture
 def user_cart_item_fixture(db, user_fixture, product_fixture):
     from cart.models import CartItem
+
     return CartItem.objects.create(
         user=user_fixture,
         product=product_fixture,
@@ -215,6 +230,7 @@ def user_cart_item_fixture(db, user_fixture, product_fixture):
 # ======================================================================
 # WEB CLIENT
 # ======================================================================
+
 
 @pytest.fixture
 def client_web(db):

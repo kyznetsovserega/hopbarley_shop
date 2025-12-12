@@ -1,17 +1,19 @@
 from __future__ import annotations
 
+from typing import Any, Dict
+
 from django import forms
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 
 from .models import UserProfile
 
-
 # =========================================================
 # REGISTER FORM
 # =========================================================
+
 
 class RegisterForm(forms.ModelForm):
     """
@@ -41,8 +43,8 @@ class RegisterForm(forms.ModelForm):
     # VALIDATION METHODS
     # -------------------
 
-    def clean_username(self):
-        username = self.cleaned_data.get("username", "").strip()
+    def clean_username(self) -> str:
+        username: str = (self.cleaned_data.get("username") or "").strip()
 
         if not username:
             raise ValidationError("Введите имя пользователя.")
@@ -52,8 +54,8 @@ class RegisterForm(forms.ModelForm):
 
         return username
 
-    def clean_email(self):
-        email = (self.cleaned_data.get("email") or "").strip().lower()
+    def clean_email(self) -> str:
+        email: str = (self.cleaned_data.get("email") or "").strip().lower()
 
         if not email:
             raise ValidationError("Введите email.")
@@ -63,15 +65,14 @@ class RegisterForm(forms.ModelForm):
 
         return email
 
-    def clean(self):
-        cleaned_data = super().clean()
-        p1 = cleaned_data.get("password1")
-        p2 = cleaned_data.get("password2")
+    def clean(self) -> Dict[str, Any]:
+        cleaned_data: Dict[str, Any] = super().clean()
+        p1: str | None = cleaned_data.get("password1")
+        p2: str | None = cleaned_data.get("password2")
 
         if p1 and p2 and p1 != p2:
             raise ValidationError({"password2": "Пароли не совпадают."})
 
-        # Проверка сложности пароля (Django validators)
         if p1:
             try:
                 validate_password(p1)
@@ -84,11 +85,11 @@ class RegisterForm(forms.ModelForm):
     # SAVE
     # -------------------
 
-    def save(self, commit=True):
-        user = super().save(commit=False)
+    def save(self, commit: bool = True) -> User:
+        user: User = super().save(commit=False)
 
-        password = self.cleaned_data["password1"]
-        user.set_password(password)  # хэшируем пароль
+        password: str = self.cleaned_data["password1"]
+        user.set_password(password)
 
         if commit:
             user.save()
@@ -99,6 +100,7 @@ class RegisterForm(forms.ModelForm):
 # =========================================================
 # USER UPDATE FORM
 # =========================================================
+
 
 class UserUpdateForm(forms.ModelForm):
     """
@@ -128,9 +130,9 @@ class UserUpdateForm(forms.ModelForm):
         model = User
         fields = ("first_name", "last_name", "email")
 
-    def clean_email(self):
-        email = (self.cleaned_data.get("email") or "").strip().lower()
-        user_id = self.instance.id
+    def clean_email(self) -> str:
+        email: str = (self.cleaned_data.get("email") or "").strip().lower()
+        user_id: int | None = self.instance.id
 
         if User.objects.exclude(id=user_id).filter(email=email).exists():
             raise ValidationError("Этот email уже используется другим пользователем.")
@@ -141,6 +143,7 @@ class UserUpdateForm(forms.ModelForm):
 # =========================================================
 # PROFILE UPDATE FORM
 # =========================================================
+
 
 class ProfileUpdateForm(forms.ModelForm):
     """

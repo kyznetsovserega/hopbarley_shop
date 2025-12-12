@@ -1,71 +1,75 @@
-from django.db.models import Q, Avg, Count
-from django_filters.views import FilterView
-from django.views.generic import DetailView
+from __future__ import annotations
 
-from .models import Product, Category
-from .filter import ProductFilter
+from typing import TYPE_CHECKING, Any, Dict
+
+from django.db.models import Avg, Count, Q, QuerySet
+from django.http import HttpRequest, HttpResponse
+from django.views.generic import DetailView
+from django_filters.views import FilterView
+
 from orders.models import OrderItem
 from reviews.forms import ReviewForm
 from reviews.models import Review
+
+from .filter import ProductFilter
+from .models import Category, Product
+
+if TYPE_CHECKING:
+    from django.contrib.auth.models import AbstractUser as UserType
+else:
+    UserType = Any
+
+
+# -------------------------------------------------------------------------
+#  PRODUCT LIST VIEW
+# -------------------------------------------------------------------------
 
 
 class ProductListView(FilterView):
     """
     Каталог товаров: фильтры, поиск, сортировка, пагинация.
     """
+
     model = Product
     template_name = "products/list.html"
     context_object_name = "products"
     filterset_class = ProductFilter
     paginate_by = 12
 
-    def get_queryset(self):
-        queryset = (
-            Product.objects
-            .filter(is_active=True)
-            .select_related("category")
-        )
+    def get_queryset(self) -> QuerySet[Product]:
+        queryset: QuerySet[Product] = Product.objects.filter(is_active=True).select_related("category")
 
         # Поиск
         q = self.request.GET.get("q")
         if q:
-            queryset = queryset.filter(
-                Q(name__icontains=q) |
-                Q(description__icontains=q)
-            )
+            queryset = queryset.filter(Q(name__icontains=q) | Q(description__icontains=q))
 
-        # Фильтры django-filter
+        # django-filter
         queryset = self.filterset_class(
             self.request.GET,
-            queryset=queryset
+            queryset=queryset,
         ).qs
 
         # Сортировка
         sort = self.request.GET.get("sort")
         allowed = {"price", "-price", "created_at", "-created_at"}
 
-        queryset = queryset.order_by(sort) if sort in allowed else queryset.order_by("-created_at")
+        if sort in allowed:
+            queryset = queryset.order_by(sort)
+        else:
+            queryset = queryset.order_by("-created_at")
 
         return queryset
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context: Dict[str, Any] = super().get_context_data(**kwargs)
 
         # Список корневых категорий
-        context["categories"] = (
-            Category.objects
-            .filter(parent__isnull=True)
-            .exclude(slug="default")
-        )
+        context["categories"] = Category.objects.filter(parent__isnull=True).exclude(slug="default")
 
         # Keywords (SEO)
-        keywords_set = set()
-        tags_qs = (
-            Product.objects
-            .exclude(tags__exact="")
-            .values_list("tags", flat=True)
-            .distinct()
-        )
+        keywords_set: set[str] = set()
+        tags_qs = Product.objects.exclude(tags__exact="").values_list("tags", flat=True).distinct()
 
         for tag_string in tags_qs:
             for kw in tag_string.replace(";", ",").split(","):
@@ -87,35 +91,43 @@ class ProductListView(FilterView):
 #  PRODUCT DETAIL VIEW
 # -------------------------------------------------------------------------
 
+
 class ProductDetailView(DetailView):
     """
     Детальная страница товара: характеристики, отзывы, рейтинг.
     """
+
     model = Product
     template_name = "products/detail.html"
     context_object_name = "product"
     slug_field = "slug"
     slug_url_kwarg = "slug"
 
-    # Позволяет принимать invalid_form от add_review
-    def __init__(self, **kwargs):
+    invalid_form: ReviewForm | None
+
+    def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.invalid_form = None
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(
+        self,
+        request: HttpRequest,
+        *args: Any,
+        **kwargs: Any,
+    ) -> HttpResponse:
         # Если extra_context передан — забираем invalid_form
         if hasattr(self, "extra_context") and self.extra_context:
             self.invalid_form = self.extra_context.get("invalid_form")
         return super().dispatch(request, *args, **kwargs)
 
-
     # --- Проверки (купил товар + писал раньше отзыв) ---
-    def user_has_bought(self, product, user) -> bool:
+
+    def user_has_bought(self, product: Product, user: UserType) -> bool:
         """
         Проверка: купил ли пользователь товар.
         Статусы: paid или delivered.
         """
-        if not user.is_authenticated:
+        if not getattr(user, "is_authenticated", False):
             return False
 
         return OrderItem.objects.filter(
@@ -124,9 +136,9 @@ class ProductDetailView(DetailView):
             product=product,
         ).exists()
 
-    def user_already_reviewed(self, product, user) -> bool:
+    def user_already_reviewed(self, product: Product, user: UserType) -> bool:
         """Проверка: писал ли пользователь отзыв ранее."""
-        if not user.is_authenticated:
+        if not getattr(user, "is_authenticated", False):
             return False
 
         return Review.objects.filter(
@@ -134,12 +146,13 @@ class ProductDetailView(DetailView):
             product=product,
         ).exists()
 
-
     # --- Контекст страницы ---
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        product = self.object
-        user = self.request.user
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context: Dict[str, Any] = super().get_context_data(**kwargs)
+
+        product: Product = self.object
+        user: UserType = self.request.user
 
         # Характеристики товара
         context["specifications"] = product.specifications.all()
@@ -161,8 +174,6 @@ class ProductDetailView(DetailView):
         context["already_reviewed"] = already_reviewed
 
         # Форма: пустая или с ошибками
-        context["review_form"] = (
-            self.invalid_form if self.invalid_form else ReviewForm()
-        )
+        context["review_form"] = self.invalid_form if self.invalid_form else ReviewForm()
 
         return context

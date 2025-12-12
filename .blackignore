@@ -1,0 +1,20 @@
+# Игнорируем виртуальное окружение
+.venv/
+venv/
+env/
+
+# Игнорируем кеши
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+
+# Игнорируем статические файлы и медиа
+staticfiles/
+static/
+media/
+
+# Django migrations
+**/migrations/
+
+# Тестовые базы и JSON
+*.json

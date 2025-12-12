@@ -14,3 +14,14 @@
 - `users/management/commands/print_jwt.py`
 
 Эти команды автоматически выполняются внутри Docker при запуске контейнера `web`.
+
+
+-------------------------------------------------------------------------------------------
+
+# HopBarley Shop API
+
+![CI](https://github.com/kyznetsovserega/hopbarley_shop/actions/workflows/ci.yml/badge.svg)
+![Coverage](https://img.shields.io/badge/coverage-82%25-yellow)
+![Mypy](https://img.shields.io/badge/mypy-strict-blue)
+![Flake8](https://img.shields.io/badge/flake8-passing-brightgreen)
+# Trigger

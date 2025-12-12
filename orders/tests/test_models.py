@@ -1,13 +1,20 @@
+from __future__ import annotations
+
+from typing import Any
+
 import pytest
+
 from orders.models import Order, OrderItem
 
 
 # ============================================================================
 # ORDER CREATION
 # ============================================================================
-
 @pytest.mark.django_db
-def test_order_creation(order_fixture, user_fixture):
+def test_order_creation(
+    order_fixture: Any,
+    user_fixture: Any,
+) -> None:
     """
     Проверяет корректное создание заказа (Order).
     """
@@ -24,9 +31,12 @@ def test_order_creation(order_fixture, user_fixture):
 # ============================================================================
 # ORDER ITEM CREATION
 # ============================================================================
-
 @pytest.mark.django_db
-def test_order_item_creation(order_item_fixture, product_fixture, order_fixture):
+def test_order_item_creation(
+    order_item_fixture: Any,
+    product_fixture: Any,
+    order_fixture: Any,
+) -> None:
     """
     Проверяет корректное создание OrderItem и связи:
     - Order > Items

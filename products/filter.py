@@ -1,9 +1,7 @@
-"""
-Фильтры каталога: поиск, цена, категория, ключевые слова.
-"""
+from __future__ import annotations
 
 import django_filters
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 
 from .models import Product
 
@@ -17,19 +15,32 @@ class ProductFilter(django_filters.FilterSet):
 
     class Meta:
         model = Product
-        fields = []
+        fields: list[str] = []
 
-    def search(self, queryset, name, value):
-        return queryset.filter(
-            Q(name__icontains=value) |
-            Q(description__icontains=value)
-        )
+    # ---------------------------------------------------------------
+    # SEARCH (name + description)
+    # ---------------------------------------------------------------
+    def search(self, queryset: QuerySet[Product], name: str, value: str) -> QuerySet[Product]:
+        if not value:
+            return queryset
+        return queryset.filter(Q(name__icontains=value) | Q(description__icontains=value))
 
-    def filter_keywords(self, queryset, name, value):
+    # ---------------------------------------------------------------
+    # KEYWORDS FILTER
+    # ---------------------------------------------------------------
+    def filter_keywords(self, queryset: QuerySet[Product], name: str, value: str) -> QuerySet[Product]:
+        if not value:
+            return queryset
+
         words = [w.strip().lower() for w in value.split(",") if w.strip()]
         for w in words:
             queryset = queryset.filter(tags__icontains=w)
         return queryset
 
-    def filter_category(self, queryset, name, value):
-        return queryset.filter(category__slug=value) if value else queryset
+    # ---------------------------------------------------------------
+    # CATEGORY FILTER
+    # ---------------------------------------------------------------
+    def filter_category(self, queryset: QuerySet[Product], name: str, value: str) -> QuerySet[Product]:
+        if not value:
+            return queryset
+        return queryset.filter(category__slug=value)

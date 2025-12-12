@@ -1,19 +1,31 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any, List, Tuple
+
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
-from django.db.models import Count, Sum, Max, QuerySet
+from django.db.models import Count, Max, QuerySet, Sum
+from django.http import HttpRequest
 
 from .models import UserProfile
 
-
+# ---------------------------------------------------------
+# Тип модели пользователя
+# ---------------------------------------------------------
 User = get_user_model()
 
+if TYPE_CHECKING:
+
+    from django.contrib.auth.models import AbstractUser as UserType
+else:
+    UserType = Any
+
 
 # =========================================================
-# INLINE: USER PROFILE
+# INLINE
 # =========================================================
+
 
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
@@ -36,61 +48,80 @@ class UserProfileInline(admin.StackedInline):
 # FILTERS
 # =========================================================
 
+
 class HasOrdersFilter(admin.SimpleListFilter):
     """Пользователи с заказами / без заказов."""
+
     title = "Has Orders"
     parameter_name = "has_orders"
 
-    def lookups(self, request, model_admin):
+    def lookups(
+        self,
+        request: HttpRequest,
+        model_admin: admin.ModelAdmin[Any],
+    ) -> List[Tuple[str, str]]:
         return [
             ("yes", "Has orders"),
             ("no", "No orders"),
         ]
 
-    def queryset(self, request, qs: QuerySet):
-        if self.value() == "yes":
-            return qs.filter(order_count__gt=0)
-        if self.value() == "no":
-            return qs.filter(order_count=0)
-        return qs
+    def queryset(
+        self,
+        request: HttpRequest,
+        qs: QuerySet[UserType],
+    ) -> QuerySet[UserType]:
+        match self.value():
+            case "yes":
+                return qs.filter(order_count__gt=0)
+            case "no":
+                return qs.filter(order_count=0)
+            case _:
+                return qs
 
 
 class BigSpendersFilter(admin.SimpleListFilter):
     """Фильтр пользователей с суммой заказов > 200$."""
+
     title = "Top Customers"
     parameter_name = "top_customers"
 
-    def lookups(self, request, model_admin):
+    def lookups(self, request: HttpRequest, model_admin: admin.ModelAdmin[Any]) -> List[Tuple[str, str]]:
         return [
             ("200", "> 200$ spent"),
             ("500", "> 500$ spent"),
         ]
 
-    def queryset(self, request, qs: QuerySet):
-        if self.value() == "200":
-            return qs.filter(total_spent__gt=200)
-        if self.value() == "500":
-            return qs.filter(total_spent__gt=500)
-        return qs
+    def queryset(
+        self,
+        request: HttpRequest,
+        qs: QuerySet[UserType],
+    ) -> QuerySet[UserType]:
+        match self.value():
+            case "200":
+                return qs.filter(total_spent__gt=200)
+            case "500":
+                return qs.filter(total_spent__gt=500)
+            case _:
+                return qs
 
 
 class CityFilter(admin.SimpleListFilter):
     """Фильтр по городу."""
+
     title = "City"
     parameter_name = "city"
 
-    def lookups(self, request, model_admin):
-        cities = (
-            UserProfile.objects.exclude(city="")
-            .order_by("city")
-            .values_list("city", flat=True)
-            .distinct()
-        )
-        return [(c, c) for c in cities]
+    def lookups(
+        self,
+        request: HttpRequest,
+        model_admin: admin.ModelAdmin[Any],
+    ) -> List[Tuple[str, str]]:
+        cities = UserProfile.objects.exclude(city="").order_by("city").values_list("city", flat=True).distinct()
+        return [(str(c), str(c)) for c in cities]
 
-    def queryset(self, request, qs: QuerySet):
-        if self.value():
-            return qs.filter(profile__city=self.value())
+    def queryset(self, request: HttpRequest, qs: QuerySet[UserType]) -> QuerySet[UserType]:
+        if city := self.value():
+            return qs.filter(profile__city=city)
         return qs
 
 
@@ -98,28 +129,23 @@ class CityFilter(admin.SimpleListFilter):
 # CUSTOM USER ADMIN
 # =========================================================
 
+
 class CustomUserAdmin(UserAdmin):
     """
-    — Inline профиль
-    — Аналитика заказов
-    — Поиск, фильтры
-    — Экшены
+    Inline профиль + аналитика заказов.
     """
 
-    inlines = [UserProfileInline]
+    inlines: List[type[admin.StackedInline]] = [UserProfileInline]
 
-    # ---- АННОТАЦИИ ORM ----
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        return (
-            qs
-            .select_related("profile")
-            .annotate(
-                order_count=Count("orders", distinct=True),
-                total_spent=Sum("orders__total_price"),
-                last_order=Max("orders__created_at"),
-            )
+    # ---- АННОТИРОВАННЫЙ QUERYSET ----
+    def get_queryset(self, request: HttpRequest) -> QuerySet[UserType]:
+        qs: QuerySet[UserType] = super().get_queryset(request)
+        annotated = qs.select_related("profile").annotate(
+            order_count=Count("orders", distinct=True),
+            total_spent=Sum("orders__total_price"),
+            last_order=Max("orders__created_at"),
         )
+        return annotated
 
     # ---- LIST DISPLAY ----
     list_display = UserAdmin.list_display + (
@@ -148,43 +174,57 @@ class CustomUserAdmin(UserAdmin):
     # DISPLAY METHODS
     # =========================================================
 
-    def get_phone(self, obj):
-        return obj.profile.phone or "—"
-    get_phone.short_description = "Phone"
+    @admin.display(description="Phone")
+    def get_phone(self, obj: UserType) -> str:
+        profile = getattr(obj, "profile", None)
+        return getattr(profile, "phone", "—") or "—"
 
-    def get_city(self, obj):
-        return obj.profile.city or "—"
-    get_city.short_description = "City"
+    @admin.display(description="City")
+    def get_city(self, obj: UserType) -> str:
+        profile = getattr(obj, "profile", None)
+        return getattr(profile, "city", "—") or "—"
 
-    def get_orders_count(self, obj):
-        return obj.order_count or 0
-    get_orders_count.short_description = "Orders"
+    @admin.display(description="Orders")
+    def get_orders_count(self, obj: UserType) -> int:
+        val = getattr(obj, "order_count", 0)
+        return int(val or 0)
 
-    def get_total_spent(self, obj):
-        total = obj.total_spent or 0
+    @admin.display(description="Total Spent")
+    def get_total_spent(self, obj: UserType) -> str:
+        total = getattr(obj, "total_spent", 0) or 0
         return f"${total:.2f}"
-    get_total_spent.short_description = "Total Spent"
 
-    def get_last_order(self, obj):
-        if obj.last_order:
-            return obj.last_order.strftime("%Y-%m-%d")
-        return "—"
-    get_last_order.short_description = "Last Order"
+    @admin.display(description="Last Order")
+    def get_last_order(self, obj: UserType) -> str:
+        dt = getattr(obj, "last_order", None)
+        return dt.strftime("%Y-%m-%d") if dt else "—"
 
     # =========================================================
     # ACTIONS
     # =========================================================
 
     @admin.action(description="Deactivate selected users")
-    def deactivate_users(self, request, qs):
+    def deactivate_users(
+        self,
+        request: HttpRequest,
+        qs: QuerySet[UserType],
+    ) -> None:
         qs.update(is_active=False)
 
     @admin.action(description="Activate selected users")
-    def activate_users(self, request, qs):
+    def activate_users(
+        self,
+        request: HttpRequest,
+        qs: QuerySet[UserType],
+    ) -> None:
         qs.update(is_active=True)
 
     @admin.action(description="Reset profiles (clear city & address)")
-    def clear_profiles(self, request, qs):
+    def clear_profiles(
+        self,
+        request: HttpRequest,
+        qs: QuerySet[UserType],
+    ) -> None:
         profiles = UserProfile.objects.filter(user__in=qs)
         profiles.update(city="", address="")
 
@@ -195,6 +235,6 @@ class CustomUserAdmin(UserAdmin):
     ]
 
 
-# Перерегистрируем User
+# Регистрируем
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
