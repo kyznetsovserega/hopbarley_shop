@@ -5,6 +5,7 @@ from graphene import ResolveInfo
 
 from cart.services import CartService
 from graphql_api.types.cart_types import CartType
+from products.models import Product
 
 
 class AddToCart(graphene.Mutation):
@@ -17,6 +18,7 @@ class AddToCart(graphene.Mutation):
         quantity = graphene.Int(required=False, default_value=1)
 
     cart = graphene.Field(CartType)
+    error = graphene.String()
 
     @classmethod
     def mutate(
@@ -27,7 +29,13 @@ class AddToCart(graphene.Mutation):
         quantity: int = 1,
     ):
         service = CartService(info.context)
-        service.add(product_id=product_id, quantity=quantity)
+
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return AddToCart(cart=None, error="Product not found.")
+
+        service.add(product=product, quantity=quantity)
         return AddToCart(cart=service)
 
 
@@ -51,7 +59,13 @@ class UpdateCartItem(graphene.Mutation):
         quantity: int,
     ):
         service = CartService(info.context)
-        service.update(product_id=product_id, quantity=quantity)
+
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return UpdateCartItem(cart=None, error="Product not found.")
+
+        service.update(product=product, quantity=quantity)
         return UpdateCartItem(cart=service)
 
 
@@ -73,7 +87,13 @@ class RemoveFromCart(graphene.Mutation):
         product_id: int,
     ):
         service = CartService(info.context)
-        service.remove(product_id=product_id)
+
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return RemoveFromCart(cart=None, error="Product not found.")
+
+        service.remove(product=product)
         return RemoveFromCart(cart=service)
 
 
