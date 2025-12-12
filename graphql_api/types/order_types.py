@@ -19,9 +19,7 @@ class OrderItemType(DjangoObjectType):
     - total — итог по позиции (price * quantity)
     """
 
-    total = graphene.Decimal(
-        description="Total price for this item (quantity x price)."
-    )
+    total = graphene.Decimal(description="Total price for this item (quantity x price).")
 
     class Meta:
         model = OrderItem
@@ -50,9 +48,7 @@ class OrderType(DjangoObjectType):
     - вычисляемое поле items_count
     """
 
-    items_count = graphene.Int(
-        description="Total quantity of products across all items in the order."
-    )
+    items_count = graphene.Int(description="Total quantity of products across all items in the order.")
 
     class Meta:
         model = Order

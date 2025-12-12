@@ -11,9 +11,7 @@ class ReviewType(DjangoObjectType):
     GraphQL тип отзыва на товар.
     """
 
-    username = graphene.String(
-        description="Username or email of the review author."
-    )
+    username = graphene.String(description="Username or email of the review author.")
 
     class Meta:
         model = Review

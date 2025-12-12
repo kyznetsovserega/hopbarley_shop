@@ -51,9 +51,7 @@ class ProductType(DjangoObjectType):
     - discountPercent (camelCase): процент скидки
     """
 
-    discount_percent = graphene.Int(
-        description="Discount percentage calculated from price and old_price."
-    )
+    discount_percent = graphene.Int(description="Discount percentage calculated from price and old_price.")
 
     class Meta:
         model = Product

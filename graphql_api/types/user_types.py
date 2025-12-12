@@ -14,9 +14,7 @@ class UserProfileType(DjangoObjectType):
     GraphQL тип профиля пользователя.
     """
 
-    full_address = graphene.String(
-        description="Formatted full address (city + address)."
-    )
+    full_address = graphene.String(description="Formatted full address (city + address).")
 
     class Meta:
         model = UserProfile

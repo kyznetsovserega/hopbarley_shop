@@ -20,6 +20,7 @@ class CreateOrderInput(graphene.InputObjectType):
     - full_name -> fullName
     - shipping_address -> shippingAddress
     """
+
     full_name = graphene.String(required=True)
     email = graphene.String(required=False)
     phone = graphene.String(required=True)
@@ -72,6 +73,4 @@ class OrderMutations(graphene.ObjectType):
     - create_order: создать заказ из корзины
     """
 
-    create_order = CreateOrderPayload.Field(
-        description="Creates an order from the current cart and returns it."
-    )
+    create_order = CreateOrderPayload.Field(description="Creates an order from the current cart and returns it.")

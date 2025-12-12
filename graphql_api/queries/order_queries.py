@@ -35,13 +35,9 @@ class OrderQuery(graphene.ObjectType):
         description="Returns list of orders for the authenticated user.",
     )
 
-    total_revenue = graphene.Float(
-        description="Total revenue for paid / shipped / delivered orders."
-    )
+    total_revenue = graphene.Float(description="Total revenue for paid / shipped / delivered orders.")
 
-    orders_count = graphene.Int(
-        description="Total number of orders in the system."
-    )
+    orders_count = graphene.Int(description="Total number of orders in the system.")
 
     top_products = graphene.List(
         ProductType,
@@ -58,12 +54,7 @@ class OrderQuery(graphene.ObjectType):
         Возвращает заказ по его ID.
         """
         try:
-            return (
-                Order.objects
-                .select_related("user")
-                .prefetch_related("items__product")
-                .get(id=id)
-            )
+            return Order.objects.select_related("user").prefetch_related("items__product").get(id=id)
         except Order.DoesNotExist as exc:  # pragma: no cover
             raise ValueError(f"Order with ID {id} not found.") from exc
 
@@ -77,29 +68,20 @@ class OrderQuery(graphene.ObjectType):
         if not user or not user.is_authenticated:
             raise ValueError("Authentication required to access orders.")
 
-        return (
-            Order.objects
-            .filter(user=user)
-            .prefetch_related("items__product")
-            .order_by("-created_at")
-        )
+        return Order.objects.filter(user=user).prefetch_related("items__product").order_by("-created_at")
 
     def resolve_total_revenue(self, info: ResolveInfo) -> float:
         """
         Суммарная выручка по заказам со статусами:
         paid, shipped, delivered.
         """
-        result = (
-            Order.objects
-            .filter(
-                status__in=(
-                    Order.STATUS_PAID,
-                    Order.STATUS_SHIPPED,
-                    Order.STATUS_DELIVERED,
-                )
+        result = Order.objects.filter(
+            status__in=(
+                Order.STATUS_PAID,
+                Order.STATUS_SHIPPED,
+                Order.STATUS_DELIVERED,
             )
-            .aggregate(total=Sum("total_price"))
-        )
+        ).aggregate(total=Sum("total_price"))
         total = result.get("total") or 0
         return float(total)
 
@@ -119,19 +101,12 @@ class OrderQuery(graphene.ObjectType):
 
         Возвращает список Product в порядке убывания продаж.
         """
-        items = (
-            OrderItem.objects
-            .values("product")
-            .annotate(total_sold=Sum("quantity"))
-            .order_by("-total_sold")[:limit]
-        )
+        items = OrderItem.objects.values("product").annotate(total_sold=Sum("quantity")).order_by("-total_sold")[:limit]
 
         product_ids: List[int] = [obj["product"] for obj in items]
         products: QuerySet[Product] = Product.objects.filter(id__in=product_ids)
 
         # Сохраняем порядок по агрегату total_sold
         product_map = {p.id: p for p in products}
-        ordered_products: List[Product] = [
-            product_map[pid] for pid in product_ids if pid in product_map
-        ]
+        ordered_products: List[Product] = [product_map[pid] for pid in product_ids if pid in product_map]
         return ordered_products

@@ -76,11 +76,7 @@ class ProductQuery(graphene.ObjectType):
         offset: Optional[int] = None,
     ) -> QuerySet[Product]:
 
-        qs = (
-            Product.objects.filter(is_active=True)
-            .select_related("category")
-            .prefetch_related("specifications")
-        )
+        qs = Product.objects.filter(is_active=True).select_related("category").prefetch_related("specifications")
 
         # SEARCH
         if search:
@@ -128,11 +124,7 @@ class ProductQuery(graphene.ObjectType):
     # ---------------------------------------------------------
     def resolve_product(self, info: ResolveInfo, slug: str) -> Optional[Product]:
         try:
-            return (
-                Product.objects.select_related("category")
-                .prefetch_related("specifications")
-                .get(slug=slug)
-            )
+            return Product.objects.select_related("category").prefetch_related("specifications").get(slug=slug)
         except Product.DoesNotExist:
             raise ValueError(f"Product with slug '{slug}' not found.")
 

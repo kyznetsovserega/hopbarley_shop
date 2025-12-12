@@ -32,10 +32,7 @@ class ReviewQuery(graphene.ObjectType):
         product_slug: str,
     ) -> Iterable[Review]:
         return (
-            Review.objects
-            .select_related("user", "product")
-            .filter(product__slug=product_slug)
-            .order_by("-created_at")
+            Review.objects.select_related("user", "product").filter(product__slug=product_slug).order_by("-created_at")
         )
 
     # ---------------------------------------------------------
@@ -44,9 +41,4 @@ class ReviewQuery(graphene.ObjectType):
         if not user.is_authenticated:
             return Review.objects.none()
 
-        return (
-            Review.objects
-            .select_related("product")
-            .filter(user=user)
-            .order_by("-created_at")
-        )
+        return Review.objects.select_related("product").filter(user=user).order_by("-created_at")
