@@ -28,10 +28,10 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-v$z50+ud4-@w=o*9eg$bvz%f3e%syoq@maw9*4@63mlgpu7w4*"
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "change-me")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", "0").lower() in ("1", "true", "yes", "on")
 
 ALLOWED_HOSTS = os.getenv(
     "DJANGO_ALLOWED_HOSTS",
@@ -109,24 +109,24 @@ WSGI_APPLICATION = "main.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 # Если есть DATABASE_URL > используем его (CI)
+# Database
+
 database_url = os.getenv("DATABASE_URL")
 
 if database_url:
-    DATABASES = {
-        "default": dj_database_url.parse(database_url, conn_max_age=600),
-    }
+    DATABASES = {"default": dj_database_url.parse(database_url, conn_max_age=600)}
 else:
-    # Локальный Docker / dev окружение
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("DJANGO_DB_NAME", "hopbarley_shop_db"),
-            "USER": os.getenv("DJANGO_DB_USER", "user"),
-            "PASSWORD": os.getenv("DJANGO_DB_PASSWORD", "password"),
-            "HOST": os.getenv("DJANGO_DB_HOST", "localhost"),
-            "PORT": os.getenv("DJANGO_DB_PORT", "5432"),
+            "NAME": os.environ["POSTGRES_DB"],
+            "USER": os.environ["POSTGRES_USER"],
+            "PASSWORD": os.environ["POSTGRES_PASSWORD"],
+            "HOST": os.environ["POSTGRES_HOST"],
+            "PORT": os.environ.get("POSTGRES_PORT", "5432"),
         }
     }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

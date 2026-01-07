@@ -48,7 +48,7 @@ https://github.com/kyznetsovserega/hopbarley_shop/actions/workflows/ci.yml
 
 ### Каталог товаров (`/`, `/products/`)
 
-- пагинация;
+- пагинация (paginate_by= 12);
 - поиск по названию и описанию;
 - фильтрация по категории и диапазону цен;
 - сортировка;
@@ -83,7 +83,7 @@ https://github.com/kyznetsovserega/hopbarley_shop/actions/workflows/ci.yml
 - транзакционное создание заказа;
 - snapshot цен в `OrderItem`;
 - эмуляция оплаты (fake payment);
-- email-уведомления пользователю и администратору (console backend в dev).
+- email-уведомления пользователю и администратору.
 
 ### Личный кабинет (`/account/`)
 
@@ -94,7 +94,7 @@ https://github.com/kyznetsovserega/hopbarley_shop/actions/workflows/ci.yml
 - смена пароля;
 - автоматическое объединение корзин после входа.
 
-Управление адресами доставки реализовано частично (опционально).
+Управление адресами доставки реализовано частично.
 
 ### Админ-панель (`/admin/`)
 
@@ -125,7 +125,7 @@ JWT:
 
 ### Swagger / OpenAPI
 
-- Swagger UI: `/api/docs/`
+- endpoint: `/api/docs/`
 - Schema: `/api/schema/`
 - Авторизация через **Bearer Token**.
 
@@ -136,8 +136,6 @@ JWT:
 - endpoint: `/graphql/`;
 - реализован отдельно;
 - не влияет на REST API;
-- используется как бонусное улучшение;
-- аналитические запросы реализованы частично.
 
 </details>
 
@@ -149,9 +147,9 @@ JWT:
 ### Клонирование проекта
 
 ```bash
-git clone https://github.com/kyznetsovserega/hopbarley_shop.git
+git https://github.com/kyznetsovserega/hopbarley_shop.git
 cd hopbarley_shop
-git checkout dev
+git checkout main
 ```
 
 ### Переменные окружения
@@ -159,7 +157,7 @@ git checkout dev
 Создать файл `.env` в корне проекта:
 
 ```env
-DJANGO_SECRET_KEY=change-me
+DJANGO_SECRET_KEY=django-insecure-v$$z50+ud4-@w=o*9eg$$bvz%f3e%syoq@maw9*4@63mlgpu7w4*
 DJANGO_DEBUG=1
 DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
 
@@ -175,7 +173,7 @@ DJANGO_SUPERUSER_PASSWORD=admin12345
 ```
 
 
-### Запуск проекта
+### Запуск проекта 
 
 ```bash
 docker compose up --build
@@ -186,27 +184,35 @@ docker compose up --build
 - http://localhost:8000/admin/ — админ-панель  
 - http://localhost:8000/api/docs/ — Swagger  
 - http://localhost:8000/graphql/ — Graphql
-- http://localhost:8000/api/redoc/ - Redoc
+- http://localhost:8000/api/redoc/ - ReDoc
 
 ---
+### DEMO запуск (с фикстурами, админом и JWT) 
+<details> <summary><strong></strong></summary> <br>
 
-## Автоматические миграции и инициализация проекта
+ВАЖНО:полностью пересоздать базу, обязательно удалить тома:
+```bash
+docker compose -f docker-compose.yml -f docker-compose.demo.yml down -v
+```
+ЗАПУСК:
+```bash
+docker compose -f docker-compose.yml -f docker-compose.demo.yml up --build
+```
 
-Проект настроен для запуска на чистой среде без ручных действий
-со стороны пользователя.
+### Автоматические миграции и инициализация проекта
 
-При старте Docker-контейнера `web` автоматически выполняется
+При старте контейнера `web` автоматически выполняется
 скрипт `entrypoint.sh`, который:
 
-1. Применяет миграции базы данных:
-   - `python manage.py makemigrations`
+1. Ожидает Postgres
+
+2. Применяет миграции базы данных:
    - `python manage.py migrate`
 
-2. Проверяет наличие данных в базе:
-   - если в базе уже существуют продукты — загрузка данных пропускается;
-   - если база пустая — загружаются **тестовые фикстуры**.
+3. Сбор статических файлов:
+   - `python manage.py collectstatic --noinput`
 
-3. Загружает тестовые данные в базу:
+4. Загружает тестовые данные в базу:
    - товары: `products/fixtures/products.json`
    - пользователи и профили: `users/fixtures/test_database.json`
    - корзина: `cart/fixtures/cart_items_test.json`
@@ -216,18 +222,14 @@ docker compose up --build
    - демонстрации работы каталога, корзины и заказов;
    - запуска автоматических тестов.
 
-4. Создаёт суперпользователя (если отсутствует):
+5. Создаёт суперпользователя (если отсутствует):
    - команда `create_superuser_if_not_exists`
 
-5. Генерирует JWT-токен суперпользователя:
-   - команда `print_jwt`
+6. python manage.py collectstatic --noinput
+   - команда `python manage.py print_jwt`
    - токен выводится в лог контейнера
-
-6. Собирает статические файлы:
-   - `python manage.py collectstatic --noinput`
-
-7. Запускает приложение через Gunicorn.
-
+ 
+   
 Таким образом:
 - база данных автоматически приводится в актуальное состояние;
 - тестовые данные загружаются только при первом запуске;
@@ -236,15 +238,14 @@ docker compose up --build
 
 Просмотр токена:
 ```bash
-docker compose logs web --tail=200 |
-Select-String "ACCESS:","REFRESH:" |
-Select-Object -Last 2
+docker compose logs web --tail=200 |Select-String "ACCESS:","REFRESH:" |Select-Object -Last 2
 ```
 
+</details>
 ---
 
 
-### Тестирование и качество кода
+## Тестирование и качество кода
 
 Запуск тестов
 ```bash
@@ -396,7 +397,7 @@ query {
 
 В рамках учебного проекта и локальной разработки
 приложение запускается напрямую через Gunicorn
-без использования Nginx, что соответствует требованиям ТЗ.
+без использования Nginx.
 
 ---
 
@@ -530,5 +531,5 @@ https://github.com/MagicCodeGit/Hop-and-Barley.git
 
 ---
 
-Репозиторий проекта (ветка dev):
-https://github.com/kyznetsovserega/hopbarley_shop/tree/dev
+Репозиторий проекта (ветка main):
+https://github.com/kyznetsovserega/hopbarley_shop.git
