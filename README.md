@@ -269,6 +269,8 @@ docker compose exec web pytest --cov=. --cov-report=term-missing
 
 ```bash
 docker compose exec web flake8
+```
+```bash
 docker compose exec web mypy .
 ```
 ---

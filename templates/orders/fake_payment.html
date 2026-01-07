@@ -17,10 +17,6 @@
                 Since this is a demo version, no real payment will be processed.
             </p>
 
-            <div class="fake-payment-preview">
-                <img src="{% static '' %}" alt="Mock Card" />
-            </div>
-
             <a href="{% url 'orders:fake_payment_success' order_id=order_id %}"
                class="button button--primary fake-payment-button">
                 Pay Now
