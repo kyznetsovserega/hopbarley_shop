@@ -76,5 +76,4 @@ htmlcov/
 staticfiles/
 
 
-.coveragerc
-htmlcov/
+

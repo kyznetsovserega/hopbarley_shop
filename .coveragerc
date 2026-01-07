@@ -1,0 +1,36 @@
+# .coveragerc
+[run]
+branch = True
+source = .
+
+omit =
+    */__init__.py
+    */migrations/*
+    */fixtures/*
+    */tests/*
+    conftest.py
+
+    # Django infrastructure
+    manage.py
+    main/asgi.py
+    main/wsgi.py
+    main/settings.py
+    main/urls.py
+
+    # Delivery layer (НЕ бизнес-логика)
+    */urls.py
+    */views.py
+    api/views/*
+    api/urls.py
+
+    # Admin
+    */admin.py
+
+    # GraphQL (bonus / не тестируется)
+    graphql_api/*
+
+    # Side-effects / integrations
+    orders/email_services.py
+
+    # Search & filtering (опционально)
+    products/filter.py
