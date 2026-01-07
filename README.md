@@ -411,7 +411,8 @@ query {
 hopbarley_shop/
 ├── Dockerfile
 ├── docker-compose.yml
-├──conftest.py
+├── .coveragerc
+├── conftest.py
 ├──.pre-commit-config.yaml
 ├── entrypoint.sh
 ├── manage.py
