@@ -9,10 +9,10 @@ from django.shortcuts import redirect, render
 
 from cart.models import CartItem
 
+from .email_services import notify_admin, send_order_confirmation
 from .forms import CheckoutForm
 from .models import Order
 from .services import create_order_from_cart
-from .email_services import send_order_confirmation, notify_admin
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import AbstractUser as UserType
