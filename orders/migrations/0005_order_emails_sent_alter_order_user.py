@@ -8,19 +8,31 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('orders', '0004_alter_order_status'),
+        ("orders", "0004_alter_order_status"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='order',
-            name='emails_sent',
-            field=models.BooleanField(default=False, help_text='Защита от повторной отправки писем клиенту/админу.', verbose_name='Email отправлены'),
+            model_name="order",
+            name="emails_sent",
+            field=models.BooleanField(
+                default=False,
+                help_text="Защита от повторной отправки писем клиенту/админу.",
+                verbose_name="Email отправлены",
+            ),
         ),
         migrations.AlterField(
-            model_name='order',
-            name='user',
-            field=models.ForeignKey(blank=True, help_text='Пользователь, оформивший заказ (необязательно для гостей).', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='orders', to=settings.AUTH_USER_MODEL, verbose_name='Пользователь'),
+            model_name="order",
+            name="user",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="Пользователь, оформивший заказ (необязательно для гостей).",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="orders",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Пользователь",
+            ),
         ),
     ]
