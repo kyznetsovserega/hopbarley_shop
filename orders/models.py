@@ -42,7 +42,7 @@ class Order(models.Model):
     # ---- Основные поля заказа ----
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="orders",
         null=True,
         blank=True,
@@ -122,6 +122,13 @@ class Order(models.Model):
         blank=True,
         null=True,
         help_text="Комментарий клиента к заказу.",
+    )
+
+    # Флаг "письма отправлены"
+    emails_sent = models.BooleanField(
+        default=False,
+        verbose_name="Email отправлены",
+        help_text="Защита от повторной отправки писем клиенту/админу.",
     )
 
     class Meta:

@@ -12,6 +12,7 @@ from cart.models import CartItem
 from .forms import CheckoutForm
 from .models import Order
 from .services import create_order_from_cart
+from .email_services import send_order_confirmation, notify_admin
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import AbstractUser as UserType
@@ -111,6 +112,13 @@ def checkout_view(request: HttpRequest) -> HttpResponse:
         if payment_method == "card":
             return redirect("orders:fake_payment", order_id=order.id)
 
+        # Защита от повторной отправки писем (двойной клик/повторный POST)
+        if not order.emails_sent:
+            send_order_confirmation(order)
+            notify_admin(order)
+            order.emails_sent = True
+            order.save(update_fields=["emails_sent"])
+
         # --- Обычная success-страница
         return redirect("orders:success", order_id=order.id)
 
@@ -144,8 +152,10 @@ def checkout_view(request: HttpRequest) -> HttpResponse:
 # ======================================================================
 def fake_payment_view(request: HttpRequest, order_id: int) -> HttpResponse:
     """
-    Имитация страницы оплаты.
-    """
+     После псевдо-оплаты:
+      это просто страница имитации оплаты.
+     Здесь НЕ меняем статус и НЕ отправляем письма - избегаем дубли/paid раньше времени.
+     """
 
     try:
         order = Order.objects.get(id=order_id)
@@ -162,13 +172,23 @@ def fake_payment_success(request: HttpRequest, order_id: int) -> HttpResponseRed
     """
     После псевдо-оплаты:
     - статус заказа становится paid
+    - отправляется email клиенту и админу
     - перевод на success
     """
 
     try:
         order = Order.objects.get(id=order_id)
-        order.status = Order.STATUS_PAID
-        order.save()
+        # статус paid (точка "успешной оплаты")
+        if order.status != Order.STATUS_PAID:
+            order.status = Order.STATUS_PAID
+            order.save(update_fields=["status"])
+        # защита от повторной отправки писем
+        if not order.emails_sent:
+            send_order_confirmation(order)
+            notify_admin(order)
+            order.emails_sent = True
+            order.save(update_fields=["emails_sent"])
+
     except Order.DoesNotExist:
         raise Http404("Order not found")
 
