@@ -135,6 +135,7 @@ def paid_order_item_fixture(db, paid_order_fixture, product_fixture):
 
 @pytest.fixture(autouse=True)
 def email_settings(settings):
+    settings.EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
     settings.DEFAULT_FROM_EMAIL = "noreply@test.com"
     settings.ADMIN_EMAIL = "admin@test.com"
 

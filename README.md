@@ -141,7 +141,6 @@ JWT:
 
 ---
 
-
 ## Быстрый старт (Docker)
 
 ### Клонирование проекта
@@ -244,6 +243,58 @@ docker compose logs web --tail=200 |Select-String "ACCESS:","REFRESH:" |Select-O
 </details>
 ---
 
+### Email-уведомления о заказе
+<details>
+<summary><strong>Проверка отправки email (development)</strong></summary>
+<br>
+
+При оформлении заказа автоматически отправляются **два email-уведомления**:
+- **покупателю** — подтверждение оформления заказа;
+- **администратору** — уведомление о новом заказе.
+
+### Режим разработки (по умолчанию)
+
+В проекте используется backend:
+
+`django.core.mail.backends.console.EmailBackend`
+
+В этом режиме письма **не отправляются во внешнюю почту**,  
+а выводятся **в логи контейнера `web`**.
+
+### Как проверить отправку email
+
+1. Оформите заказ через веб-интерфейс:
+
+         / → добавить товар в корзину → /cart/ → /orders/checkout/
+
+2. Просмотрите email-уведомления в логах контейнера `web`
+(Windows / PowerShell):
+
+```powershell
+# Включаем корректный UTF-8 вывод
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
+$OutputEncoding = [System.Text.UTF8Encoding]::new()
+
+# Выводим только email-сообщения из логов контейнера web
+docker compose logs -f --tail=4000 web |
+  ForEach-Object { $_.ToString() -replace '^[^|]*\|\s*', '' } |
+  ForEach-Object {
+    if ($_ -match '^Content-Type:\s*text/plain') { $script:inMail = $true }
+    if ($script:inMail) { $_ }
+    if ($_ -match '^-{10,}$') { $script:inMail = $false; "" }
+  }
+```
+
+В логах отображаются оба письма (покупателю и администратору)
+с получателем, темой и текстом сообщения.
+
+### Защита от повторной отправки
+
+Для заказов используется флаг `emails_sent`,
+который предотвращает повторную отправку email
+при повторных запросах или обновлении страницы.
+
+</details> 
 
 ## Тестирование и качество кода
 
@@ -259,8 +310,8 @@ docker compose exec web pytest --cov=. --cov-report=term-missing
 
 ### Результаты тестирования
 
-- Все тесты успешно пройдены (41 / 41);
-- Общее покрытие кода: ~79%;
+- Все тесты успешно пройдены (42 / 42);
+- Общее покрытие кода: ~84%;
 - Основной фокус тестирования: бизнес-логика, модели и REST API.
 
 ---
