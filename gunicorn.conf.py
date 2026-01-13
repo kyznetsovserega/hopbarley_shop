@@ -10,3 +10,4 @@ max_requests_jitter = int(os.getenv("GUNICORN_MAX_REQUESTS_JITTER", "50"))
 accesslog = "-"
 errorlog = "-"
 loglevel = os.getenv("GUNICORN_LOGLEVEL", "info")
+capture_output = True

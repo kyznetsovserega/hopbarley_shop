@@ -296,6 +296,26 @@ docker compose logs -f --tail=4000 web |
 
 </details> 
 
+
+### Восстановление пароля (DEMO)
+
+<details>
+<summary><strong></strong></summary>
+<br>
+
+В DEMO-режиме письма отправляются в консоль (email backend = console), поэтому ссылку для сброса пароля берём из логов `web`.
+
+1) Откройте страницу восстановления:
+- `http://localhost:8000/users/forgot/`
+
+2) Введите email пользователя (например: `admin@example.com`) и отправьте форму.
+
+3) В отдельном терминале найдите письмо и ссылку в логах:
+```bash
+docker compose logs --tail=300 web | Select-String -Pattern "To reset your password|/users/reset/|Subject:|To:"
+```
+<details>
+
 ## Тестирование и качество кода
 
 Запуск тестов
@@ -310,7 +330,7 @@ docker compose exec web pytest --cov=. --cov-report=term-missing
 
 ### Результаты тестирования
 
-- Все тесты успешно пройдены (42 / 42);
+- Все тесты успешно пройдены (45 / 45);
 - Общее покрытие кода: ~84%;
 - Основной фокус тестирования: бизнес-логика, модели и REST API.
 

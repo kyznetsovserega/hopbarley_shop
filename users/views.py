@@ -5,7 +5,13 @@ from typing import TYPE_CHECKING, Any
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import PasswordChangeView
+from django.contrib.auth.views import (
+    PasswordChangeView,
+    PasswordResetCompleteView,
+    PasswordResetConfirmView,
+    PasswordResetDoneView,
+    PasswordResetView,
+)
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
@@ -53,7 +59,7 @@ def login_view(request: HttpRequest) -> HttpResponse:
 
                 merge_session_cart_into_user_cart(user, request.session.session_key)
 
-                return redirect("account")
+                return redirect("users:account")
 
         messages.error(request, "Incorrect email or password.")
 
@@ -78,7 +84,7 @@ def register_view(request: HttpRequest) -> HttpResponse:
 
             merge_session_cart_into_user_cart(user, request.session.session_key)
 
-            return redirect("account")
+            return redirect("users:account")
     else:
         form = RegisterForm()
 
@@ -117,7 +123,7 @@ def account_view(request: HttpRequest) -> HttpResponse:
             profile_form.save()
 
             messages.success(request, "Профиль успешно обновлён!")
-            return redirect("account")
+            return redirect("users:account")
 
         messages.error(request, "Пожалуйста, исправьте ошибки формы.")
 
@@ -151,7 +157,7 @@ class UserPasswordChangeView(PasswordChangeView):
     """
 
     template_name = "users/change_password.html"
-    success_url = reverse_lazy("account")
+    success_url = reverse_lazy("users:account")
 
     def form_valid(self, form: Any) -> HttpResponse:
         messages.success(self.request, "Пароль успешно изменён!")
@@ -159,15 +165,38 @@ class UserPasswordChangeView(PasswordChangeView):
 
 
 # -------------------------
-# FORGOT PASSWORD (PLACEHOLDER)
+# PASSWORD RESET (Forgot password)
 # -------------------------
-def forgot_password_view(request: HttpRequest) -> HttpResponse:
+class UserPasswordResetView(PasswordResetView):
     """
-    Демонстрационная заглушка.
+    Запрос восстановления пароля:
+    - пользователь вводит email
+    - отправляется письмо со ссылкой reset/<uid>/<token>/
     """
 
-    if request.method == "POST":
-        messages.info(request, "If this email exists, instructions will be sent.")
-        return redirect("users:login")
+    template_name = "users/forgot_password.html"
+    email_template_name = "users/emails/password_reset_email.txt"
+    subject_template_name = "users/emails/password_reset_subject.txt"
 
-    return render(request, "users/forgot_password.html")
+    success_url = reverse_lazy("users:password_reset_done")
+
+    def form_valid(self, form: Any) -> HttpResponse:
+        # Одинаковое сообщение
+        messages.info(self.request, "If this email exists, instructions will be sent.")
+        return super().form_valid(form)
+
+
+class UserPasswordResetDoneView(PasswordResetDoneView):
+    """Шаг 2: страница 'проверьте почту'."""
+    template_name = "users/password_reset_done.html"
+
+
+class UserPasswordResetConfirmView(PasswordResetConfirmView):
+    """Шаг 3: установка нового пароля по ссылке из письма."""
+    template_name = "users/password_reset_confirm.html"
+    success_url = reverse_lazy("users:password_reset_complete")
+
+
+class UserPasswordResetCompleteView(PasswordResetCompleteView):
+    """Шаг 4: пароль успешно изменён."""
+    template_name = "users/password_reset_complete.html"
