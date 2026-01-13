@@ -188,15 +188,18 @@ class UserPasswordResetView(PasswordResetView):
 
 class UserPasswordResetDoneView(PasswordResetDoneView):
     """Шаг 2: страница 'проверьте почту'."""
+
     template_name = "users/password_reset_done.html"
 
 
 class UserPasswordResetConfirmView(PasswordResetConfirmView):
     """Шаг 3: установка нового пароля по ссылке из письма."""
+
     template_name = "users/password_reset_confirm.html"
     success_url = reverse_lazy("users:password_reset_complete")
 
 
 class UserPasswordResetCompleteView(PasswordResetCompleteView):
     """Шаг 4: пароль успешно изменён."""
+
     template_name = "users/password_reset_complete.html"
