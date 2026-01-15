@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # ---my apps---
+    "staff_dashboard",
     # Third-party
     "django_extensions",
     "django_filters",

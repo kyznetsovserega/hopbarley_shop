@@ -37,18 +37,18 @@ https://github.com/kyznetsovserega/hopbarley_shop/actions/workflows/ci.yml
 - Веб-интерфейс использует **session-based authentication**.
 - REST API использует **JWT**.
 - PostgreSQL используется как основная БД.
-- Проект полностью поднимается через **Docker Compose**.
+- Проект поднимается через **Docker Compose**.
 - Архитектура разделена по приложениям и слоям ответственности.
-- GraphQL реализован (отдельный endpoint `/graphql/`).
+- GraphQL реализован ( endpoint `/graphql/`).
 
 ---
 
 ## Реализованная функциональность
-<details> <summary><strong></strong></summary> <br>
+<details> <summary><strong>Показать/скрыть</strong></summary> <br>
 
 ### Каталог товаров (`/`, `/products/`)
 
-- пагинация (paginate_by= 12);
+- пагинация (`paginate_by= 12`);
 - поиск по названию и описанию;
 - фильтрация по категории и диапазону цен;
 - сортировка;
@@ -58,13 +58,27 @@ https://github.com/kyznetsovserega/hopbarley_shop/actions/workflows/ci.yml
 
 - детальная информация о товаре;
 - изображения и характеристики;
-- рейтинг и отзывы (1–5);
+- средний рейтинг товара;
+- отзывы пользователей (1–5);
 - добавление в корзину с выбором количества.
+
+**User flow (доступ к отзывам):**    
+`Account → Order → Review → Product`
+
+**Отзывы:**
+- форма отзыва отображается:
+  - на странице товара;
+  - в личном кабинете пользователя (история заказов);
+- отзыв отправляется через POST:
+    `/reviews/<product_slug>/add/`;
+- после успешного добавления выполняется redirect обратно на страницу товара;
+- отзыв сразу отображается в списке отзывов и учитывается в рейтинге.
 
 **Ограничения:**
 - отзыв может оставить только авторизованный пользователь;
-- отзыв возможен только после покупки;
+- отзыв возможен только после покупки товара;
 - один пользователь — один отзыв на товар.
+
 
 ### Корзина (`/cart/`)
 
@@ -83,7 +97,9 @@ https://github.com/kyznetsovserega/hopbarley_shop/actions/workflows/ci.yml
 - транзакционное создание заказа;
 - snapshot цен в `OrderItem`;
 - эмуляция оплаты (fake payment);
-- email-уведомления пользователю и администратору.
+- email-уведомления пользователю и администратору  
+  (используется `django.core.mail.backends.console.EmailBackend`, письма выводятся в логи).
+
 
 ### Личный кабинет (`/account/`)
 
@@ -91,8 +107,11 @@ https://github.com/kyznetsovserega/hopbarley_shop/actions/workflows/ci.yml
 - профиль пользователя (User + UserProfile);
 - редактирование профиля;
 - история заказов;
-- смена пароля;
-- автоматическое объединение корзин после входа.
+- автоматическое объединение корзин после входа;
+- смена пароля:
+  - из личного кабинета пользователя;
+  - через восстановление по email  
+    (используется `EmailBackend`, ссылка выводится в логи).
 
 Управление адресами доставки реализовано частично.
 
@@ -102,6 +121,14 @@ https://github.com/kyznetsovserega/hopbarley_shop/actions/workflows/ci.yml
 - поиск и фильтры;
 - кастомизация admin-интерфейса;
 - базовая аналитика (агрегации и аннотации).
+
+### Staff Dashboard (`/dashboard/`)
+
+Кастомная админка для сотрудников (доступ **только для `is_staff=True`):
+
+- аналитика по продажам / заказам / pending / среднему чеку;
+- управление товарами (list / add / edit / delete);
+- доступ закрыт для не-staff пользователей (403), анонимные — редирект на `/users/login/`.
 
 ---
 
@@ -125,9 +152,11 @@ JWT:
 
 ### Swagger / OpenAPI
 
-- endpoint: `/api/docs/`
+- Swagger UI: `/api/docs/`
 - Schema: `/api/schema/`
-- Авторизация через **Bearer Token**.
+- ReDoc: `/api/redoc/`
+
+Авторизация: **Bearer Token**.
 
 ---
 
@@ -179,10 +208,11 @@ docker compose up --build
 ```
 
 Доступные адреса:
-- http://localhost:8000/ — сайт  
-- http://localhost:8000/admin/ — админ-панель  
-- http://localhost:8000/api/docs/ — Swagger  
-- http://localhost:8000/graphql/ — Graphql
+- http://localhost:8000/ - сайт  
+- http://localhost:8000/admin/ - админ-панель 
+- http://localhost:8000/dashboard/ - staff dashboard
+- http://localhost:8000/api/docs/ - Swagger  
+- http://localhost:8000/graphql/ - Graphql
 - http://localhost:8000/api/redoc/ - ReDoc
 
 ---
@@ -224,7 +254,7 @@ docker compose -f docker-compose.yml -f docker-compose.demo.yml up --build
 5. Создаёт суперпользователя (если отсутствует):
    - команда `create_superuser_if_not_exists`
 
-6. python manage.py collectstatic --noinput
+6. Печать JWT токена:
    - команда `python manage.py print_jwt`
    - токен выводится в лог контейнера
  
@@ -297,13 +327,14 @@ docker compose logs -f --tail=4000 web |
 </details> 
 
 
-### Восстановление пароля (DEMO)
+### Восстановление пароля
 
 <details>
-<summary><strong></strong></summary>
+<summary><strong>Показать/скрыть</strong></summary>
 <br>
 
-В DEMO-режиме письма отправляются в консоль (email backend = console), поэтому ссылку для сброса пароля берём из логов `web`.
+Используется стандартный Django password reset flow  
+(`django.contrib.auth` + console EmailBackend).
 
 1) Откройте страницу восстановления:
 - `http://localhost:8000/users/forgot/`
@@ -330,8 +361,8 @@ docker compose exec web pytest --cov=. --cov-report=term-missing
 
 ### Результаты тестирования
 
-- Все тесты успешно пройдены (45 / 45);
-- Общее покрытие кода: ~84%;
+- Все тесты успешно пройдены (58 / 58);
+- Общее покрытие кода: ~85%;
 - Основной фокус тестирования: бизнес-логика, модели и REST API.
 
 ---
@@ -545,6 +576,13 @@ hopbarley_shop/
 │   │   └── commands/
 │   └── tests/
 │
+├── staff_dashboard/       # Собственная админка
+│   ├── views.py
+│   ├── urls.py
+│   ├── form.py
+│   ├── decorators.py
+│   └── tests/
+│
 ├── api/                   # REST API (DRF)
 │   ├── serializers/
 │   ├── views/
@@ -563,7 +601,8 @@ hopbarley_shop/
 │   ├── products/
 │   ├── cart/
 │   ├── orders/
-│   └── users/
+│   ├── users/
+│   └── staff_dashboard/
 │
 └── static/                 # Статические файлы
     ├── css/
@@ -571,8 +610,7 @@ hopbarley_shop/
     └── img/
 ```
 
-</details> 
-
+</details>
 
 
 ---
@@ -584,16 +622,17 @@ hopbarley_shop/
 - [X] Каталог: фильтры, поиск, пагинация.
 - [X] Страница товара: детали, отзывы, добавление в корзину.
 - [X] Корзина: управление, расчёт, проверка остатков.
-- [X] Оформление заказа: создание, email-уведомления, валидация.
+- [X] Оформление заказа: создание, email-уведомления (console backend), валидация.
 - [X] Личный кабинет: регистрация, вход, история заказов, редактирование профиля.
 - [X] REST API: JWT-авторизация, документация, права доступа.
 - [X] Админка: аналитика, фильтры, управление сущностями.
-- [X] Swagger / OpenAPI работает (/api/docs/, /api/schema/, /redoc/).
+- [X] Staff dashboard: закрыт от не-staff, CRUD товаров, статистика.
+- [X] Swagger / OpenAPI работает (/api/docs/, /api/schema/, /api/redoc/).
 - [X] Типизация и докстринги присутствуют.
 - [X] Линтеры (flake8, mypy) без критичных ошибок.
-- [X] Базовые тесты проходят (pytest, 41/41).
-- [X] README полон и понятен.
-- [X] Коммиты осмысленные, используется ветка dev.
+- [X] Базовые тесты проходят (pytest).
+- [X] README полон.
+- [X] Коммиты осмысленные, используется ветка main.
 - [X] Чек-лист приложен.
 
 ---

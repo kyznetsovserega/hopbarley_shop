@@ -1,0 +1,153 @@
+{% extends "staff_dashboard/base.html" %}
+
+{% block title %}Admin - Dashboard | Hop & Barley{% endblock %}
+{% block tab_dashboard_active %}active{% endblock %}
+
+{% block content %}
+  <h1 class="admin-content__title">Admin - Dashboard</h1>
+
+  <div class="category-tags">
+    {% for p in periods %}
+      <a
+        href="?period={{ p.key }}"
+        class="category-tag {% if period_key == p.key %}active{% endif %}"
+      >
+        {{ p.title }}
+      </a>
+    {% endfor %}
+  </div>
+
+  <p style="margin: 8px 0 20px; opacity: .75;">
+    Period: {{ start }} → {{ end }} (vs {{ prev_start }} → {{ prev_end }})
+  </p>
+
+  <div class="stats-grid">
+
+    {# -------- Sales -------- #}
+    <div class="stat-card">
+      <div class="stat-card__header">
+        <span class="stat-card__title">Sales</span>
+        <div class="stat-card__icon-wrapper" style="background-color: #e0f8e3;">
+          <i class="fa-solid fa-arrow-trend-up" style="color: #34c759;"></i>
+        </div>
+      </div>
+
+      <p class="stat-card__value">${{ sales_curr }}</p>
+
+      <div class="stat-card__delta delta--{% if sales_dir == 'down' %}down{% else %}up{% endif %}">
+        <i class="fa-solid fa-arrow-{% if sales_dir == 'down' %}down{% else %}up{% endif %}"></i>
+        <span>
+          {% if sales_pct is None %}—{% else %}{{ sales_pct }}%{% endif %}
+          {% if sales_dir == 'down' %}Down{% elif sales_dir == 'up' %}Up{% else %}No change{% endif %}
+          vs previous period
+        </span>
+      </div>
+
+      <p style="margin-top: 10px; opacity: .75;">All time: ${{ sales_total }}</p>
+    </div>
+
+    {# -------- Users -------- #}
+    <div class="stat-card">
+      <div class="stat-card__header">
+        <span class="stat-card__title">Users</span>
+        <div class="stat-card__icon-wrapper" style="background-color: #e6e5ff;">
+          <i class="fa-solid fa-users" style="color: #5856d6;"></i>
+        </div>
+      </div>
+
+      <p class="stat-card__value">{{ users_total }}</p>
+
+      {% if users_curr is None %}
+        <div class="stat-card__delta delta--up">
+          <i class="fa-solid fa-arrow-up"></i>
+          <span>—</span>
+        </div>
+      {% else %}
+        <div class="stat-card__delta delta--{% if users_dir == 'down' %}down{% else %}up{% endif %}">
+          <i class="fa-solid fa-arrow-{% if users_dir == 'down' %}down{% else %}up{% endif %}"></i>
+          <span>
+            {{ users_curr }} new /
+            {% if users_pct is None %}—{% else %}{{ users_pct }}%{% endif %}
+            {% if users_dir == 'down' %}Down{% elif users_dir == 'up' %}Up{% else %}No change{% endif %}
+            vs previous period
+          </span>
+        </div>
+      {% endif %}
+    </div>
+
+    {# -------- Orders -------- #}
+    <div class="stat-card">
+      <div class="stat-card__header">
+        <span class="stat-card__title">Orders</span>
+        <div class="stat-card__icon-wrapper" style="background-color: #fff0d4;">
+          <i class="fa-solid fa-box-archive" style="color: #ff9f0a;"></i>
+        </div>
+      </div>
+
+      <p class="stat-card__value">{{ orders_curr }}</p>
+
+      <div class="stat-card__delta delta--{% if orders_dir == 'down' %}down{% else %}up{% endif %}">
+        <i class="fa-solid fa-arrow-{% if orders_dir == 'down' %}down{% else %}up{% endif %}"></i>
+        <span>
+          {% if orders_pct is None %}—{% else %}{{ orders_pct }}%{% endif %}
+          {% if orders_dir == 'down' %}Down{% elif orders_dir == 'up' %}Up{% else %}No change{% endif %}
+          vs previous period
+        </span>
+      </div>
+
+      <p style="margin-top: 10px; opacity: .75;">All time: {{ orders_total }}</p>
+    </div>
+
+    {# -------- Pending -------- #}
+    <div class="stat-card">
+      <div class="stat-card__header">
+        <span class="stat-card__title">Pending</span>
+        <div class="stat-card__icon-wrapper" style="background-color: #ffe6e0;">
+          <i class="fa-solid fa-clock-rotate-left" style="color: #ff3b30;"></i>
+        </div>
+      </div>
+
+      <p class="stat-card__value">{{ pending_curr }}</p>
+
+      <div class="stat-card__delta delta--{% if pending_dir == 'down' %}down{% else %}up{% endif %}">
+        <i class="fa-solid fa-arrow-{% if pending_dir == 'down' %}down{% else %}up{% endif %}"></i>
+        <span>
+          {% if pending_pct is None %}—{% else %}{{ pending_pct }}%{% endif %}
+          {% if pending_dir == 'down' %}Down{% elif pending_dir == 'up' %}Up{% else %}No change{% endif %}
+          vs previous period
+        </span>
+      </div>
+
+      <p style="margin-top: 10px; opacity: .75;">All time: {{ pending_total }}</p>
+    </div>
+
+    {# -------- Avg Check -------- #}
+    <div class="stat-card">
+      <div class="stat-card__header">
+        <span class="stat-card__title">Avg Check</span>
+        <div class="stat-card__icon-wrapper" style="background-color: #e0f8e3;">
+          <i class="fa-solid fa-receipt" style="color: #34c759;"></i>
+        </div>
+      </div>
+
+      <p class="stat-card__value">${{ avg_check_curr }}</p>
+
+      <div class="stat-card__delta delta--{% if avg_check_dir == 'down' %}down{% else %}up{% endif %}">
+        <i class="fa-solid fa-arrow-{% if avg_check_dir == 'down' %}down{% else %}up{% endif %}"></i>
+        <span>
+          {% if avg_check_pct is None %}—{% else %}{{ avg_check_pct }}%{% endif %}
+          {% if avg_check_dir == 'down' %}Down{% elif avg_check_dir == 'up' %}Up{% else %}No change{% endif %}
+          vs previous period
+        </span>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top: 22px; opacity: .85;">
+    Products: total {{ products_total }},
+    active {{ products_active }},
+    inactive {{ products_inactive }},
+    out of stock {{ out_of_stock }}
+  </div>
+{% endblock %}

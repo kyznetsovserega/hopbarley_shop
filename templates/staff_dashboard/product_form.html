@@ -1,0 +1,123 @@
+{% extends "staff_dashboard/base.html" %}
+
+{% block title %}Admin - Add/Edit Product | Hop & Barley{% endblock %}
+{% block tab_products_active %}active{% endblock %}
+
+{% block content %}
+  <h1 class="admin-content__title">
+    {% if mode == "edit" %}Admin - Edit Product{% else %}Admin - Add Product{% endif %}
+  </h1>
+
+  <div class="admin-form-layout">
+
+    <div class="admin-form-col-left">
+      <h2 class="admin-form-section-title">Control</h2>
+
+      <div class="image-upload-card">
+        {% if product and product.image %}
+          <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width:100%; border-radius: 12px;">
+        {% else %}
+          <div class="image-upload-placeholder">
+            <i class="fa-regular fa-image"></i>
+          </div>
+        {% endif %}
+
+        <p style="margin-top: 10px; opacity: .75;">
+          Upload image in the form.
+        </p>
+      </div>
+    </div>
+
+    <div class="admin-form-col-right">
+      <h2 class="admin-form-section-title">Information</h2>
+
+      <form id="product-form" class="product-info-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {{ form.non_field_errors }}
+
+        <div class="checkout-form-group">
+          <label>Title</label>
+          {{ form.name }}
+          {{ form.name.errors }}
+        </div>
+
+        <div class="checkout-form-group">
+          <label>Short description</label>
+          {{ form.short_description }}
+          {{ form.short_description.errors }}
+        </div>
+
+        <div class="checkout-form-group">
+          <label>Description</label>
+          {{ form.description }}
+          {{ form.description.errors }}
+        </div>
+
+        <div class="checkout-form-group">
+          <label>Unit</label>
+          {{ form.unit }}
+          {{ form.unit.errors }}
+        </div>
+
+        <div class="checkout-form-group">
+          <label>Price</label>
+          {{ form.price }}
+          {{ form.price.errors }}
+        </div>
+
+        <div class="checkout-form-group">
+          <label>Old price</label>
+          {{ form.old_price }}
+          {{ form.old_price.errors }}
+        </div>
+
+        <div class="checkout-form-group">
+          <label>Category</label>
+          {{ form.category }}
+          {{ form.category.errors }}
+        </div>
+
+        <div class="checkout-form-group">
+          <label>Image</label>
+          {{ form.image }}
+          {{ form.image.errors }}
+        </div>
+
+        <div class="checkout-form-group">
+          <label>Stock</label>
+          {{ form.stock }}
+          {{ form.stock.errors }}
+        </div>
+
+        <div class="checkout-form-group">
+          <label>Tags</label>
+          {{ form.tags }}
+          {{ form.tags.errors }}
+        </div>
+
+        <div class="checkout-form-group">
+          <label>
+            {{ form.is_active }} Active
+          </label>
+          {{ form.is_active.errors }}
+        </div>
+      </form>
+    </div>
+
+    <div class="admin-form-actions">
+      <button type="submit" form="product-form" class="button button--primary">Save</button>
+      <a href="{% url 'staff_dashboard:products' %}" class="button button--secondary">Back</a>
+
+      {% if product %}
+        <form method="post" action="{% url 'staff_dashboard:product_delete' product.id %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="button button--danger" onclick="return confirm('Удалить товар?');">
+            Delete
+          </button>
+        </form>
+      {% endif %}
+    </div>
+
+  </div>
+{% endblock %}
