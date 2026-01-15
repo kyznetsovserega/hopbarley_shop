@@ -15,6 +15,7 @@ from graphene_django.views import GraphQLView
 from users.views import account_view
 
 urlpatterns = [
+    path("dashboard/", include("staff_dashboard.urls")),
     # -------------------------------------------------
     # Admin
     path("admin/", admin.site.urls),

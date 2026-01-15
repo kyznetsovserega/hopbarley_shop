@@ -1,0 +1,63 @@
+{% extends "staff_dashboard/base.html" %}
+
+{% block title %}Admin - Product Stock | Hop & Barley{% endblock %}
+{% block tab_products_active %}active{% endblock %}
+
+{% block content %}
+  <h1 class="admin-content__title">Admin - Product Stock</h1>
+
+  <div class="admin-actions">
+    <a href="{% url 'staff_dashboard:product_add' %}" class="button button--primary">
+      <i class="fa-solid fa-plus"></i>
+      <span>Add Product</span>
+    </a>
+  </div>
+
+  <div class="admin-table-wrapper">
+    <table class="admin-table">
+      <thead>
+      <tr>
+        <th>id</th>
+        <th>name</th>
+        <th>description</th>
+        <th>price</th>
+        <th>category</th>
+        <th>stock</th>
+        <th>active</th>
+        <th>created_at</th>
+        <th>updated_at</th>
+        <th></th>
+      </tr>
+      </thead>
+
+      <tbody>
+      {% for p in products %}
+        <tr>
+          <td>{{ p.id }}</td>
+          <td>{{ p.name }}</td>
+          <td>{{ p.short_description|default:p.description|striptags|truncatechars:80 }}</td>
+          <td>${{ p.price|floatformat:2 }}</td>
+          <td>{{ p.category }}</td>
+          <td>{{ p.stock }}</td>
+          <td>
+            {% if p.is_active %}
+              <span style="color:#34c759; font-weight:600;">Yes</span>
+            {% else %}
+              <span style="color:#ff3b30; font-weight:600;">No</span>
+            {% endif %}
+          </td>
+          <td>{{ p.created_at|date:"Y-m-d" }}</td>
+          <td>{{ p.updated_at|date:"Y-m-d" }}</td>
+          <td>
+            <a href="{% url 'staff_dashboard:product_edit' p.id %}" class="button button--edit">Edit</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="10">No products</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Admin | Hop & Barley{% endblock %}</title>
+
+  <!-- Google Fonts & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  >
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>
+<header>
+  <div class="header-container">
+    <a href="{% url 'products:product_list' %}" class="header__logo">
+      <img src="{% static 'img/logo.svg' %}" alt="Hop & Barley Logo">
+      <p class="logo-text">Hop &amp; Barley</p>
+    </a>
+
+    <nav class="header__nav">
+      <ul>
+        <li><a href="{% url 'products:product_list' %}">Products</a></li>
+      </ul>
+    </nav>
+
+    <div class="header__user-actions">
+      <!-- User icon (safe, without URL reversing) -->
+      <a href="#" class="user-icon" aria-label="My Account">
+        <img src="{% static 'img/icons/user_alt.svg' %}" alt="User Account">
+      </a>
+
+      <a href="{% url 'cart:detail' %}" class="cart-icon" aria-label="Shopping Cart">
+        <img src="{% static 'img/icons/shopping_bag.svg' %}" alt="Shopping Cart">
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="admin-page-wrapper">
+  <div class="admin-container">
+
+    <div class="admin-tabs">
+      <a
+        href="{% url 'staff_dashboard:products' %}"
+        class="admin-tab {% block tab_products_active %}{% endblock %}"
+      >
+        Product Management
+      </a>
+
+      <a
+        href="{% url 'staff_dashboard:home' %}"
+        class="admin-tab {% block tab_dashboard_active %}{% endblock %}"
+      >
+        Dashboard
+      </a>
+    </div>
+
+    {% if messages %}
+      <div class="admin-messages" style="margin: 14px 0;">
+        {% for message in messages %}
+          <div
+            class="admin-message admin-message--{{ message.tags }}"
+            style="
+              padding: 10px 12px;
+              border-radius: 10px;
+              margin-bottom: 10px;
+              {% if 'success' in message.tags %}
+                background: #e0f8e3; color: #1f7a2e;
+              {% elif 'error' in message.tags %}
+                background: #ffe6e0; color: #b42318;
+              {% elif 'warning' in message.tags %}
+                background: #fff0d4; color: #8a5b00;
+              {% else %}
+                background: #eef2ff; color: #2b3a67;
+              {% endif %}
+            "
+          >
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="admin-content">
+      {% block content %}{% endblock %}
+    </div>
+
+  </div>
+</main>
+
+<script src="{% static 'js/main.js' %}" defer></script>
+</body>
+</html>
