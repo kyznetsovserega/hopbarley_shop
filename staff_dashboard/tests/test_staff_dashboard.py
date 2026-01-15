@@ -99,9 +99,9 @@ def product_for_dashboard(category_fixture):
     ],
 )
 def test_dashboard_anonymous_redirects_to_users_login(
-        client_web,
-        url_name,
-        kwargs,
+    client_web,
+    url_name,
+    kwargs,
 ):
     """
     Анонимный пользователь должен быть перенаправлен на страницу логина.
@@ -125,9 +125,9 @@ def test_dashboard_anonymous_redirects_to_users_login(
     ],
 )
 def test_dashboard_nonstaff_gets_403(
-        nonstaff_client,
-        url_name,
-        kwargs,
+    nonstaff_client,
+    url_name,
+    kwargs,
 ):
     """
     Обычный пользователь не имеет доступа к staff dashboard.
@@ -147,9 +147,9 @@ def test_dashboard_nonstaff_gets_403(
     ],
 )
 def test_dashboard_staff_gets_200(
-        staff_client,
-        url_name,
-        kwargs,
+    staff_client,
+    url_name,
+    kwargs,
 ):
     """
     Staff-пользователь имеет доступ к dashboard.
@@ -176,8 +176,8 @@ def test_product_add_page_staff_ok(staff_client):
 
 
 def test_product_add_creates_product(
-        staff_client,
-        category_fixture,
+    staff_client,
+    category_fixture,
 ):
     """
     POST-запрос из dashboard создаёт новый продукт.
@@ -209,8 +209,8 @@ def test_product_add_creates_product(
 
 
 def test_product_edit_updates_product(
-        staff_client,
-        product_for_dashboard,
+    staff_client,
+    product_for_dashboard,
 ):
     """
     POST-запрос обновляет существующий продукт.
@@ -248,8 +248,8 @@ def test_product_edit_updates_product(
 
 
 def test_product_delete_get_does_not_delete_and_redirects(
-        staff_client,
-        product_for_dashboard,
+    staff_client,
+    product_for_dashboard,
 ):
     """
     GET-запрос на удаление не удаляет продукт,
@@ -271,8 +271,8 @@ def test_product_delete_get_does_not_delete_and_redirects(
 
 
 def test_product_delete_post_deletes_and_redirects(
-        staff_client,
-        product_for_dashboard,
+    staff_client,
+    product_for_dashboard,
 ):
     """
     POST-запрос удаляет продукт и редиректит на список.

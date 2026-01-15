@@ -148,12 +148,8 @@ def dashboard(request: HttpRequest) -> HttpResponse:
     users_dir = "flat"
 
     if hasattr(User, "date_joined"):
-        users_curr_count = User.objects.filter(
-            date_joined__date__range=(start, end)
-        ).count()
-        users_prev_count = User.objects.filter(
-            date_joined__date__range=(prev_start, prev_end)
-        ).count()
+        users_curr_count = User.objects.filter(date_joined__date__range=(start, end)).count()
+        users_prev_count = User.objects.filter(date_joined__date__range=(prev_start, prev_end)).count()
 
         users_curr = users_curr_count
         users_pct, users_dir = _pct_change(
